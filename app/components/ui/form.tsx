@@ -36,11 +36,12 @@ export function FormInput({
   helper?: React.ReactNode
 }) {
   let { error, getInputProps } = useField(name)
+  let id = React.useId()
 
   return (
     <div className="flex flex-col space-y-1.5">
-      <Label htmlFor="projectNumber">{label}</Label>
-      <Input {...getInputProps()} />
+      <Label htmlFor={id}>{label}</Label>
+      <Input id={id} {...getInputProps()} />
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>

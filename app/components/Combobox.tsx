@@ -21,6 +21,9 @@ import { useFetcher } from '@remix-run/react'
 import type { loader } from '~/routes/api.keywords'
 import type { Keyword } from '@prisma/client'
 import { Separator } from './ui/separator'
+import { Label } from './ui/label'
+import { useField } from 'remix-validated-form'
+import { ErrorMessage } from './typography'
 
 let keywordCache: Record<string, Keyword> = {}
 
@@ -94,10 +97,18 @@ export function Combobox() {
   )
 }
 
-export function MultiCombobox() {
+export function MultiCombobox({
+  label,
+  name,
+}: {
+  label: string
+  name: string
+}) {
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string[]>([])
   let [search, setSearch] = React.useState('')
+  let { error, getInputProps } = useField(name)
+  let id = React.useId()
 
   let fetcher = useFetcher<typeof loader>()
 
@@ -116,6 +127,10 @@ export function MultiCombobox() {
 
   return (
     <div>
+      <Label htmlFor={id}>{label}</Label>
+      {value.map((kw, i) => (
+        <input key={kw} type="hidden" name={`${name}[${i}]`} value={kw} />
+      ))}
       <div className="mb-1.5 flex gap-1.5">
         {value.map(v => (
           <Button
@@ -133,8 +148,9 @@ export function MultiCombobox() {
           </Button>
         ))}
       </div>
+      {error && <ErrorMessage>{error}</ErrorMessage>}
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger id={id} asChild>
           <Button
             variant="outline"
             role="combobox"
@@ -167,7 +183,6 @@ export function MultiCombobox() {
                         ? currentValue.filter(v => v !== newValue)
                         : [...currentValue, newValue],
                     )
-                    setOpen(false)
                   }}
                 >
                   <Check

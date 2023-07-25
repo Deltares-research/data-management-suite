@@ -1,18 +1,22 @@
 // app/services/auth.server.ts
-import { MicrosoftStrategy } from "remix-auth-microsoft";
-import { Authenticator } from "remix-auth";
-import { sessionStorage } from "~/services/session.server";
+import { MicrosoftStrategy } from 'remix-auth-microsoft'
+import { Authenticator } from 'remix-auth'
+import { sessionStorage } from '~/services/session.server'
+import { db } from '~/utils/db.server'
 
-export let authenticator = new Authenticator<any>(sessionStorage); //User is a custom user types you can define as you want
+export let authenticator = new Authenticator<{
+  id: string
+  name: string | null
+}>(sessionStorage) //User is a custom user types you can define as you want
 
 let microsoftStrategy = new MicrosoftStrategy(
   {
-    clientId: "35a69d8f-fe0e-403a-9d55-de7e7f63423c",
-    clientSecret: "EnC8Q~ljcDHw4jPuT09IalEj07EEhibPhtYpebeO",
-    redirectUri: "http://localhost:3000/auth/microsoft/callback",
-    tenantId: "0ee307a7-424f-48d1-9e9d-9732f0b76328",
-    scope: "openid profile email", // optional
-    prompt: "login", // optional,
+    clientId: '35a69d8f-fe0e-403a-9d55-de7e7f63423c',
+    clientSecret: 'EnC8Q~ljcDHw4jPuT09IalEj07EEhibPhtYpebeO',
+    redirectUri: 'http://localhost:3000/auth/microsoft/callback',
+    tenantId: '0ee307a7-424f-48d1-9e9d-9732f0b76328',
+    scope: 'openid profile email', // optional
+    prompt: 'login', // optional,
   },
   async ({ accessToken, extraParams, profile }) => {
     // Here you can fetch the user from database or return a user object based on profile
@@ -23,9 +27,24 @@ let microsoftStrategy = new MicrosoftStrategy(
     // For example this won't work
     // return {accessToken, extraParams, profile}
     // return User.findOrCreate({ email: profile.emails[0].value });
-    console.log({ profile });
-    return profile;
-  }
-);
 
-authenticator.use(microsoftStrategy);
+    let userData = {
+      name: profile.displayName,
+      email: profile._json.email,
+    }
+
+    return db.person.upsert({
+      where: {
+        email: profile._json.email,
+      },
+      create: userData,
+      update: userData,
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+  },
+)
+
+authenticator.use(microsoftStrategy)

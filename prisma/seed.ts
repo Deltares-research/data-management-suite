@@ -49,6 +49,20 @@ async function seed() {
   await db.$queryRaw`
     INSERT INTO "public"."Item"("id", "updatedAt", "ownerId", "geometry", "collectionId") VALUES('1', now(), ${person.id}, ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326), ${collection.id}) RETURNING "id", "createdAt", "updatedAt", "ownerId", "license", ST_AsEWKT("geometry") AS "geometry", "properties", "assets";
   `
+
+  await db.keyword.createMany({
+    data: [
+      {
+        title: 'Banana',
+      },
+      {
+        title: 'Apple',
+      },
+      {
+        title: 'Pear',
+      },
+    ],
+  })
 }
 
 seed()

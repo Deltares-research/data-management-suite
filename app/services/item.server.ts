@@ -1,6 +1,7 @@
 import type { Geometry } from 'geojson'
 import { db } from '~/utils/db.server'
 import { v4 as uuid } from 'uuid'
+import type { Item } from '@prisma/client'
 
 export async function createItem({
   ownerId,
@@ -10,8 +11,10 @@ export async function createItem({
   ownerId: string
   collectionId: string
   geometry: Geometry
-}) {
-  return db.$queryRaw`
+}): Promise<{
+  id: string
+}> {
+  let [result] = await db.$queryRaw<Item[]>`
     INSERT INTO "public"."Item"(
       "id",
       "updatedAt", 
@@ -39,4 +42,6 @@ export async function createItem({
       "assets"
     ;
   `
+
+  return result
 }
