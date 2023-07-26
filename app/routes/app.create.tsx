@@ -34,6 +34,7 @@ import { zfd } from 'zod-form-data'
 import { Combobox, MultiCombobox } from '~/components/Combobox'
 import { CollectionSelector } from '~/components/CollectionSelector'
 import { authenticator } from '~/services/auth.server'
+import { Separator } from '~/components/ui/separator'
 
 type AllowedGeometry = GeoJSON.Point | GeoJSON.LineString | GeoJSON.Polygon
 
@@ -174,37 +175,27 @@ export default function CreatePage() {
                 </Muted>
               </div>
 
-              <div className="grid grid-cols-2 gap-8">
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="creator">Creator</Label>
-                  <Select>
-                    <SelectTrigger id="creator">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      <SelectItem value="next">Next.js</SelectItem>
-                      <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                      <SelectItem value="astro">Astro</SelectItem>
-                      <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <Separator />
 
-                <div className="flex flex-col space-y-1.5">
-                  <Label htmlFor="facility">Facility</Label>
-                  <Select>
-                    <SelectTrigger id="facility">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent position="popper">
-                      <SelectItem value="next">Next.js</SelectItem>
-                      <SelectItem value="sveltekit">SvelteKit</SelectItem>
-                      <SelectItem value="astro">Astro</SelectItem>
-                      <SelectItem value="nuxt">Nuxt.js</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <H3>Experimental Facilities</H3>
+
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="facility">Facility</Label>
+                <Select>
+                  <SelectTrigger id="facility">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    <SelectItem value="next">Next.js</SelectItem>
+                    <SelectItem value="sveltekit">SvelteKit</SelectItem>
+                    <SelectItem value="astro">Astro</SelectItem>
+                    <SelectItem value="nuxt">Nuxt.js</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              <MultiCombobox label="Keywords" name="keywords" />
+
+              <Separator />
 
               <div>
                 <H3>Geometry</H3>
@@ -233,10 +224,6 @@ export default function CreatePage() {
                     <FormInput name="geometry.coordinates[3]" label="SE Lng" />
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <MultiCombobox label="Keywords" name="keywords" />
               </div>
 
               <div>

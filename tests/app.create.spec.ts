@@ -10,7 +10,7 @@ test('can register dataset', async ({ page }) => {
 
   // Collection
   await page.getByRole('combobox', { name: /Collection/i }).click()
-  await page.getByRole('option', { name: /Test$/i }).click()
+  await page.getByRole('option', { name: /Test/i }).click()
 
   // Geometry
   await page.getByRole('combobox', { name: /type/i }).click()
@@ -22,7 +22,7 @@ test('can register dataset', async ({ page }) => {
 
   // Keywords
   await page.getByRole('combobox', { name: /Keywords/i }).click()
-  await page.getByRole('option', { name: /Banana/i }).click()
+  await page.getByRole('option', { name: /Banaan/i }).click()
 
   await page.getByRole('button', { name: /Save/i }).click()
 
