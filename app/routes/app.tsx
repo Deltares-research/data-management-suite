@@ -25,16 +25,29 @@ export default function AppLayout() {
   return (
     <div>
       <div className="border-b h-16 px-8 flex items-center justify-between">
-        <NavLink
-          to="/app/list"
-          className={({ isActive }) =>
-            `text-sm font-medium transition-colors hover:text-primary ${
-              isActive ? 'text-primary' : 'text-muted-foreground'
-            }`
-          }
-        >
-          Datasets
-        </NavLink>
+        <div className="flex gap-5">
+          <NavLink
+            to={routes.items()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            Datasets
+          </NavLink>
+
+          <NavLink
+            to={routes.collections()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            Collections
+          </NavLink>
+        </div>
 
         <div>
           <DropdownMenu>

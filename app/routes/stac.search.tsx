@@ -1,12 +1,7 @@
 import type { LinksFunction, LoaderArgs, V2_MetaArgs } from '@remix-run/node'
 import { db } from '~/utils/db.server'
-import Map, {
-  FillLayer,
-  Layer,
-  Marker,
-  Source,
-  ViewStateChangeEvent,
-} from 'react-map-gl'
+import type { ViewStateChangeEvent } from 'react-map-gl'
+import Map, { FillLayer, Layer, Marker, Source } from 'react-map-gl'
 import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
 import React from 'react'
 import { useLoaderData, useSearchParams } from '@remix-run/react'

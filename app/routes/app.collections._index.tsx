@@ -1,19 +1,16 @@
+import { Collection } from '@prisma/client'
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
-import { DataTableRowActions } from '~/components/list-table/data-table-row-actions'
 import { H3 } from '~/components/typography'
-import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
@@ -23,21 +20,11 @@ export async function loader({ request }: LoaderArgs) {
   let url = new URL(request.url)
   let page = +(url.searchParams.get('page') ?? 0)
 
-  return db.item.findMany({
+  return db.collection.findMany({
     take: 20,
     skip: 20 * page,
     include: {
-      collection: {
-        select: {
-          title: true,
-        },
-      },
-      owner: {
-        select: {
-          name: true,
-          id: true,
-        },
-      },
+      items: true,
     },
   })
 }
@@ -48,40 +35,11 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
     header: '#',
   },
   {
-    id: 'owner',
-    accessorFn(value) {
-      return value.owner?.name
-    },
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Owner" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <Avatar>
-            <AvatarImage src="?" />
-            <AvatarFallback>{row.original.owner?.name?.[0]}</AvatarFallback>
-          </Avatar>
-          <span>{row.original.owner?.name}</span>
-        </div>
-      )
-    },
-  },
-  {
     id: 'title',
     accessorKey: 'title',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
-  },
-  {
-    id: 'collection',
-    header({ column }) {
-      return <DataTableColumnHeader column={column} title="Collection" />
-    },
-    accessorFn(value) {
-      return value.collection?.title
-    },
   },
   {
     id: 'updatedAt',
@@ -110,7 +68,7 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem asChild>
-            <Link to={routes.editItem(row.original.id)}>Edit</Link>
+            <Link to={routes.editCollection(row.original.id)}>Edit</Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -124,7 +82,7 @@ export default function ListPage() {
   return (
     <div className="p-8 flex flex-col">
       <div className="flex justify-between items-center">
-        <H3>Items</H3>
+        <H3>Collections</H3>
         <Button asChild className="ml-auto" size="sm">
           <Link to={routes.createItem()}>
             <Plus className="w-4 h-4 mr-1" /> Create New
