@@ -7,6 +7,7 @@ import { Controller, FormProvider, useFormContext } from 'react-hook-form'
 import { cn } from '~/utils'
 import { Label } from '~/components/ui/label'
 import { useField, useIsSubmitting } from 'remix-validated-form'
+import type { InputProps } from './input'
 import { Input } from './input'
 import { ErrorMessage, Muted } from '../typography'
 import type { ButtonProps } from './button'
@@ -30,18 +31,19 @@ export function FormInput({
   name,
   label,
   helper,
+  ...props
 }: {
   name: string
   label: React.ReactNode
   helper?: React.ReactNode
-}) {
+} & InputProps) {
   let { error, getInputProps } = useField(name)
   let id = React.useId()
 
   return (
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} {...getInputProps()} />
+      <Input id={id} {...getInputProps()} {...props} />
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>

@@ -22,7 +22,7 @@ import {
 } from '~/components/ui/select'
 import { z } from 'zod'
 import { redirect } from '@remix-run/node'
-import type { LoaderArgs, type ActionArgs } from '@remix-run/node'
+import type { LoaderArgs, ActionArgs } from '@remix-run/node'
 import { zx } from 'zodix'
 import { db } from '~/utils/db.server'
 import { createItem } from '~/services/item.server'
