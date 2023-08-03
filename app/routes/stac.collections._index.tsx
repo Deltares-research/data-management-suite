@@ -28,7 +28,7 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
       },
       temporal: {
         interval: [
-          [collection.startTime.toISOString(), collection.endTime ?? null],
+          [collection.startTime?.toISOString(), collection.endTime ?? null],
         ],
       },
     },

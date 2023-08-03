@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [postgis(version: "3.3.2")]
+  extensions = [postgis(version: "3.2.3")]
 }
 
 model Person {
@@ -59,8 +59,9 @@ model Item {
   owner   Person? @relation(fields: [ownerId], references: [id])
   ownerId String?
 
-  projectNumber String?
-  title         String?
+  projectNumber String
+  title         String
+  location      String
   description   String?
   license       String?
   keywords      Keyword[]
@@ -70,8 +71,8 @@ model Item {
   properties Json?
   assets     Json? // Dictionary of downloads
 
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-  collectionId String?
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String
 
   @@index([geometry], name: "location_idx", type: Gist)
 }

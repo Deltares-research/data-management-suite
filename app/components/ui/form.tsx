@@ -1,17 +1,20 @@
 import * as React from 'react'
 import type * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
-import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
-import { Controller, FormProvider, useFormContext } from 'react-hook-form'
+import type { FieldPath, FieldValues } from 'react-hook-form'
+import { FormProvider, useFormContext } from 'react-hook-form'
 
 import { cn } from '~/utils'
 import { Label } from '~/components/ui/label'
 import { useField, useIsSubmitting } from 'remix-validated-form'
+import type { InputProps } from './input'
 import { Input } from './input'
 import { ErrorMessage, Muted } from '../typography'
 import type { ButtonProps } from './button'
 import { Button } from './button'
 import { Loader2 } from 'lucide-react'
+import { Textarea } from './textarea'
+import { Select, SelectContent, SelectTrigger, SelectValue } from './select'
 
 const Form = FormProvider
 
@@ -34,7 +37,7 @@ export function FormInput({
   name: string
   label: React.ReactNode
   helper?: React.ReactNode
-}) {
+} & InputProps) {
   let { error, getInputProps } = useField(name)
   let id = React.useId()
 
@@ -42,6 +45,59 @@ export function FormInput({
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
       <Input id={id} {...getInputProps()} />
+      {helper && <Muted>{helper}</Muted>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  )
+}
+
+export function FormTextarea({
+  name,
+  label,
+  helper,
+}: {
+  name: string
+  label: React.ReactNode
+  helper?: React.ReactNode
+}) {
+  let { error, getInputProps } = useField(name)
+  let id = React.useId()
+
+  return (
+    <div className="flex flex-col space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Textarea id={id} {...getInputProps()} />
+      {helper && <Muted>{helper}</Muted>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  )
+}
+
+export function FormSelect({
+  name,
+  label,
+  helper,
+  placeholder,
+  children,
+}: {
+  name: string
+  label: React.ReactNode
+  helper?: React.ReactNode
+  children: React.ReactNode
+  placeholder?: string
+}) {
+  let { error } = useField(name)
+  let id = React.useId()
+
+  return (
+    <div className="flex flex-col space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Select name={name}>
+        <SelectTrigger id={id}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent position="popper">{children}</SelectContent>
+      </Select>
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>

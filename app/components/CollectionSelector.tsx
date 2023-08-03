@@ -13,17 +13,19 @@ import {
 import type { Collection } from '@prisma/client'
 import { useField } from 'remix-validated-form'
 import { Label } from './ui/label'
+import type { SerializeFrom } from '@remix-run/node'
+import { ErrorMessage } from './typography'
 
 export function CollectionSelector({
   collections,
   name,
   label,
 }: {
-  collections: Collection[]
+  collections: SerializeFrom<Collection>[]
   name: string
   label: string
 }) {
-  let { defaultValue } = useField(name)
+  let { defaultValue, error } = useField(name)
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string>(defaultValue)
   let id = React.useId()
@@ -83,6 +85,8 @@ export function CollectionSelector({
           </Command>
         </PopoverContent>
       </Popover>
+
+      {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>
   )
 }

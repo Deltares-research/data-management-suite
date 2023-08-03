@@ -32,7 +32,7 @@ export let loader = withCors(async ({ request, params }) => {
       },
       temporal: {
         interval: [
-          [collection.startTime.toISOString(), collection.endTime ?? null],
+          [collection.startTime?.toISOString(), collection.endTime ?? null],
         ],
       },
     },

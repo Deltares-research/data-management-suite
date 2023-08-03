@@ -9,10 +9,14 @@ import {
   ScrollRestoration,
 } from '@remix-run/react'
 
+import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
+import mapboxDrawStyles from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
 import styles from './tailwind.css'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
+  { rel: 'stylesheet', href: mapboxStyles },
+  { rel: 'stylesheet', href: mapboxDrawStyles },
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ]
 

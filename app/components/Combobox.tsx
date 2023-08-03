@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Check, CheckIcon, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronsUpDown, X } from 'lucide-react'
 
 import { cn } from '~/utils'
 import { Button } from '~/components/ui/button'
@@ -107,7 +107,7 @@ export function MultiCombobox({
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string[]>([])
   let [search, setSearch] = React.useState('')
-  let { error, getInputProps } = useField(name)
+  let { error } = useField(name)
   let id = React.useId()
 
   let fetcher = useFetcher<typeof loader>()

@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test'
 
 test('can register dataset', async ({ page }) => {
-  await page.goto('/app/create')
+  await page.goto('/auth/mock')
+  await page.goto('/app/items/create')
 
   await page.getByRole('textbox', { name: /project number/i }).fill('test-01')
   await page.getByRole('textbox', { name: /title/i }).fill('Test 01')
@@ -26,5 +27,5 @@ test('can register dataset', async ({ page }) => {
 
   await page.getByRole('button', { name: /Save/i }).click()
 
-  await expect.poll(async () => page.url()).toContain('/app/list')
+  await expect.poll(async () => page.url()).toMatch(/\/app\/items$/i)
 })

@@ -11,7 +11,9 @@ import { routes } from '~/routes'
 import { authenticator } from '~/services/auth.server'
 
 export async function loader({ request }: LoaderArgs) {
-  return authenticator.isAuthenticated(request, { failureRedirect: '/login' })
+  return authenticator.isAuthenticated(request, {
+    failureRedirect: routes.login(),
+  })
 }
 
 export async function action({ request }: ActionArgs) {
@@ -54,8 +56,8 @@ export default function AppLayout() {
             <DropdownMenuTrigger>
               <Avatar>
                 <AvatarFallback>
-                  {firstName[0]}
-                  {lastName[0]}
+                  {firstName?.[0]}
+                  {lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
