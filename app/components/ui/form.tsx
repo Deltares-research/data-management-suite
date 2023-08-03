@@ -33,6 +33,7 @@ export function FormInput({
   name,
   label,
   helper,
+  ...props
 }: {
   name: string
   label: React.ReactNode
@@ -44,7 +45,7 @@ export function FormInput({
   return (
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} {...getInputProps()} />
+      <Input id={id} {...getInputProps()} {...props} />
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>
