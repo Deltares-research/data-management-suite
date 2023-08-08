@@ -1,21 +1,27 @@
 import type { LoaderArgs } from '@remix-run/node'
 import { getStacValidator } from '~/utils/stacspec'
 import { geonetworkItem2StacItem } from '~/utils/geonetwork'
+import { cachedFetch } from '~/utils/cachedFetch'
+import { withCors } from '~/utils/withCors'
 
 let GN_BASE_URL = 'https://deltaresdata.openearth.eu'
 
 // https://deltaresdata.openearth.eu/geonetwork/srv/eng/q?_content_type=json&bucket=s101&facet.q=&fast=index&from=1&resultType=details&sortBy=relevance&sortOrder=&to=20
 
-export async function loader({ request }: LoaderArgs) {
+export let loader = withCors(async ({ request }) => {
   let validate = await getStacValidator('Item')
 
   let url = new URL(request.url)
   let baseUrl = `${url.protocol}//${url.host}/oe/stac`
+  let collectionsString = url.searchParams.get('collections')
+  let collections = collectionsString?.split(',') ?? []
 
-  let rawResult = await fetch(
-    `${GN_BASE_URL}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20`,
-  )
-  let result = await rawResult.json()
+  let gnUrl = `${GN_BASE_URL}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20`
+  for (let collection of collections) {
+    gnUrl += `&facet.q=topicCat/${collection}`
+  }
+
+  let result = await cachedFetch(gnUrl)
 
   let features = []
 
@@ -27,11 +33,8 @@ export async function loader({ request }: LoaderArgs) {
   }
 
   return {
-    res: {
-      type: 'FeatureCollection',
-      features,
-      links: [],
-    },
-    metadata: result.metadata,
+    type: 'FeatureCollection',
+    features,
+    links: [],
   }
-}
+})

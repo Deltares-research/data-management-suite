@@ -5,6 +5,7 @@ import { withCors } from '~/utils/withCors'
 import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
+import { cachedFetch } from '~/utils/cachedFetch'
 
 export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let { source64 } = zx.parseParams(params, { source64: z.string() })
@@ -17,29 +18,9 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
-  let response = await fetch(
+  let result = await cachedFetch(
     `${sourceUrl}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20`,
   )
-
-  let mesponse = await fetch(`${sourceUrl}/geonetwork/srv/api/me`, {
-    method: 'POST',
-  })
-
-  let cookie = mesponse.headers.get('set-cookie')
-  let token = cookie?.split(';')[0].split('=')[1]
-
-  console.log({ cookie, token })
-
-  let site = await fetch(`${sourceUrl}/geonetwork/srv/api/site`, {
-    headers: {
-      'X-XSRF-TOKEN': token ?? '',
-      Cookie: cookie ?? '',
-    },
-  })
-
-  console.log(site)
-
-  let result = await response.json()
 
   let topics = result.summary.topicCats
 

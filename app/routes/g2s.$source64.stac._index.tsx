@@ -1,11 +1,10 @@
 import { type LoaderArgs } from '@remix-run/node'
 import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
-import { getStacValidator } from '~/utils/stacspec'
+import { conformsTo, getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
-
-let TOKEN_URL = 'https://fairdatafinder.deltares.nl/geonetwork/srv/api/me'
+import { cachedFetch } from '~/utils/cachedFetch'
 
 export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let { source64 } = zx.parseParams(params, { source64: z.string() })
@@ -14,6 +13,17 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
 
   let validate = await getStacValidator('Catalog')
   let url = new URL(request.url)
+
+  let siteUrl = `${sourceUrl}/geonetwork/srv/api/site`
+
+  let site = await cachedFetch(siteUrl, {
+    requestInit: {
+      headers: {
+        accept: '*/*;q=0.8',
+      },
+    },
+    cacheOptions: { ttl: 1000 * 60 * 60 * 24 },
+  })
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
@@ -29,8 +39,8 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
 
   let data = {
     type: 'Catalog',
-    id: site['system/site/siteId'],
-    description: `Searchable STAC Server for the ${site['system/site/name']} Geonetwork`,
+    id: site['system/site/name'],
+    description: `Geonetwork catalog found at ${sourceUrl}`,
     stac_version: stacPackageJson.version,
     links: [
       {
@@ -51,6 +61,7 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
         href: `${baseUrl}/collections`,
       },
     ],
+    conformsTo,
   }
 
   if (validate(data)) {

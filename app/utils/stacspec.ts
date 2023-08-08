@@ -5,8 +5,9 @@ import addFormatsDraft2019 from 'ajv-formats-draft2019'
 import addFormats from 'ajv-formats'
 import collectionSchema from 'stac-spec/collection-spec/json-schema/collection.json'
 import catalogSchema from 'stac-spec/catalog-spec/json-schema/catalog.json'
-import stacPackageJson from 'stac-spec/package.json'
 import itemSchema from 'stac-spec/item-spec/json-schema/item.json'
+import stacPackageJson from 'stac-spec/package.json'
+import { cachedFetch } from './cachedFetch'
 
 let schemasByKey = {
   Item: itemSchema,
@@ -19,7 +20,7 @@ export async function getStacValidator(
 ) {
   let ajv = new Ajv({
     async loadSchema(uri) {
-      let schema = await fetch(uri).then(res => res.json())
+      let schema = await cachedFetch(uri)
       return schema
     },
   })
@@ -35,3 +36,9 @@ export async function getStacValidator(
 
   return ajv.compileAsync(schema)
 }
+
+export const conformsTo = [
+  `https://api.stacspec.org/v${stacPackageJson.version}/core`,
+  `https://api.stacspec.org/v${stacPackageJson.version}/item-search`,
+  `https://api.stacspec.org/v${stacPackageJson.version}/ogcapi-features`,
+]

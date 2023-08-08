@@ -1,13 +1,16 @@
 import { type LoaderArgs } from '@remix-run/node'
 import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
-import { getStacValidator } from '~/utils/stacspec'
+import { conformsTo, getStacValidator } from '~/utils/stacspec'
+import { db } from '~/utils/db.server'
 
 export let loader = withCors(async ({ request }: LoaderArgs) => {
   let validate = await getStacValidator('Catalog')
   let url = new URL(request.url)
 
   let baseUrl = `${url.protocol}//${url.host}/stac`
+
+  let externalCatalogs = await db.externalCatalog.findMany()
 
   let data = {
     type: 'Catalog',
@@ -24,7 +27,6 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
       {
         rel: 'search',
         type: 'application/geo+json',
-        title: 'STAC Search',
         href: `${baseUrl}/search`,
         method: 'GET',
       },
@@ -33,7 +35,14 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
         type: 'application/json',
         href: `${baseUrl}/collections`,
       },
+      ...externalCatalogs.map(catalog => ({
+        rel: 'child',
+        type: 'application/json',
+        href: catalog.url,
+        title: catalog.title,
+      })),
     ],
+    conformsTo,
   }
 
   if (validate(data)) {
