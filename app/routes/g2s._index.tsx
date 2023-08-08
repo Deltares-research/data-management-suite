@@ -64,7 +64,7 @@ export default function G2SPage() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Input value={apiUrl} />
+          <Input readOnly value={apiUrl} />
           <Muted>Copyable API URL</Muted>
         </div>
       </ValidatedForm>

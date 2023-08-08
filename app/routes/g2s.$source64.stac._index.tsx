@@ -5,6 +5,8 @@ import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
 
+let TOKEN_URL = 'https://fairdatafinder.deltares.nl/geonetwork/srv/api/me'
+
 export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let { source64 } = zx.parseParams(params, { source64: z.string() })
 
@@ -15,10 +17,20 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
+  let site = await fetch(`${sourceUrl}/geonetwork/srv/api/0.1/site`, {
+    headers: {
+      'X-XSRF-TOKEN': '71ab0f46-5a92-4226-9ded-fb8034fe6cb5',
+    },
+  })
+
+  console.log(site)
+
+  return site
+
   let data = {
     type: 'Catalog',
-    id: 'TBD',
-    description: 'TBD',
+    id: site['system/site/siteId'],
+    description: `Searchable STAC Server for the ${site['system/site/name']} Geonetwork`,
     stac_version: stacPackageJson.version,
     links: [
       {

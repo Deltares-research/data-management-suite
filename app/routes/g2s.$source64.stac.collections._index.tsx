@@ -17,9 +17,29 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
-  let result = await fetch(
+  let response = await fetch(
     `${sourceUrl}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20`,
-  ).then(res => res.json())
+  )
+
+  let mesponse = await fetch(`${sourceUrl}/geonetwork/srv/api/me`, {
+    method: 'POST',
+  })
+
+  let cookie = mesponse.headers.get('set-cookie')
+  let token = cookie?.split(';')[0].split('=')[1]
+
+  console.log({ cookie, token })
+
+  let site = await fetch(`${sourceUrl}/geonetwork/srv/api/site`, {
+    headers: {
+      'X-XSRF-TOKEN': token ?? '',
+      Cookie: cookie ?? '',
+    },
+  })
+
+  console.log(site)
+
+  let result = await response.json()
 
   let topics = result.summary.topicCats
 
@@ -39,7 +59,7 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
       },
     },
     links: [
-      // TODO
+      // TODO: Is this necessary? You can view the items inside the collection
       // ...collection.items.map(item => ({
       //   rel: 'child',
       //   href: `${baseUrl}/items/${item.id}`,

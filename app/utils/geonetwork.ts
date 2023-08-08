@@ -37,7 +37,7 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
       {
         rel: 'self',
         type: 'application/json',
-        href: `${baseUrl}/items/${item.id}`,
+        href: `${baseUrl}/items/${item['geonet:info'].uuid}`,
       },
     ],
   }

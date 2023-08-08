@@ -1,4 +1,3 @@
-import { db } from '~/utils/db.server'
 import { withCors } from '~/utils/withCors'
 import stacPackageJson from 'stac-spec/package.json'
 import { getStacValidator } from '~/utils/stacspec'
@@ -19,16 +18,6 @@ export let loader = withCors(async ({ request, params }) => {
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
-  // https://deltaresdata.openearth.eu/geonetwork/srv/eng/q?_content_type=json&bucket=s101&facet.q=topicCat%2FclimatologyMeteorologyAtmosphere&fast=index&from=1&resultType=details&sortBy=relevance&sortOrder=&to=20
-
-  let result = await fetch(
-    `${sourceUrl}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20&facet.q=topicCat%2F${topic}`,
-  ).then(res => res.json())
-
-  let metadata = Array.isArray(result.metadata)
-    ? result.metadata
-    : [result.metadata]
-
   let stacCollection = {
     type: 'Collection',
     stac_version: stacPackageJson.version,
@@ -44,16 +33,16 @@ export let loader = withCors(async ({ request, params }) => {
       },
     },
     links: [
-      ...metadata.map(item => ({
-        rel: 'child',
-        href: `${baseUrl}/items/${item['geonet:info'].uuid}`,
+      {
+        rel: 'items',
+        href: `${baseUrl}/collections/${topic}/items`,
         type: 'application/geo+json',
-      })),
+      },
       {
         rel: 'self',
         type: 'application/json',
         // TODO: Fetch collections from GN
-        href: `${baseUrl}/collections/all`,
+        href: `${baseUrl}/collections/${topic}`,
       },
     ],
   }
