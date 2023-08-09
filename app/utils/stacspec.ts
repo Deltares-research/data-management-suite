@@ -7,6 +7,7 @@ import collectionSchema from 'stac-spec/collection-spec/json-schema/collection.j
 import catalogSchema from 'stac-spec/catalog-spec/json-schema/catalog.json'
 import itemSchema from 'stac-spec/item-spec/json-schema/item.json'
 import stacPackageJson from 'stac-spec/package.json'
+import * as turf from '@turf/turf'
 import { cachedFetch } from './cachedFetch'
 
 let schemasByKey = {
@@ -42,3 +43,13 @@ export const conformsTo = [
   `https://api.stacspec.org/v${stacPackageJson.version}/item-search`,
   `https://api.stacspec.org/v${stacPackageJson.version}/ogcapi-features`,
 ]
+
+export function polygonsToBbox({
+  features,
+}: {
+  features: turf.Feature[]
+}): turf.BBox {
+  const featureCollection = turf.featureCollection(features)
+
+  return turf.bbox(featureCollection)
+}

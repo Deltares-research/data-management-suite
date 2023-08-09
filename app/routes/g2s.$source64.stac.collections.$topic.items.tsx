@@ -1,9 +1,10 @@
 import { withCors } from '~/utils/withCors'
 import stacPackageJson from 'stac-spec/package.json'
-import { getStacValidator } from '~/utils/stacspec'
+import { getStacValidator, polygonsToBbox } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { geonetworkItem2StacItem } from '~/utils/geonetwork'
+import { cachedFetch } from '~/utils/cachedFetch'
 
 const RESULTS_PER_PAGE = 20
 
@@ -23,11 +24,11 @@ export let loader = withCors(async ({ request, params }) => {
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
-  let result = await fetch(
+  let result = await cachedFetch(
     `${sourceUrl}/geonetwork/srv/eng/q?_content_type=json&fast=index&sortOrder=&facet.q=topicCat%2F${topic}&from=${
       (page - 1) * RESULTS_PER_PAGE + 1
     }&to=${page * RESULTS_PER_PAGE}`,
-  ).then(res => res.json())
+  )
 
   let metadata = Array.isArray(result.metadata)
     ? result.metadata
@@ -36,16 +37,6 @@ export let loader = withCors(async ({ request, params }) => {
   let features = await Promise.all(
     metadata.map(async item => geonetworkItem2StacItem({ item, baseUrl })),
   )
-
-  let topLefts = features.map(f => f.geometry.coordinates[0][0])
-  let bottomRights = features.map(f => f.geometry.coordinates[0][2])
-
-  let minX = Math.min(...topLefts.map(c => c[0]))
-  let minY = Math.min(...topLefts.map(c => c[1]))
-  let maxX = Math.max(...bottomRights.map(c => c[0]))
-  let maxY = Math.min(...bottomRights.map(c => c[1]))
-
-  let bbox = [[minX, minY, maxX, maxY]]
 
   let pagination = []
   if (page < 9999) {
@@ -63,6 +54,12 @@ export let loader = withCors(async ({ request, params }) => {
       href: `${baseUrl}/collections/${topic}/items?page=${page - 1}`,
     })
   }
+
+  let bbox = [
+    polygonsToBbox({
+      features: features.filter(f => !!f.geometry?.coordinates),
+    }),
+  ]
 
   let stacCollection = {
     type: 'FeatureCollection',

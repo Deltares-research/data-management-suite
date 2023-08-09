@@ -27,16 +27,6 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
-  let site = await fetch(`${sourceUrl}/geonetwork/srv/api/0.1/site`, {
-    headers: {
-      'X-XSRF-TOKEN': '71ab0f46-5a92-4226-9ded-fb8034fe6cb5',
-    },
-  })
-
-  console.log(site)
-
-  return site
-
   let data = {
     type: 'Catalog',
     id: site['system/site/name'],
