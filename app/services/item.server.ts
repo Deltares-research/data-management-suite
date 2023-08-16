@@ -71,7 +71,6 @@ export async function upsertItem({
     ON CONFLICT ("id") DO UPDATE
     SET
       "updatedAt" = now(),
-      "ownerId" = ${ownerId},
       "projectNumber" = ${projectNumber},
       "title" = ${title},
       "location" = ${location},

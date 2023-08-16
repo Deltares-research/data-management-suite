@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [postgis(version: "3.2.3")]
+  extensions = [postgis(version: "3.3.2")]
 }
 
 model Person {
@@ -67,7 +67,7 @@ model Item {
   keywords      Keyword[]
 
   // STAC Props
-  geometry   Unsupported("geometry")
+  geometry   Unsupported("geometry")? // Required, but making it optional allows for prisma.create queries
   dateTime   DateTime?
   startTime  DateTime?
   endTime    DateTime?

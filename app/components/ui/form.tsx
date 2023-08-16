@@ -13,6 +13,7 @@ import { ErrorMessage, Muted } from '../typography'
 import type { ButtonProps } from './button'
 import { Button } from './button'
 import { Loader2 } from 'lucide-react'
+import type { TextareaProps } from './textarea'
 import { Textarea } from './textarea'
 import { Select, SelectContent, SelectTrigger, SelectValue } from './select'
 
@@ -29,45 +30,46 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,
 )
 
-export function FormInput({
-  name,
-  label,
-  helper,
-  ...props
-}: {
-  name: string
-  label: React.ReactNode
-  helper?: React.ReactNode
-} & InputProps) {
+export let FormInput = React.forwardRef<
+  HTMLInputElement,
+  {
+    name: string
+    label?: React.ReactNode
+    helper?: React.ReactNode
+  } & InputProps
+>(({ name, label, helper, ...props }, ref) => {
   let { error, getInputProps } = useField(name)
   let id = React.useId()
 
   return (
     <div className="flex flex-col space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <Input id={id} {...getInputProps()} {...props} />
+      {label && <Label htmlFor={id}>{label}</Label>}
+      <Input ref={ref} id={id} {...getInputProps()} {...props} />
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>
   )
-}
+})
+
+FormInput.displayName = 'FormInput'
 
 export function FormTextarea({
   name,
   label,
   helper,
+  ...rest
 }: {
   name: string
   label: React.ReactNode
   helper?: React.ReactNode
-}) {
+} & TextareaProps) {
   let { error, getInputProps } = useField(name)
   let id = React.useId()
 
   return (
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <Textarea id={id} {...getInputProps()} />
+      <Textarea id={id} {...rest} {...getInputProps()} />
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>
@@ -87,13 +89,13 @@ export function FormSelect({
   children: React.ReactNode
   placeholder?: string
 }) {
-  let { error } = useField(name)
+  let { error, getInputProps } = useField(name)
   let id = React.useId()
 
   return (
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <Select name={name}>
+      <Select name={name} {...getInputProps()}>
         <SelectTrigger id={id}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

@@ -14,14 +14,18 @@ export function BoundsSelector({ name }: { name: string }) {
   let { defaultValue } = useField(`${name}`)
   let { error } = useField(`${name}.coordinates`)
 
-  const [features, setFeatures] = useState<Record<string, Feature<Polygon>>>({
-    '1': {
-      type: 'Feature',
-      properties: {},
-      geometry: defaultValue,
-      id: '1',
-    },
-  })
+  const [features, setFeatures] = useState<Record<string, Feature<Polygon>>>(
+    defaultValue.type === 'Polygon'
+      ? {
+          '1': {
+            type: 'Feature',
+            properties: {},
+            geometry: defaultValue,
+            id: '1',
+          },
+        }
+      : {},
+  )
 
   const onUpdate = useCallback(e => {
     setFeatures(currFeatures => {
@@ -49,20 +53,22 @@ export function BoundsSelector({ name }: { name: string }) {
       {Object.values(features)
         .filter(f => !!f.geometry)?.[0]
         ?.geometry?.coordinates.map((polygon, polygonIndex) =>
-          polygon.map((point, pointIndex) => (
-            <React.Fragment key={`${polygonIndex}-${pointIndex}`}>
-              <input
-                type="hidden"
-                name={`${name}.coordinates[${polygonIndex}][${pointIndex}][0]`}
-                value={point[0]}
-              />
-              <input
-                type="hidden"
-                name={`${name}.coordinates[${polygonIndex}][${pointIndex}][1]`}
-                value={point[1]}
-              />
-            </React.Fragment>
-          )),
+          (Array.isArray(polygon) ? polygon : [polygon]).map(
+            (point, pointIndex) => (
+              <React.Fragment key={`${polygonIndex}-${pointIndex}`}>
+                <input
+                  type="hidden"
+                  name={`${name}.coordinates[${polygonIndex}][${pointIndex}][0]`}
+                  value={point[0]}
+                />
+                <input
+                  type="hidden"
+                  name={`${name}.coordinates[${polygonIndex}][${pointIndex}][1]`}
+                  value={point[1]}
+                />
+              </React.Fragment>
+            ),
+          ),
         )}
 
       <Map

@@ -25,8 +25,8 @@ export default function AppLayout() {
   let [firstName, lastName] = (user.name ?? '? ?').split(' ')
 
   return (
-    <div>
-      <div className="border-b h-16 px-8 flex items-center justify-between">
+    <div className="h-full flex flex-col">
+      <div className="border-b flex-shrink-0 h-16 px-8 flex items-center justify-between">
         <div className="flex gap-5">
           <NavLink
             to={routes.items()}
@@ -93,7 +93,7 @@ export default function AppLayout() {
           </DropdownMenu>
         </div>
       </div>
-      <main>
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
     </div>

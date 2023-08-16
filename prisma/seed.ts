@@ -1,5 +1,12 @@
-import { rand, randLine, randWord } from '@ngneat/falso'
-import type { Collection, Prisma } from '@prisma/client'
+import {
+  rand,
+  randAnimal,
+  randColor,
+  randFilePath,
+  randLine,
+  randNumber,
+  randWord,
+} from '@ngneat/falso'
 import { db } from '~/utils/db.server'
 
 async function seed() {
@@ -36,20 +43,52 @@ async function seed() {
   //   update: newPerson,
   // })
 
-  // let catalog = await db.catalog.create({
-  //   data: {
-  //     title: 'Test Catalog',
-  //     description: 'Test Catalog Description',
-  //   },
-  // })
+  let animal = randAnimal()
+  let collection = await db.collection.create({
+    data: {
+      title: `${animal} Collection`,
+      startTime: new Date(),
+      catalog: {
+        create: {
+          title: 'Animals',
+          description: 'Catalog of animals',
+        },
+      },
+    },
+  })
 
-  // let collection = (await db.$queryRaw`
-  //   INSERT INTO "public"."Collection"("id", "updatedAt", "geometry", "startTime", "catalogId", "title") VALUES('1', now(), ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326), now(), ${catalog.id}, 'Test Collection') RETURNING "id", "createdAt", "updatedAt", ST_AsEWKT("geometry") AS "geometry", "catalogId";
-  // `) as Collection
+  await db.$queryRaw`
+    UPDATE 
+      "public"."Collection"
+    SET 
+      "geometry" = ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326)
+    WHERE
+      "id" =  ${collection.id};
+  `
 
-  // await db.$queryRaw`
-  //   INSERT INTO "public"."Item"("id", "updatedAt", "ownerId", "geometry", "collectionId") VALUES('1', now(), ${person.id}, ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326), ${collection.id}) RETURNING "id", "createdAt", "updatedAt", "ownerId", "license", ST_AsEWKT("geometry") AS "geometry", "properties", "assets";
-  // `
+  await Promise.all(
+    Array(100)
+      .fill('')
+      .map(async () => {
+        let item = await db.item.create({
+          data: {
+            collectionId: collection.id,
+            projectNumber: `${randColor()}-${randNumber()}`,
+            title: `${animal} Item ${randNumber()}`,
+            location: randFilePath(),
+          },
+        })
+
+        await db.$queryRaw`
+    UPDATE 
+      "public"."Item"
+    SET 
+      "geometry" = ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326)
+    WHERE
+      "id" =  ${item.id};
+  `
+      }),
+  )
 
   let standardIds = await Promise.all(
     Array(3)
@@ -88,7 +127,7 @@ async function seed() {
       .map(async () => {
         let parent = rand(parents)
 
-        await db.keyword.create({
+        let newKeyword = await db.keyword.create({
           data: {
             title: randWord(),
             description: randLine(),
@@ -96,6 +135,8 @@ async function seed() {
             parentId: parent.id,
           },
         })
+
+        parents.push(newKeyword)
       }),
   )
 }
