@@ -118,6 +118,13 @@ export default function KeywordListPage() {
                 >
                   <X className="w-4 h-4" />
                 </Button>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  onClick={() => setSelectedKeyword(undefined)}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
               </div>
             </CardHeader>
 
