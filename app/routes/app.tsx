@@ -49,6 +49,28 @@ export default function AppLayout() {
           >
             Collections
           </NavLink>
+
+          <NavLink
+            to={routes.catalogs()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            Catalogs
+          </NavLink>
+
+          <NavLink
+            to={routes.keywords()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            Keywords
+          </NavLink>
         </div>
 
         <div>

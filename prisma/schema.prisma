@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [postgis(version: "3.3.2")]
+  extensions = [postgis(version: "3.2.3")]
 }
 
 model Person {
@@ -68,6 +68,9 @@ model Item {
 
   // STAC Props
   geometry   Unsupported("geometry")
+  dateTime   DateTime?
+  startTime  DateTime?
+  endTime    DateTime?
   properties Json?
   assets     Json? // Dictionary of downloads
 
@@ -90,6 +93,7 @@ model Catalog {
 
   collections Collection[]
 
+  access Access  @default(PRIVATE)
   groups Group[]
 }
 
@@ -123,6 +127,10 @@ model Collection {
 
 model Keyword {
   id String @id @default(uuid())
+
+  parent   Keyword?  @relation("parent-child", fields: [parentId], references: [id])
+  parentId String?
+  children Keyword[] @relation("parent-child")
 
   title       String
   description String?

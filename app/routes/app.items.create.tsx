@@ -11,7 +11,15 @@ import { routes } from '~/routes'
 export async function loader({ request }: LoaderArgs) {
   await authenticator.isAuthenticated(request)
 
-  let collections = await db.collection.findMany()
+  let collections = await db.collection.findMany({
+    include: {
+      catalog: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  })
 
   return { collections }
 }

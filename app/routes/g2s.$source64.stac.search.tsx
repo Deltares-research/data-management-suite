@@ -1,4 +1,3 @@
-import type { LoaderArgs } from '@remix-run/node'
 import { getStacValidator } from '~/utils/stacspec'
 import { geonetworkItem2StacItem } from '~/utils/geonetwork'
 import { cachedFetch } from '~/utils/cachedFetch'

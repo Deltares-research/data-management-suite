@@ -29,7 +29,9 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
     description: item.abstract,
     properties: {
       title: item.title,
-      datetime: item.revisionDate?.[0] ?? item.tempExtentBegin,
+      datetime: undefined,
+      start_datetime: undefined,
+      end_datetime: undefined,
     },
     geometry,
     assets: {},
@@ -40,6 +42,18 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
         href: `${baseUrl}/items/${item['geonet:info'].uuid}`,
       },
     ],
+  }
+
+  if (
+    item.tempExtentBegin &&
+    item.tempExtentEnd &&
+    item.tempExtentBegin !== item.tempExtentEnd
+  ) {
+    stacItem.properties.start_datetime = item.tempExtentBegin
+    stacItem.properties.end_datetime = item.tempExtentEnd
+  } else {
+    stacItem.properties.datetime =
+      item.tempExtentBegin ?? item.revisionDate?.[0]
   }
 
   validate(stacItem)

@@ -1,9 +1,8 @@
 import { withCors } from '~/utils/withCors'
 import stacPackageJson from 'stac-spec/package.json'
-import { getStacValidator, polygonsToBbox } from '~/utils/stacspec'
+import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
-import * as turf from '@turf/turf'
 import { loader as itemsLoader } from './g2s.$source64.stac.collections.$topic.items'
 
 export let loader = withCors(async ({ request, params, ...args }) => {
@@ -12,38 +11,23 @@ export let loader = withCors(async ({ request, params, ...args }) => {
     topic: z.string(),
   })
 
-  let sourceUrl = Buffer.from(source64, 'base64').toString()
-
   let validate = await getStacValidator('Collection')
 
   let url = new URL(request.url)
 
   let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
-  let { features } = await itemsLoader({ request, params, ...args }).then(res =>
+  let { extent } = await itemsLoader({ request, params, ...args }).then(res =>
     res.json(),
   )
-
-  let bbox = [
-    polygonsToBbox({
-      features: features.filter(f => !!f.geometry?.coordinates),
-    }),
-  ]
 
   let stacCollection = {
     type: 'Collection',
     stac_version: stacPackageJson.version,
-    id: sourceUrl,
+    id: topic,
     description: '',
     license: 'MIT',
-    extent: {
-      spatial: {
-        bbox,
-      },
-      temporal: {
-        interval: [[new Date().toISOString(), null]],
-      },
-    },
+    extent,
     links: [
       {
         rel: 'root',

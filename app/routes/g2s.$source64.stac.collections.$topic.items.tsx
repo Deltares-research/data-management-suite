@@ -38,6 +38,20 @@ export let loader = withCors(async ({ request, params }) => {
     metadata.map(async item => geonetworkItem2StacItem({ item, baseUrl })),
   )
 
+  let dates = features
+    .flatMap(
+      f =>
+        f.properties.datetime ?? [
+          f.properties.start_datetime,
+          f.properties.end_datetime,
+        ],
+    )
+    .filter(Boolean)
+    .map(d => new Date(d).getTime())
+
+  let minTime = Math.min(...dates)
+  let maxTime = Math.max(...dates)
+
   let pagination = []
   if (page < 9999) {
     pagination.push({
@@ -72,7 +86,9 @@ export let loader = withCors(async ({ request, params }) => {
         bbox,
       },
       temporal: {
-        interval: [[new Date().toISOString(), null]],
+        interval: [
+          [new Date(minTime).toISOString(), new Date(maxTime).toISOString()],
+        ],
       },
     },
     features,

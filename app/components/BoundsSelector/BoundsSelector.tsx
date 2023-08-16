@@ -44,10 +44,11 @@ export function BoundsSelector({ name }: { name: string }) {
   }, [])
 
   return (
-    <>
+    <div data-testid="geometry-selector">
       <input type="hidden" name={`${name}.type`} value="Polygon" />
-      {Object.values(features)?.[0]?.geometry.coordinates.map(
-        (polygon, polygonIndex) =>
+      {Object.values(features)
+        .filter(f => !!f.geometry)?.[0]
+        ?.geometry?.coordinates.map((polygon, polygonIndex) =>
           polygon.map((point, pointIndex) => (
             <React.Fragment key={`${polygonIndex}-${pointIndex}`}>
               <input
@@ -62,7 +63,7 @@ export function BoundsSelector({ name }: { name: string }) {
               />
             </React.Fragment>
           )),
-      )}
+        )}
 
       <Map
         style={{ height: 400 }}
@@ -77,17 +78,7 @@ export function BoundsSelector({ name }: { name: string }) {
         customAttribution=""
       >
         <DrawControl
-          initialFeature={{
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: defaultValue,
-                properties: {},
-                id: '1',
-              },
-            ],
-          }}
+          initialFeature={defaultValue}
           position="top-left"
           displayControlsDefault={false}
           controls={{
@@ -101,6 +92,6 @@ export function BoundsSelector({ name }: { name: string }) {
         />
       </Map>
       {error && <ErrorMessage>{error}</ErrorMessage>}
-    </>
+    </div>
   )
 }

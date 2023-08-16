@@ -1,4 +1,3 @@
-import { Collection } from '@prisma/client'
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
@@ -24,7 +23,9 @@ export async function loader({ request }: LoaderArgs) {
     take: 20,
     skip: 20 * page,
     include: {
-      items: true,
+      _count: {
+        select: { items: true },
+      },
     },
   })
 }
@@ -39,6 +40,15 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
     accessorKey: 'title',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
+    ),
+  },
+  {
+    id: 'itemCount',
+    accessorFn(value) {
+      return value._count.items
+    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="# Items" />
     ),
   },
   {
@@ -84,7 +94,7 @@ export default function ListPage() {
       <div className="flex justify-between items-center">
         <H3>Collections</H3>
         <Button asChild className="ml-auto" size="sm">
-          <Link to={routes.createItem()}>
+          <Link to={routes.createCollection()}>
             <Plus className="w-4 h-4 mr-1" /> Create New
           </Link>
         </Button>

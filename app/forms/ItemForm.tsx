@@ -1,23 +1,12 @@
 import { Link, useSearchParams } from '@remix-run/react'
 import { H3, Muted } from '~/components/typography'
 import { Button } from '~/components/ui/button'
-import { Label } from '~/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select'
+import { SelectItem } from '~/components/ui/select'
 import { z } from 'zod'
 import type { ActionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import { upsertItem } from '~/services/item.server'
-import {
-  ValidatedForm,
-  useFormContext,
-  validationError,
-} from 'remix-validated-form'
+import { ValidatedForm, validationError } from 'remix-validated-form'
 import { withZod } from '@remix-validated-form/with-zod'
 import {
   FormInput,
@@ -32,10 +21,8 @@ import { authenticator } from '~/services/auth.server'
 import { Separator } from '~/components/ui/separator'
 import type { Collection } from '@prisma/client'
 import type { AllowedGeometry } from '~/types'
-import type { ViewStateChangeEvent } from 'react-map-gl'
-import { Map } from 'react-map-gl'
-import React from 'react'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
+import { DateRangePicker } from '~/components/DateRangePicker'
 
 let geometrySchema = z.object({
   coordinates: zfd.numeric().array().length(2).array().array(),
@@ -49,13 +36,20 @@ let metadataSchema = z.object({
   location: z.string(),
   license: z.string().nullable(),
   keywords: z.string().array().optional(),
-  collectionId: z.string(),
+  collectionId: z.string().nonempty({ message: 'Please select a collection' }),
   geometry: geometrySchema,
+  dateRange: z.object({
+    from: z.string().nonempty({ message: 'Please select a date' }),
+    to: z.string().optional(),
+  }),
 })
 
 let metadataValidator = withZod(metadataSchema)
 
-export async function submitItemForm({ request }: ActionArgs) {
+export async function submitItemForm({
+  request,
+  id,
+}: ActionArgs & { id?: string }) {
   let user = await authenticator.isAuthenticated(request, {
     failureRedirect: '/auth/microsoft',
   })
@@ -66,13 +60,25 @@ export async function submitItemForm({ request }: ActionArgs) {
     throw validationError(form.error)
   }
 
-  let { geometry } = form.data
+  let { geometry, dateRange } = form.data
+
+  let dates =
+    dateRange.to && dateRange.to !== dateRange.from
+      ? {
+          startTime: dateRange.from,
+          endTime: dateRange.to,
+        }
+      : {
+          dateTime: dateRange.from,
+        }
 
   let item = await upsertItem({
     ...form.data,
+    id,
     ownerId: user.id,
     collectionId: form.data.collectionId,
     geometry,
+    dates,
   })
 
   // Gross, but easier than a raw query for now
@@ -98,9 +104,12 @@ export function ItemForm({
   defaultValues,
   collections,
 }: {
-  collections: SerializeFrom<Collection>[]
+  collections: SerializeFrom<
+    Collection & { catalog: { title: string | null } }
+  >[]
   defaultValues?: z.infer<typeof metadataSchema>
 }) {
+  // let { fieldErrors } = useFormContext('myform')
   let [searchParams] = useSearchParams()
 
   return (
@@ -109,6 +118,7 @@ export function ItemForm({
         <H3>{defaultValues ? 'Edit' : 'Create'} metadata record</H3>
         <Muted>Publish your dataset directly to the metadata service</Muted>
         <ValidatedForm
+          id="myform"
           method="post"
           validator={metadataValidator}
           defaultValues={{
@@ -169,6 +179,15 @@ export function ItemForm({
               <H3>Geometry</H3>
               <div className="pt-5">
                 <BoundsSelector name="geometry" />
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <H3>Temporal</H3>
+              <div className="pt-5">
+                <DateRangePicker label="Date or date range" name="dateRange" />
               </div>
             </div>
 

@@ -48,7 +48,9 @@ export async function loader({ request, params }: LoaderArgs) {
 }
 
 export async function action(args: ActionArgs) {
-  await submitItemForm(args)
+  let { itemId } = zx.parseParams(args.params, { itemId: z.string() })
+
+  await submitItemForm({ ...args, id: itemId })
 
   return redirect(routes.items())
 }
@@ -61,6 +63,10 @@ export default function CreatePage() {
       collections={collections}
       defaultValues={{
         ...defaultValues,
+        dateRange: {
+          from: defaultValues.startTime ?? defaultValues.dateTime ?? '',
+          to: defaultValues.endTime ?? '',
+        },
         keywords: defaultValues.keywords.map(({ id }) => id),
       }}
     />

@@ -13,6 +13,7 @@ export async function upsertItem({
   description,
   title,
   location,
+  dates,
 }: {
   id?: string
   ownerId: string
@@ -23,6 +24,14 @@ export async function upsertItem({
   location: string
   collectionId: string
   geometry: Geometry
+  dates:
+    | {
+        dateTime: string
+      }
+    | {
+        startTime: string
+        endTime: string
+      }
 }): Promise<Item> {
   let [result] = await db.$queryRaw<Item[]>`
     INSERT INTO "public"."Item"(
@@ -36,7 +45,10 @@ export async function upsertItem({
       "license", 
       "ownerId", 
       "geometry", 
-      "collectionId"
+      "collectionId",
+      "dateTime",
+      "startTime",
+      "endTime"
     ) 
     
     VALUES(
@@ -50,7 +62,10 @@ export async function upsertItem({
       ${license},
       ${ownerId}, 
       ST_GeomFromGeoJSON(${geometry}), 
-      ${collectionId}
+      ${collectionId},
+      ${'dateTime' in dates ? dates.dateTime : undefined}::timestamp,
+      ${'startTime' in dates ? dates.startTime : undefined}::timestamp,
+      ${'endTime' in dates ? dates.endTime : undefined}::timestamp
     )
 
     ON CONFLICT ("id") DO UPDATE
@@ -62,7 +77,14 @@ export async function upsertItem({
       "location" = ${location},
       "license" = ${license},
       "geometry" = ST_GeomFromGeoJSON(${geometry}),
-      "collectionId" = ${collectionId}
+      "collectionId" = ${collectionId},
+      "dateTime" = ${
+        'dateTime' in dates ? dates.dateTime : undefined
+      }::timestamp,
+      "startTime" = ${
+        'startTime' in dates ? dates.startTime : undefined
+      }::timestamp,
+      "endTime" = ${'endTime' in dates ? dates.endTime : undefined}::timestamp
     
     RETURNING 
       "id", 
