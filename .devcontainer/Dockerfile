@@ -23,7 +23,8 @@ RUN apt-get update \
     && /bin/bash /tmp/library-scripts/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
     # Use Docker script from script library to set things up
     && /bin/bash /tmp/library-scripts/docker-debian.sh "${ENABLE_NONROOT_DOCKER}" "/var/run/docker-host.sock" "/var/run/docker.sock" "${USERNAME}" \
-    && wget -c https://github.com/Azure/azure-dev/releases/download/azure-dev-cli_1.0.2/azd-linux-arm64-beta.tar.gz -O - | tar -xz -C /usr/local/bin\
+    && wget -c https://github.com/Azure/azure-dev/releases/download/azure-dev-cli_1.2.0/azd-linux-arm64-beta.tar.gz -O - | tar -xz -C /usr/local/bin \
+    && mv /usr/local/bin/azd-linux-arm64-beta /usr/local/bin/azd \
     # Clean up
     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* /tmp/library-scripts/
 
