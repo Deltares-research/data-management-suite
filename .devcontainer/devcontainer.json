@@ -9,14 +9,19 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "dbaeumer.vscode-eslint",
-        "EditorConfig.EditorConfig",
-        "esbenp.prettier-vscode",
-        "Prisma.prisma",
-        "ms-vscode.vscode-node-azure-pack",
-        "ms-azuretools.vscode-docker",
-        "ms-azuretools.vscode-bicep"
-      ]
+		"dbaeumer.vscode-eslint",
+		"EditorConfig.EditorConfig",
+		"esbenp.prettier-vscode",
+		"Prisma.prisma",
+		"ms-vscode.vscode-node-azure-pack",
+		"ms-azuretools.vscode-docker",
+		"ms-azuretools.vscode-bicep",
+		"github.vscode-github-actions",
+		"mhutchie.git-graph",
+		"hashicorp.terraform",
+		"ms-vsliveshare.vsliveshare",
+		"redhat.vscode-yaml"
+	]
     }
   },
 
