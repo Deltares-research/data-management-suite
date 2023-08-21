@@ -9,7 +9,7 @@ import type { SessionStorage, SessionData } from '@remix-run/node'
 export let authenticator = new Authenticator<{
   id: string
   name: string | null
-}>(sessionStorage) //User is a custom user types you can define as you want
+}>(sessionStorage)
 
 let microsoftStrategy = new MicrosoftStrategy(
   {
@@ -20,16 +20,7 @@ let microsoftStrategy = new MicrosoftStrategy(
     scope: 'openid profile email', // optional
     prompt: 'login', // optional,
   },
-  async ({ accessToken, extraParams, profile }) => {
-    // Here you can fetch the user from database or return a user object based on profile
-    // return {profile}
-    // The returned object is stored in the session storage you are using by the authenticator
-
-    // If you're using cookieSessionStorage, be aware that cookies have a size limit of 4kb
-    // For example this won't work
-    // return {accessToken, extraParams, profile}
-    // return User.findOrCreate({ email: profile.emails[0].value });
-
+  async ({ profile }) => {
     let userData = {
       name: profile.displayName,
       email: profile._json.email,

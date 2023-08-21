@@ -2,24 +2,28 @@ import { type LoaderArgs } from '@remix-run/node'
 import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
 import { conformsTo, getStacValidator } from '~/utils/stacspec'
+import { zx } from 'zodix'
+import { z } from 'zod'
 import { db } from '~/utils/db.server'
 
-export let loader = withCors(async ({ request }: LoaderArgs) => {
+export let loader = withCors(async ({ request, params }: LoaderArgs) => {
+  let { catalogId } = zx.parseParams(params, { catalogId: z.string() })
+
   let validate = await getStacValidator('Catalog')
   let url = new URL(request.url)
 
-  let baseUrl = `${url.protocol}//${url.host}/stac`
+  let catalog = await db.catalog.findUniqueOrThrow({
+    where: {
+      id: catalogId,
+    },
+  })
 
-  let [catalogs, externalCatalogs] = await Promise.all([
-    db.catalog.findMany(),
-    db.externalCatalog.findMany(),
-  ])
+  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
 
   let data = {
     type: 'Catalog',
-    id: 'deltares-catalog',
-    description:
-      'Searchable spatiotemporal metadata catalog for all data within Deltares.',
+    id: catalog.title,
+    description: catalog.description,
     stac_version: stacPackageJson.version,
     links: [
       {
@@ -30,26 +34,15 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
       {
         rel: 'search',
         type: 'application/geo+json',
+        title: 'STAC Search',
         href: `${baseUrl}/search`,
         method: 'GET',
       },
-      // {
-      //   rel: 'data',
-      //   type: 'application/json',
-      //   href: `${baseUrl}/collections`,
-      // },
-      ...catalogs.map(catalog => ({
-        rel: 'child',
+      {
+        rel: 'data',
         type: 'application/json',
-        href: `${baseUrl}/catalogs/${catalog.id}`,
-        title: catalog.title,
-      })),
-      ...externalCatalogs.map(catalog => ({
-        rel: 'child',
-        type: 'application/json',
-        href: catalog.url,
-        title: catalog.title,
-      })),
+        href: `${baseUrl}/collections`,
+      },
     ],
     conformsTo,
   }

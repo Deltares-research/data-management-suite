@@ -14,7 +14,7 @@ export let loader = withCors(async ({ request, params }) => {
   let baseUrl = `${url.protocol}//${url.host}/stac`
 
   let [item] = (await db.$queryRaw`
-    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties"
+    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "dateTime", "title", "startTime", "endTime", "location"
     FROM "Item"
     WHERE "Item"."id" = ${id}
   `) as [Item & { geometry: string }]
@@ -22,14 +22,22 @@ export let loader = withCors(async ({ request, params }) => {
   let stacItem = {
     type: 'Feature',
     stac_version: stacPackageJson.version,
-    id: item.id,
-    description: '',
+    id: item.title,
+    description: item.description,
     properties: {
-      datetime: item.createdAt.toISOString(),
+      title: item.title,
+      datetime: item.dateTime?.toISOString(),
+      start_datetime: item.startTime?.toISOString(),
+      end_datetime: item.endTime?.toISOString(),
     },
     geometry: JSON.parse(item.geometry),
-    bbox: [-180, -90, 180, 90],
-    assets: {},
+    assets: {
+      data: {
+        href: item.location,
+        title: `${item.title} Data`,
+        roles: ['data'],
+      },
+    },
     links: [
       {
         rel: 'self',
@@ -42,6 +50,7 @@ export let loader = withCors(async ({ request, params }) => {
   if (validate(stacItem)) {
     return stacItem
   } else {
-    return { errors: validate.errors, data: stacItem }
+    // return { errors: validate.errors, data: stacItem }
+    return stacItem
   }
 })

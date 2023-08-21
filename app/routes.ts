@@ -27,6 +27,16 @@ export let routes = {
   createCatalog() {
     return `${appPrefix}/catalogs/create`
   },
+  editCatalog(catalogId: string) {
+    return `${appPrefix}/catalogs/${catalogId}/edit`
+  },
+
+  externalCatalogs() {
+    return `${appPrefix}/external-catalogs`
+  },
+  createExternalCatalog() {
+    return `${appPrefix}/external-catalogs/create`
+  },
 
   keywords() {
     return `${appPrefix}/keywords`

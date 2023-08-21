@@ -1,11 +1,11 @@
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal, Plus } from 'lucide-react'
-import { ID } from '~/components/ID'
+import { ExternalLink, MoreHorizontal, Plus } from 'lucide-react'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
 import { H3 } from '~/components/typography'
+import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -14,35 +14,19 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
-import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
-  let filters = await getDataTableFilters(request)
+  let url = new URL(request.url)
+  let page = +(url.searchParams.get('page') ?? 0)
 
-  let [count, catalogs] = await db.$transaction([
-    db.catalog.count(),
-    db.catalog.findMany({
-      ...filters,
-      include: {
-        _count: {
-          select: { collections: true },
-        },
-      },
-    }),
-  ])
-
-  return { count, catalogs }
+  return db.externalCatalog.findMany({
+    take: 20,
+    skip: 20 * page,
+  })
 }
 
-let columns: ColumnDef<SerializeFrom<typeof loader>['catalogs'][number]>[] = [
-  {
-    accessorKey: 'id',
-    header: 'ID',
-    cell({ getValue }) {
-      return <ID>{getValue<string>()}</ID>
-    },
-  },
+let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
   {
     id: 'title',
     accessorKey: 'title',
@@ -51,13 +35,27 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['catalogs'][number]>[] = [
     ),
   },
   {
-    id: 'Collection Count',
-    accessorFn(value) {
-      return value._count.collections
-    },
+    id: 'url',
+    accessorKey: 'url',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="# Collections" />
+      <DataTableColumnHeader column={column} title="URL" />
     ),
+    cell({ row }) {
+      let value = row.original.url
+      let url = new URL(value)
+
+      return (
+        <a
+          href={value}
+          target="_blank"
+          className="flex items-center gap-1.5"
+          rel="noreferrer"
+        >
+          <ExternalLink className="w-4 h-4" /> {url.hostname}
+          {url.pathname}
+        </a>
+      )
+    },
   },
   {
     id: 'actions',
@@ -75,7 +73,13 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['catalogs'][number]>[] = [
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem asChild>
-            <Link to={routes.editCatalog(row.original.id)}>Edit</Link>
+            <a
+              target="_blank"
+              href={`https://radiantearth.github.io/stac-browser/#/${row.original.url}`}
+              rel="noreferrer"
+            >
+              Open in STAC Browser
+            </a>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -84,20 +88,20 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['catalogs'][number]>[] = [
 ]
 
 export default function ListPage() {
-  let { count, catalogs } = useLoaderData<typeof loader>()
+  let data = useLoaderData<typeof loader>()
 
   return (
     <div className="p-8 flex flex-col">
       <div className="flex justify-between items-center">
-        <H3>Catalogs</H3>
+        <H3>External Catalogs</H3>
         <Button asChild className="ml-auto" size="sm">
-          <Link to={routes.createCatalog()}>
+          <Link to={routes.createExternalCatalog()}>
             <Plus className="w-4 h-4 mr-1" /> Create New
           </Link>
         </Button>
       </div>
       <div className="pt-12">
-        <DataTable count={count} data={catalogs} columns={columns} />
+        <DataTable data={data} columns={columns} />
       </div>
     </div>
   )

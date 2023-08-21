@@ -14,15 +14,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
+import { useSearchParams } from '@remix-run/react'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
+  count: number
 }
 
 export function DataTablePagination<TData>({
   table,
+  count,
 }: DataTablePaginationProps<TData>) {
+  let [searchParams, setSearchParams] = useSearchParams()
   let amountSelected = table.getFilteredSelectedRowModel().rows.length
+
+  let take = +(searchParams.get('take') ?? 10)
+  let page = +(searchParams.get('page') ?? 0)
+
+  let totalPages = Math.ceil(count / take)
 
   return (
     <div className="flex items-center justify-between px-2">
@@ -38,16 +47,18 @@ export function DataTablePagination<TData>({
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
-            value={`${table.getState().pagination.pageSize}`}
+            value={`${take}`}
             onValueChange={value => {
-              table.setPageSize(Number(value))
+              searchParams.set('take', value)
+              setSearchParams(searchParams)
+              // table.setPageSize(Number(value))
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder={take} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map(pageSize => (
+              {[2, 5, 10, 20, 30, 40, 50].map(pageSize => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
@@ -56,15 +67,17 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{' '}
-          {table.getPageCount()}
+          Page {page + 1} of {totalPages}
         </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => {
+              searchParams.set('page', '0')
+              setSearchParams(searchParams)
+            }}
+            disabled={page <= 0}
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeft className="h-4 w-4" />
@@ -72,8 +85,11 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            onClick={() => {
+              searchParams.set('page', (page - 1).toString())
+              setSearchParams(searchParams)
+            }}
+            disabled={page <= 0}
           >
             <span className="sr-only">Go to previous page</span>
             <ChevronLeftIcon className="h-4 w-4" />
@@ -81,8 +97,11 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => {
+              searchParams.set('page', (page + 1).toString())
+              setSearchParams(searchParams)
+            }}
+            disabled={page >= totalPages - 1}
           >
             <span className="sr-only">Go to next page</span>
             <ChevronRightIcon className="h-4 w-4" />
@@ -90,8 +109,11 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            onClick={() => {
+              searchParams.set('page', (totalPages - 1).toString())
+              setSearchParams(searchParams)
+            }}
+            disabled={page >= totalPages - 1}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRight className="h-4 w-4" />

@@ -2,28 +2,30 @@ import { db } from '~/utils/db.server'
 import { withCors } from '~/utils/withCors'
 import stacPackageJson from 'stac-spec/package.json'
 import { getStacValidator } from '~/utils/stacspec'
+import { zx } from 'zodix'
+import { z } from 'zod'
 
 export let loader = withCors(async ({ request, params }) => {
+  let { collectionId, catalogId } = zx.parseParams(params, {
+    collectionId: z.string(),
+    catalogId: z.string(),
+  })
   let validate = await getStacValidator('Collection')
 
   let url = new URL(request.url)
-  let { id } = params
-  if (!id) throw new Response(null, { status: 400 })
 
-  let baseUrl = `${url.protocol}//${url.host}/stac`
+  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
 
   let collection = await db.collection.findUniqueOrThrow({
     where: {
-      id,
-    },
-    include: {
-      items: true,
+      id: collectionId,
     },
   })
+
   let stacCollection = {
     type: 'Collection',
     stac_version: stacPackageJson.version,
-    id: collection.id,
+    id: collection.title,
     description: collection.description ?? '',
     license: 'MIT',
     extent: {
@@ -32,16 +34,19 @@ export let loader = withCors(async ({ request, params }) => {
       },
       temporal: {
         interval: [
-          [collection.startTime?.toISOString(), collection.endTime ?? null],
+          [
+            collection.startTime?.toISOString() ?? new Date().toISOString(),
+            collection.endTime ?? null,
+          ],
         ],
       },
     },
     links: [
-      ...collection.items.map(item => ({
-        rel: 'child',
-        href: `${baseUrl}/items/${item.id}`,
+      {
+        rel: 'items',
         type: 'application/geo+json',
-      })),
+        href: `${baseUrl}/collections/${collection.id}/items`,
+      },
       {
         rel: 'self',
         type: 'application/json',

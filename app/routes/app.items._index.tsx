@@ -2,11 +2,11 @@ import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Plus } from 'lucide-react'
+import { ID } from '~/components/ID'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
-import { H3, Muted } from '~/components/typography'
+import { H3 } from '~/components/typography'
 import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar'
-import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -15,45 +15,49 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
+import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
-  let url = new URL(request.url)
-  let page = +(url.searchParams.get('page') ?? 0)
+  let filters = await getDataTableFilters(request)
 
-  return db.item.findMany({
-    take: 20,
-    skip: 20 * page,
-    orderBy: {
-      updatedAt: 'desc',
-    },
-    include: {
-      collection: {
-        select: {
-          title: true,
-          catalog: {
-            select: {
-              title: true,
+  let [count, items] = await db.$transaction([
+    db.item.count(),
+    db.item.findMany({
+      ...filters,
+      orderBy: {
+        updatedAt: 'desc',
+      },
+      include: {
+        collection: {
+          select: {
+            title: true,
+            catalog: {
+              select: {
+                title: true,
+              },
             },
           },
         },
-      },
-      owner: {
-        select: {
-          name: true,
-          id: true,
+        owner: {
+          select: {
+            name: true,
+            id: true,
+          },
         },
       },
-    },
-  })
+    }),
+  ])
+
+  return { count, items }
 }
 
-let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
+let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
     cell({ getValue }) {
-      return <Badge variant="secondary">{getValue<string>().slice(-5)}</Badge>
+      return <ID>{getValue<string>()}</ID>
     },
   },
   {
@@ -138,7 +142,7 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
 ]
 
 export default function ListPage() {
-  let data = useLoaderData<typeof loader>()
+  let { items, count } = useLoaderData<typeof loader>()
 
   return (
     <div className="p-8 flex flex-col">
@@ -151,7 +155,7 @@ export default function ListPage() {
         </Button>
       </div>
       <div className="pt-12">
-        <DataTable data={data} columns={columns} />
+        <DataTable count={count} data={items} columns={columns} />
       </div>
     </div>
   )

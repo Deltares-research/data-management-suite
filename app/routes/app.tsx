@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
+import { Separator } from '~/components/ui/separator'
 import { routes } from '~/routes'
 import { authenticator } from '~/services/auth.server'
 
@@ -27,7 +28,7 @@ export default function AppLayout() {
   return (
     <div className="h-full flex flex-col">
       <div className="border-b flex-shrink-0 h-16 px-8 flex items-center justify-between">
-        <div className="flex gap-5">
+        <div className="flex gap-5 items-center">
           <NavLink
             to={routes.items()}
             className={({ isActive }) =>
@@ -70,6 +71,19 @@ export default function AppLayout() {
             }
           >
             Keywords
+          </NavLink>
+
+          <Separator className="h-4" orientation="vertical" />
+
+          <NavLink
+            to={routes.externalCatalogs()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            External Catalogs
           </NavLink>
         </div>
 

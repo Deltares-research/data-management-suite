@@ -14,62 +14,48 @@ export function BoundsSelector({ name }: { name: string }) {
   let { defaultValue } = useField(`${name}`)
   let { error } = useField(`${name}.coordinates`)
 
-  const [features, setFeatures] = useState<Record<string, Feature<Polygon>>>(
-    defaultValue.type === 'Polygon'
+  const [feature, setFeature] = useState<Feature<Polygon> | undefined>(
+    defaultValue?.type === 'Polygon'
       ? {
-          '1': {
-            type: 'Feature',
-            properties: {},
-            geometry: defaultValue,
-            id: '1',
-          },
+          type: 'Feature',
+          properties: {},
+          geometry: defaultValue,
+          id: '1',
         }
-      : {},
+      : undefined,
   )
 
   const onUpdate = useCallback(e => {
-    setFeatures(currFeatures => {
-      const newFeatures = { ...currFeatures }
-      for (const f of e.features) {
-        newFeatures[f.id] = f
-      }
-      return newFeatures
-    })
+    for (const f of e.features) {
+      return setFeature(f)
+    }
   }, [])
 
   const onDelete = useCallback(e => {
-    setFeatures(currFeatures => {
-      const newFeatures = { ...currFeatures }
-      for (const f of e.features) {
-        delete newFeatures[f.id]
-      }
-      return newFeatures
-    })
+    setFeature(undefined)
   }, [])
 
   return (
     <div data-testid="geometry-selector">
       <input type="hidden" name={`${name}.type`} value="Polygon" />
-      {Object.values(features)
-        .filter(f => !!f.geometry)?.[0]
-        ?.geometry?.coordinates.map((polygon, polygonIndex) =>
-          (Array.isArray(polygon) ? polygon : [polygon]).map(
-            (point, pointIndex) => (
-              <React.Fragment key={`${polygonIndex}-${pointIndex}`}>
-                <input
-                  type="hidden"
-                  name={`${name}.coordinates[${polygonIndex}][${pointIndex}][0]`}
-                  value={point[0]}
-                />
-                <input
-                  type="hidden"
-                  name={`${name}.coordinates[${polygonIndex}][${pointIndex}][1]`}
-                  value={point[1]}
-                />
-              </React.Fragment>
-            ),
+      {feature?.geometry?.coordinates.map((polygon, polygonIndex) =>
+        (Array.isArray(polygon) ? polygon : [polygon]).map(
+          (point, pointIndex) => (
+            <React.Fragment key={`${polygonIndex}-${pointIndex}`}>
+              <input
+                type="hidden"
+                name={`${name}.coordinates[${polygonIndex}][${pointIndex}][0]`}
+                value={point[0]}
+              />
+              <input
+                type="hidden"
+                name={`${name}.coordinates[${polygonIndex}][${pointIndex}][1]`}
+                value={point[1]}
+              />
+            </React.Fragment>
           ),
-        )}
+        ),
+      )}
 
       <Map
         style={{ height: 400 }}

@@ -2,6 +2,7 @@ import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Plus } from 'lucide-react'
+import { ID } from '~/components/ID'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
 import { H3 } from '~/components/typography'
@@ -13,81 +14,89 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
+import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
-  let url = new URL(request.url)
-  let page = +(url.searchParams.get('page') ?? 0)
+  let filters = await getDataTableFilters(request)
 
-  return db.collection.findMany({
-    take: 20,
-    skip: 20 * page,
-    include: {
-      _count: {
-        select: { items: true },
+  let [count, collections] = await db.$transaction([
+    db.collection.count(),
+    db.collection.findMany({
+      ...filters,
+      include: {
+        _count: {
+          select: { items: true },
+        },
       },
-    },
-  })
+    }),
+  ])
+
+  return { count, collections }
 }
 
-let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
-  {
-    accessorKey: 'id',
-    header: '#',
-  },
-  {
-    id: 'title',
-    accessorKey: 'title',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
-    ),
-  },
-  {
-    id: 'itemCount',
-    accessorFn(value) {
-      return value._count.items
+let columns: ColumnDef<SerializeFrom<typeof loader>['collections'][number]>[] =
+  [
+    {
+      accessorKey: 'id',
+      header: '#',
+      cell({ getValue }) {
+        return <ID>{getValue<string>()}</ID>
+      },
     },
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="# Items" />
-    ),
-  },
-  {
-    id: 'updatedAt',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Updated" />
-    ),
-    accessorFn(value) {
-      return Intl.DateTimeFormat('nl-NL', {
-        dateStyle: 'medium',
-      }).format(new Date(value.updatedAt))
+    {
+      id: 'title',
+      accessorKey: 'title',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Title" />
+      ),
     },
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem asChild>
-            <Link to={routes.editCollection(row.original.id)}>Edit</Link>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
+    {
+      id: 'itemCount',
+      accessorFn(value) {
+        return value._count.items
+      },
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="# Items" />
+      ),
+    },
+    {
+      id: 'updatedAt',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Updated" />
+      ),
+      accessorFn(value) {
+        return Intl.DateTimeFormat('nl-NL', {
+          dateStyle: 'medium',
+        }).format(new Date(value.updatedAt))
+      },
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem asChild>
+              <Link to={routes.editCollection(row.original.id)}>Edit</Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ]
 
 export default function ListPage() {
-  let data = useLoaderData<typeof loader>()
+  let { count, collections } = useLoaderData<typeof loader>()
 
   return (
     <div className="p-8 flex flex-col">
@@ -100,7 +109,7 @@ export default function ListPage() {
         </Button>
       </div>
       <div className="pt-12">
-        <DataTable data={data} columns={columns} />
+        <DataTable count={count} data={collections} columns={columns} />
       </div>
     </div>
   )
