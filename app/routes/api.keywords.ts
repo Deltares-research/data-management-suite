@@ -7,10 +7,19 @@ export async function loader({ request }: LoaderArgs) {
 
   let keywords = await db.keyword.findMany({
     where: {
-      title: {
-        contains: search,
-        mode: 'insensitive',
-      },
+      OR: [
+        {
+          title: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          id: {
+            equals: search,
+          },
+        },
+      ],
     },
     orderBy: {
       items: {

@@ -10,6 +10,9 @@ import { routes } from '~/routes'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import type { AllowedGeometry } from '~/types'
+import React from 'react'
+import { keywordCache } from '~/utils/keywordCache'
+import type { Keyword } from '@prisma/client'
 
 export async function loader({ request, params }: LoaderArgs) {
   await authenticator.isAuthenticated(request)
@@ -23,11 +26,7 @@ export async function loader({ request, params }: LoaderArgs) {
       id: itemId,
     },
     include: {
-      keywords: {
-        select: {
-          id: true,
-        },
-      },
+      keywords: true,
     },
   })
 
@@ -37,6 +36,10 @@ export async function loader({ request, params }: LoaderArgs) {
     FROM "Item"
     WHERE "Item"."id" = ${itemId}
   `
+
+  defaultValues.keywords.forEach(kw => {
+    keywordCache[kw.id] = kw
+  })
 
   return {
     collections,
@@ -61,6 +64,11 @@ export default function CreatePage() {
   return (
     <ItemForm
       collections={collections}
+      // TODO: Keyword cache very strange, come up with better solution
+      initialKeywordCache={defaultValues?.keywords?.reduce((acc, current) => {
+        acc[current.id] = current
+        return acc
+      }, {} as Record<string, Keyword>)}
       defaultValues={{
         ...defaultValues,
         dateRange: {
