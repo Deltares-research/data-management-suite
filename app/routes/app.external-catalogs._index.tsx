@@ -5,7 +5,6 @@ import { ExternalLink, MoreHorizontal, Plus } from 'lucide-react'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
 import { H3 } from '~/components/typography'
-import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -14,19 +13,23 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
+import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
-  let url = new URL(request.url)
-  let page = +(url.searchParams.get('page') ?? 0)
+  let filters = await getDataTableFilters(request)
 
-  return db.externalCatalog.findMany({
-    take: 20,
-    skip: 20 * page,
-  })
+  let [count, catalogs] = await db.$transaction([
+    db.externalCatalog.count(),
+    db.externalCatalog.findMany({
+      ...filters,
+    }),
+  ])
+
+  return { count, catalogs }
 }
 
-let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
+let columns: ColumnDef<SerializeFrom<typeof loader>['catalogs'][number]>[] = [
   {
     id: 'title',
     accessorKey: 'title',
@@ -88,7 +91,7 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
 ]
 
 export default function ListPage() {
-  let data = useLoaderData<typeof loader>()
+  let { count, catalogs } = useLoaderData<typeof loader>()
 
   return (
     <div className="p-8 flex flex-col">
@@ -96,12 +99,12 @@ export default function ListPage() {
         <H3>External Catalogs</H3>
         <Button asChild className="ml-auto" size="sm">
           <Link to={routes.createExternalCatalog()}>
-            <Plus className="w-4 h-4 mr-1" /> Create New
+            <Plus className="w-4 h-4 mr-1" /> Add Catalog
           </Link>
         </Button>
       </div>
       <div className="pt-12">
-        <DataTable data={data} columns={columns} />
+        <DataTable count={count} data={catalogs} columns={columns} />
       </div>
     </div>
   )

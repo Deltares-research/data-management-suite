@@ -50,8 +50,8 @@ export function DataTablePagination<TData>({
             value={`${take}`}
             onValueChange={value => {
               searchParams.set('take', value)
+              searchParams.set('page', '1')
               setSearchParams(searchParams)
-              // table.setPageSize(Number(value))
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">

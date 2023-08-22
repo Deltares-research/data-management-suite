@@ -40,12 +40,6 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
       },
     },
     links: [
-      // TODO: Is this necessary? You can view the items inside the collection
-      // ...collection.items.map(item => ({
-      //   rel: 'child',
-      //   href: `${baseUrl}/items/${item.id}`,
-      //   type: 'application/geo+json',
-      // })),
       {
         rel: 'self',
         type: 'application/json',

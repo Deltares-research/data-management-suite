@@ -6,7 +6,7 @@ import type { Feature, Polygon } from 'geojson'
 import { useField } from 'remix-validated-form'
 import { ErrorMessage } from '../typography'
 
-// TODO: Put token in .env
+// TODO: Get token from BE
 const MAPBOX_TOKEN =
   'pk.eyJ1Ijoicm9iZXJ0YnJvZXJzbWEiLCJhIjoiY2tjMjVwbnRuMjBoMjM0bXh1eHR5d2o0YSJ9.xZxWCeY2LEaGHDzME5JqfA'
 
