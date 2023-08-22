@@ -59,19 +59,23 @@ model Item {
   owner   Person? @relation(fields: [ownerId], references: [id])
   ownerId String?
 
-  projectNumber String?
-  title         String?
+  projectNumber String
+  title         String
+  location      String
   description   String?
   license       String?
   keywords      Keyword[]
 
   // STAC Props
-  geometry   Unsupported("geometry")
+  geometry   Unsupported("geometry")? // Required, but making it optional allows for prisma.create queries
+  dateTime   DateTime?
+  startTime  DateTime?
+  endTime    DateTime?
   properties Json?
   assets     Json? // Dictionary of downloads
 
-  collection   Collection? @relation(fields: [collectionId], references: [id])
-  collectionId String?
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  collectionId String
 
   @@index([geometry], name: "location_idx", type: Gist)
 }
@@ -89,7 +93,14 @@ model Catalog {
 
   collections Collection[]
 
+  access Access  @default(PRIVATE)
   groups Group[]
+}
+
+model ExternalCatalog {
+  url String @id
+
+  title String?
 }
 
 // STAC Collection
@@ -116,6 +127,10 @@ model Collection {
 
 model Keyword {
   id String @id @default(uuid())
+
+  parent   Keyword?  @relation("parent-child", fields: [parentId], references: [id])
+  parentId String?
+  children Keyword[] @relation("parent-child")
 
   title       String
   description String?

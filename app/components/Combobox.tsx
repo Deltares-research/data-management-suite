@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Check, CheckIcon, ChevronsUpDown, X } from 'lucide-react'
+import { Check, ChevronRight, ChevronsUpDown, ListTree, X } from 'lucide-react'
 
 import { cn } from '~/utils'
 import { Button } from '~/components/ui/button'
@@ -87,7 +87,12 @@ export function Combobox() {
                     value === keyword.title ? 'opacity-100' : 'opacity-0',
                   )}
                 />
-                {keyword.title}
+                <div>
+                  <strong className="block">{keyword.parent?.title}</strong>
+                  <span className="text-muted-foreground flex items-center gap-1.5">
+                    <ListTree className="w-4 h-4" /> {keyword.title}
+                  </span>
+                </div>
               </CommandItem>
             ))}
           </CommandGroup>
@@ -107,7 +112,7 @@ export function MultiCombobox({
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string[]>([])
   let [search, setSearch] = React.useState('')
-  let { error, getInputProps } = useField(name)
+  let { error } = useField(name)
   let id = React.useId()
 
   let fetcher = useFetcher<typeof loader>()
@@ -131,7 +136,7 @@ export function MultiCombobox({
       {value.map((kw, i) => (
         <input key={kw} type="hidden" name={`${name}[${i}]`} value={kw} />
       ))}
-      <div className="mb-1.5 flex gap-1.5">
+      <div className="mb-1.5 flex gap-1.5 flex-wrap">
         {value.map(v => (
           <Button
             onClick={() => {
@@ -191,7 +196,19 @@ export function MultiCombobox({
                       value.includes(keyword.id) ? 'opacity-100' : 'opacity-0',
                     )}
                   />
-                  {keyword.title}
+                  <div className="flex items-center gap-1">
+                    {keyword.parent && (
+                      <>
+                        <span className="block text-muted-foreground ">
+                          {keyword.parent?.title}
+                        </span>
+                        <ChevronRight className="w-4 h-4" />
+                      </>
+                    )}
+                    <strong className="text-foreground flex items-center gap-1.5 font-medium">
+                      {keyword.title}
+                    </strong>
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>

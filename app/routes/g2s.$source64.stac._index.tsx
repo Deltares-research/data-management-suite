@@ -2,21 +2,35 @@ import { type LoaderArgs } from '@remix-run/node'
 import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
 import { conformsTo, getStacValidator } from '~/utils/stacspec'
-import { db } from '~/utils/db.server'
+import { zx } from 'zodix'
+import { z } from 'zod'
+import { cachedFetch } from '~/utils/cachedFetch'
 
-export let loader = withCors(async ({ request }: LoaderArgs) => {
+export let loader = withCors(async ({ request, params }: LoaderArgs) => {
+  let { source64 } = zx.parseParams(params, { source64: z.string() })
+
+  let sourceUrl = Buffer.from(source64, 'base64').toString()
+
   let validate = await getStacValidator('Catalog')
   let url = new URL(request.url)
 
-  let baseUrl = `${url.protocol}//${url.host}/stac`
+  let siteUrl = `${sourceUrl}/geonetwork/srv/api/site`
 
-  let externalCatalogs = await db.externalCatalog.findMany()
+  let site = await cachedFetch(siteUrl, {
+    requestInit: {
+      headers: {
+        accept: '*/*;q=0.8',
+      },
+    },
+    cacheOptions: { ttl: 1000 * 60 * 60 * 24 },
+  })
+
+  let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
 
   let data = {
     type: 'Catalog',
-    id: 'deltares-catalog',
-    description:
-      'Searchable spatiotemporal metadata catalog for all data within Deltares.',
+    id: site['system/site/name'],
+    description: `Geonetwork catalog found at ${sourceUrl}`,
     stac_version: stacPackageJson.version,
     links: [
       {
@@ -27,6 +41,7 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
       {
         rel: 'search',
         type: 'application/geo+json',
+        title: 'STAC Search',
         href: `${baseUrl}/search`,
         method: 'GET',
       },
@@ -35,12 +50,6 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
         type: 'application/json',
         href: `${baseUrl}/collections`,
       },
-      ...externalCatalogs.map(catalog => ({
-        rel: 'child',
-        type: 'application/json',
-        href: catalog.url,
-        title: catalog.title,
-      })),
     ],
     conformsTo,
   }

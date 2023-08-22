@@ -1,8 +1,10 @@
 // app/services/auth.server.ts
 import { MicrosoftStrategy } from 'remix-auth-microsoft'
-import { Authenticator } from 'remix-auth'
+import type { AuthenticateOptions } from 'remix-auth'
+import { Authenticator, Strategy } from 'remix-auth'
 import { sessionStorage } from '~/services/session.server'
 import { db } from '~/utils/db.server'
+import type { SessionStorage, SessionData } from '@remix-run/node'
 
 export let authenticator = new Authenticator<{
   id: string
@@ -48,3 +50,34 @@ let microsoftStrategy = new MicrosoftStrategy(
 )
 
 authenticator.use(microsoftStrategy)
+
+// For tests
+class MockStrategy extends Strategy<
+  {
+    id: string
+    name: string | null
+  },
+  null
+> {
+  name = 'mock'
+
+  async authenticate(
+    request: Request,
+    sessionStorage: SessionStorage<SessionData, SessionData>,
+    options: AuthenticateOptions,
+  ): Promise<{ id: string; name: string | null }> {
+    return this.success(
+      await this.verify(null),
+      request,
+      sessionStorage,
+      options,
+    )
+  }
+}
+
+let mockStrategy = new MockStrategy(async () => ({
+  id: 'admin',
+  name: 'Admin',
+}))
+
+authenticator.use(mockStrategy)

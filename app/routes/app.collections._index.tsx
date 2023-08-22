@@ -4,9 +4,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
-import { H3, Muted } from '~/components/typography'
-import { Avatar, AvatarImage, AvatarFallback } from '~/components/ui/avatar'
-import { Badge } from '~/components/ui/badge'
+import { H3 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import {
   DropdownMenu,
@@ -21,28 +19,12 @@ export async function loader({ request }: LoaderArgs) {
   let url = new URL(request.url)
   let page = +(url.searchParams.get('page') ?? 0)
 
-  return db.item.findMany({
+  return db.collection.findMany({
     take: 20,
     skip: 20 * page,
-    orderBy: {
-      updatedAt: 'desc',
-    },
     include: {
-      collection: {
-        select: {
-          title: true,
-          catalog: {
-            select: {
-              title: true,
-            },
-          },
-        },
-      },
-      owner: {
-        select: {
-          name: true,
-          id: true,
-        },
+      _count: {
+        select: { items: true },
       },
     },
   })
@@ -51,30 +33,7 @@ export async function loader({ request }: LoaderArgs) {
 let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
   {
     accessorKey: 'id',
-    header: 'ID',
-    cell({ getValue }) {
-      return <Badge variant="secondary">{getValue<string>().slice(-5)}</Badge>
-    },
-  },
-  {
-    id: 'owner',
-    accessorFn(value) {
-      return value.owner?.name
-    },
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Owner" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex items-center gap-2">
-          <Avatar>
-            <AvatarImage src="?" />
-            <AvatarFallback>{row.original.owner?.name?.[0]}</AvatarFallback>
-          </Avatar>
-          <span>{row.original.owner?.name}</span>
-        </div>
-      )
-    },
+    header: '#',
   },
   {
     id: 'title',
@@ -84,23 +43,13 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
     ),
   },
   {
-    id: 'collection',
-    header({ column }) {
-      return <DataTableColumnHeader column={column} title="Collection" />
-    },
+    id: 'itemCount',
     accessorFn(value) {
-      return value.collection
+      return value._count.items
     },
-    cell({ row }) {
-      return (
-        <div>
-          <div className="text-muted-foreground text-xs">
-            {row.original.collection.catalog.title}
-          </div>
-          <div className="font-medium">{row.original.collection.title}</div>
-        </div>
-      )
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="# Items" />
+    ),
   },
   {
     id: 'updatedAt',
@@ -129,7 +78,7 @@ let columns: ColumnDef<SerializeFrom<typeof loader>[number]>[] = [
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem asChild>
-            <Link to={routes.editItem(row.original.id)}>Edit</Link>
+            <Link to={routes.editCollection(row.original.id)}>Edit</Link>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -143,9 +92,9 @@ export default function ListPage() {
   return (
     <div className="p-8 flex flex-col">
       <div className="flex justify-between items-center">
-        <H3>Items</H3>
+        <H3>Collections</H3>
         <Button asChild className="ml-auto" size="sm">
-          <Link to={routes.createItem()}>
+          <Link to={routes.createCollection()}>
             <Plus className="w-4 h-4 mr-1" /> Create New
           </Link>
         </Button>

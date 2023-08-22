@@ -1,17 +1,21 @@
 import * as React from 'react'
 import type * as LabelPrimitive from '@radix-ui/react-label'
 import { Slot } from '@radix-ui/react-slot'
-import type { ControllerProps, FieldPath, FieldValues } from 'react-hook-form'
-import { Controller, FormProvider, useFormContext } from 'react-hook-form'
+import type { FieldPath, FieldValues } from 'react-hook-form'
+import { FormProvider, useFormContext } from 'react-hook-form'
 
 import { cn } from '~/utils'
 import { Label } from '~/components/ui/label'
 import { useField, useIsSubmitting } from 'remix-validated-form'
+import type { InputProps } from './input'
 import { Input } from './input'
 import { ErrorMessage, Muted } from '../typography'
 import type { ButtonProps } from './button'
 import { Button } from './button'
 import { Loader2 } from 'lucide-react'
+import type { TextareaProps } from './textarea'
+import { Textarea } from './textarea'
+import { Select, SelectContent, SelectTrigger, SelectValue } from './select'
 
 const Form = FormProvider
 
@@ -26,14 +30,64 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
   {} as FormFieldContextValue,
 )
 
-export function FormInput({
+export let FormInput = React.forwardRef<
+  HTMLInputElement,
+  {
+    name: string
+    label?: React.ReactNode
+    helper?: React.ReactNode
+  } & InputProps
+>(({ name, label, helper, ...props }, ref) => {
+  let { error, getInputProps } = useField(name)
+  let id = React.useId()
+
+  return (
+    <div className="flex flex-col space-y-1.5">
+      {label && <Label htmlFor={id}>{label}</Label>}
+      <Input ref={ref} id={id} {...getInputProps()} {...props} />
+      {helper && <Muted>{helper}</Muted>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  )
+})
+
+FormInput.displayName = 'FormInput'
+
+export function FormTextarea({
   name,
   label,
   helper,
+  ...rest
 }: {
   name: string
   label: React.ReactNode
   helper?: React.ReactNode
+} & TextareaProps) {
+  let { error, getInputProps } = useField(name)
+  let id = React.useId()
+
+  return (
+    <div className="flex flex-col space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Textarea id={id} {...rest} {...getInputProps()} />
+      {helper && <Muted>{helper}</Muted>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  )
+}
+
+export function FormSelect({
+  name,
+  label,
+  helper,
+  placeholder,
+  children,
+}: {
+  name: string
+  label: React.ReactNode
+  helper?: React.ReactNode
+  children: React.ReactNode
+  placeholder?: string
 }) {
   let { error, getInputProps } = useField(name)
   let id = React.useId()
@@ -41,7 +95,12 @@ export function FormInput({
   return (
     <div className="flex flex-col space-y-1.5">
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} {...getInputProps()} />
+      <Select name={name} {...getInputProps()}>
+        <SelectTrigger id={id}>
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent position="popper">{children}</SelectContent>
+      </Select>
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
     </div>

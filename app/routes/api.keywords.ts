@@ -12,7 +12,19 @@ export async function loader({ request }: LoaderArgs) {
         mode: 'insensitive',
       },
     },
+    orderBy: {
+      items: {
+        _count: 'desc',
+      },
+    },
     take: 10,
+    include: {
+      parent: {
+        select: {
+          title: true,
+        },
+      },
+    },
   })
 
   return keywords
