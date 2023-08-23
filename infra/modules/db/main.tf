@@ -37,9 +37,16 @@ resource "azurerm_postgresql_flexible_server_configuration" "ext" {
   value     = "POSTGIS"
 }
 
+resource "azurerm_postgresql_flexible_server_firewall_rule" "whitelist_azure" {
+  name             = "whitelist_azure"
+  server_id        = azurerm_postgresql_flexible_server.db_server.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "0.0.0.0"
+}
+
 resource "azurerm_postgresql_flexible_server_firewall_rule" "whitelist_all" {
   name             = "whitelist_all"
   server_id        = azurerm_postgresql_flexible_server.db_server.id
   start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 }
