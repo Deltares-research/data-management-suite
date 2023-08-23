@@ -11,6 +11,7 @@ module "db" {
   source               = "./modules/db"
   location             = var.location
   environment_name     = var.environment_name
+  database_admin       = "dms_psqladmin"
   database_password    = var.database_password
   resource_group       = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
