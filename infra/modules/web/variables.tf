@@ -10,7 +10,7 @@ variable "resource_group" {
 
 variable "image_name" {
   description = "name of the web service image"
-  type = string
+  type        = string
 }
 
 variable "session_secret" {

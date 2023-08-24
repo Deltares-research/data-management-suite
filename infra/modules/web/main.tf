@@ -45,7 +45,7 @@ resource "azurerm_container_app" "web" {
   template {
     container {
       name   = "remix-main"
-      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      image  = "${data.azurerm_container_registry.cr.login_server}/${var.image_name}:latest"
       cpu    = 0.5
       memory = "1Gi"
 
