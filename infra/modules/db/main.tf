@@ -8,14 +8,10 @@ terraform {
   }
 }
 
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group
-}
-
 resource "azurerm_postgresql_flexible_server" "db_server" {
   name                   = "sql-${var.stack_name}"
-  resource_group_name    = data.azurerm_resource_group.rg.name
-  location               = data.azurerm_resource_group.rg.location
+  resource_group_name    = var.resource_group_name
+  location               = var.location
   version                = "15"
   administrator_login    = var.database_admin
   administrator_password = var.database_password

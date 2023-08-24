@@ -7,8 +7,13 @@ variable "stack_name" {
   description = "Name of the stack being deployed, consisting of app name, env and location"
 }
 
-variable "resource_group" {
+variable "resource_group_name" {
   description = "Name of the resource group the database should be placed in"
+  type        = string
+}
+
+variable "location" {
+  description = "Azure region the resources should be deployed in"
   type        = string
 }
 

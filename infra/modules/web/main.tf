@@ -8,32 +8,18 @@ terraform {
   }
 }
 
-data "azurerm_resource_group" "rg" {
-  name = var.resource_group
-}
-
-data "azurerm_container_app_environment" "cae" {
-  name                = var.container_app_environment_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-data "azurerm_container_registry" "cr" {
-  name                = var.container_registry_name
-  resource_group_name = data.azurerm_resource_group.rg.name
-}
-
 resource "azurerm_user_assigned_identity" "webapp" {
   name                = "id-${var.stack_name}-webapp"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
+  resource_group_name = var.resource_group_name
+  location            = var.location
   tags                = var.default_tags
 }
 
 
 resource "azurerm_container_app" "web" {
   name                         = "ca-${var.stack_name}-web"
-  container_app_environment_id = data.azurerm_container_app_environment.cae.id
-  resource_group_name          = data.azurerm_resource_group.rg.name
+  container_app_environment_id = var.container_app_environment_id
+  resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
   tags                         = var.default_tags
   identity {
@@ -41,13 +27,13 @@ resource "azurerm_container_app" "web" {
     identity_ids = [azurerm_user_assigned_identity.webapp.id]
   }
   registry {
-    server   = data.azurerm_container_registry.cr.login_server
+    server   = var.container_registry_server
     identity = azurerm_user_assigned_identity.webapp.id
   }
   template {
     container {
       name   = "remix-main"
-      image  = "${data.azurerm_container_registry.cr.login_server}/${var.image_name}:latest"
+      image  = "${var.container_registry_server}/${var.image_name}:latest"
       cpu    = 0.5
       memory = "1Gi"
 
