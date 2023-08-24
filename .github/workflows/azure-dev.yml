@@ -23,10 +23,12 @@ jobs:
             with:
               node-version: 16
 
-          - name: Login az
+          - name: 'Az CLI login'
             uses: azure/login@v1
             with:
-              creds: ${{ secrets.AZURE_CREDENTIALS }}
+              client-id: ${{ vars.AZURE_CLIENT_ID }}
+              tenant-id: ${{ vars.AZURE_TENANT_ID }}
+              subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
           - name: Set az account
             uses: azure/CLI@v1
@@ -36,16 +38,15 @@ jobs:
 
           - name: Log in with Azure
             run: |
-              $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
-              Write-Host "::add-mask::$($info.clientSecret)"
-
               azd auth login `
-              --client-id "$($info.clientId)" `
-              --client-secret "$($info.clientSecret)" `
-              --tenant-id "$($info.tenantId)"
+              --client-id "$Env:AZURE_CLIENT_ID" `
+              --subscription-id "$Env:AZURE_SUBSCRIPTION_ID" `
+              --tenant-id "$Env:AZURE_TENANT_ID"
               shell: pwsh
-              env:
-              AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+            env:
+              AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+              AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+              AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
           - name: Enable terraform alpha feature
             run: azd config set alpha.terraform on
