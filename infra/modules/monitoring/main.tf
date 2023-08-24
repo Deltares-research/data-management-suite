@@ -12,7 +12,7 @@ resource "azurerm_log_analytics_workspace" "log" {
   name                = "log-${var.stack_name}"
   resource_group_name = var.resource_group_name
   location            = var.location
-  sku                 = var.environment_name == "dev" ? "Free" : "PerGB2018"
+  sku                 = "PerGB2018"
   retention_in_days   = 30
   tags                = var.default_tags
 }
