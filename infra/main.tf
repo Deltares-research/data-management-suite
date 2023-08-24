@@ -38,6 +38,7 @@ module "web" {
   resource_group_name                    = azurerm_resource_group.rg.name
   location                               = azurerm_resource_group.rg.location
   stack_name                             = local.stack_name
+  short_app_name                         = local.short_app_name
   default_tags                           = local.default_tags
   image_name                             = "dms_remix_web"
   session_secret                         = var.session_secret

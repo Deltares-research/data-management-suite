@@ -18,6 +18,11 @@ variable "stack_name" {
   type        = string
 }
 
+variable "short_app_name" {
+  description = "Short alphanumeric string to describe the app"
+  type        = string
+}
+
 variable "default_tags" {
   description = "Default tags to add to all resources"
   type        = map(string)

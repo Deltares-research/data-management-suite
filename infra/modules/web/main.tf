@@ -17,7 +17,7 @@ resource "azurerm_user_assigned_identity" "webapp" {
 
 
 resource "azurerm_container_app" "web" {
-  name                         = "ca-${var.stack_name}-web"
+  name                         = "ca-${var.short_app_name}-${var.environment_name}-web"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
