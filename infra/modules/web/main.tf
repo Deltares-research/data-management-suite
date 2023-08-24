@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.1.7, < 2.0.0"
   required_providers {
     azurerm = {
-      version = "~>3.47.0"
+      version = "~>3.70.0"
       source  = "hashicorp/azurerm"
     }
   }
@@ -26,6 +26,7 @@ resource "azurerm_user_assigned_identity" "webapp" {
   name                = "id-${var.stack_name}-webapp"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
+  tags                = var.default_tags
 }
 
 
@@ -34,6 +35,7 @@ resource "azurerm_container_app" "web" {
   container_app_environment_id = data.azurerm_container_app_environment.cae.id
   resource_group_name          = data.azurerm_resource_group.rg.name
   revision_mode                = "Single"
+  tags                         = var.default_tags
   identity {
     type         = "SystemAssigned, UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.webapp.id]

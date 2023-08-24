@@ -24,6 +24,7 @@ resource "azurerm_postgresql_flexible_server" "db_server" {
   storage_mb = 32768
 
   sku_name = "B_Standard_B1ms"
+  tags     = var.default_tags
 }
 
 resource "azurerm_postgresql_flexible_server_database" "db" {

@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.1.7, < 2.0.0"
   required_providers {
     azurerm = {
-      version = "~>3.47.0"
+      version = "~>3.70.0"
       source  = "hashicorp/azurerm"
     }
   }
@@ -28,6 +28,7 @@ resource "azurerm_container_app_environment" "env" {
   location                   = data.azurerm_resource_group.rg.location
   resource_group_name        = data.azurerm_resource_group.rg.name
   log_analytics_workspace_id = data.azurerm_log_analytics_workspace.log.id
+  tags                       = var.default_tags
 }
 
 resource "azurerm_container_registry" "acr" {
@@ -36,6 +37,7 @@ resource "azurerm_container_registry" "acr" {
   location            = data.azurerm_resource_group.rg.location
   sku                 = "Basic"
   admin_enabled       = false
+  tags                = var.default_tags
 }
 
 resource "azurerm_role_assignment" "acrpull" {

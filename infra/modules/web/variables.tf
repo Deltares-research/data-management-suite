@@ -8,6 +8,16 @@ variable "resource_group" {
   type        = string
 }
 
+variable "stack_name" {
+  description = "Name of the stack being deployed, consisting of app name, env and location"
+  type        = string
+}
+
+variable default_tags {
+  description = "Default tags to add to all resources"
+  type        = map(string)
+}
+
 variable "image_name" {
   description = "name of the web service image"
   type        = string

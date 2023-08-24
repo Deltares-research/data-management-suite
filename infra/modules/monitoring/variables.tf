@@ -11,3 +11,8 @@ variable "resource_group" {
   description = "Name of the resource group the database should be placed in"
   type        = string
 }
+
+variable "default_tags" {
+  description = "Default tags to add to all resources"
+  type        = map(string)
+}

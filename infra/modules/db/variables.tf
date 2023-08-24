@@ -1,9 +1,3 @@
-
-variable "location" {
-  description = "The supported Azure location where the resource deployed"
-  type        = string
-}
-
 variable "environment_name" {
   description = "The name of the azd environment to be deployed"
   type        = string
@@ -11,6 +5,11 @@ variable "environment_name" {
 
 variable "stack_name" {
   description = "Name of the stack being deployed, consisting of app name, env and location"
+}
+
+variable "default_tags" {
+  description = "Default tags to add to all resources"
+  type        = map(string)
 }
 
 variable "database_admin" {
