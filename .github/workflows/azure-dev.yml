@@ -39,11 +39,16 @@ jobs:
               inlineScript: |
                   az account set --subscription ${{vars.AZURE_SUBSCRIPTION_ID}}
 
+          - name: Check login status
+            run: |
+              azd auth login --check-status
+            shell: pwsh
+
           - name: Log in with Azure
             run: |
               azd auth login `
               --client-id "$Env:AZURE_CLIENT_ID" `
-              --federated-credential-provider "api://AzureADTokenExchange" `
+              --federated-credential-provider "https://token.actions.githubusercontent.com" `
               --tenant-id "$Env:AZURE_TENANT_ID"
             shell: pwsh
             env:
