@@ -9,6 +9,10 @@ variable "environment_name" {
   type        = string
 }
 
+variable "stack_name" {
+  description = "Name of the stack being deployed, consisting of app name, env and location"
+}
+
 variable "database_admin" {
   description = "Database admin username"
   type        = string

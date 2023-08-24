@@ -13,7 +13,7 @@ data "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_postgresql_flexible_server" "db_server" {
-  name                   = "dms-psqlflexibleserver-${var.environment_name}"
+  name                   = "sql-${var.stack_name}"
   resource_group_name    = data.azurerm_resource_group.rg.name
   location               = data.azurerm_resource_group.rg.location
   version                = "15"
@@ -27,7 +27,7 @@ resource "azurerm_postgresql_flexible_server" "db_server" {
 }
 
 resource "azurerm_postgresql_flexible_server_database" "db" {
-  name      = "dms"
+  name      = "psql-${var.stack_name}"
   server_id = azurerm_postgresql_flexible_server.db_server.id
 }
 
