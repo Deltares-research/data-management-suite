@@ -43,7 +43,7 @@ jobs:
             run: |
               azd auth login `
               --client-id "$Env:AZURE_CLIENT_ID" `
-              --subscription-id "$Env:AZURE_SUBSCRIPTION_ID" `
+              --federated-credential-provider "api://AzureADTokenExchange" `
               --tenant-id "$Env:AZURE_TENANT_ID"
             shell: pwsh
             env:
