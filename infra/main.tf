@@ -1,7 +1,7 @@
 locals {
   app            = "data-management-suite"
   short_app_name = "dms"
-  stack_name     = "${local.app}-${var.environment_name}-${var.location}"
+  stack_name     = "${local.app}-${var.location}-${var.environment_name}"
 
   default_tags = {
     environment = var.environment_name
