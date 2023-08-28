@@ -7,7 +7,7 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "dev": "remix dev",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
-    "start": "remix-serve build",
+    "start": "prisma migrate deploy ; remix-serve build",
     "typecheck": "tsc -b"
   },
   "prisma": {
