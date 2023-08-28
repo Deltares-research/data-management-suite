@@ -34,7 +34,9 @@ function createMicrosoftStrategy(request: LoaderArgs['request']) {
       clientId,
       clientSecret,
       tenantId,
-      redirectUri: `${url.protocol}//${url.host}/auth/microsoft/callback`,
+      redirectUri: `${url.hostname === 'localhost' ? 'http' : 'https'}//${
+        url.host
+      }/auth/microsoft/callback`,
       scope: 'openid profile email', // optional
       prompt: 'login', // optional,
     },
