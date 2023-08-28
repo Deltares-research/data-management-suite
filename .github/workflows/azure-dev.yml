@@ -29,7 +29,7 @@ jobs:
 
       - name: Install azd
         uses: Azure/setup-azd@v0.1.0
-      
+
       - name: Install Nodejs
         uses: actions/setup-node@v3
         with:
@@ -63,6 +63,9 @@ jobs:
           RS_RESOURCE_GROUP: ${{ vars.RS_RESOURCE_GROUP }}
           RS_STORAGE_ACCOUNT: ${{ vars.RS_STORAGE_ACCOUNT }}
           RS_CONTAINER_NAME: ${{ vars.RS_CONTAINER_NAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          AZURE_APP_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
+          AZURE_APP_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
 
       - name: Deploy Application
         run: azd deploy --no-prompt
