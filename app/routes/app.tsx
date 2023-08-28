@@ -9,15 +9,17 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Separator } from '~/components/ui/separator'
 import { routes } from '~/routes'
-import { authenticator } from '~/services/auth.server'
+import {
+  createAuthenticator,
+  requireAuthentication,
+} from '~/services/auth.server'
 
 export async function loader({ request }: LoaderArgs) {
-  return authenticator.isAuthenticated(request, {
-    failureRedirect: routes.login(),
-  })
+  return requireAuthentication(request)
 }
 
 export async function action({ request }: ActionArgs) {
+  let authenticator = createAuthenticator(request)
   await authenticator.logout(request, { redirectTo: routes.login() })
 }
 
@@ -84,6 +86,19 @@ export default function AppLayout() {
             }
           >
             External Catalogs
+          </NavLink>
+
+          <Separator className="h-4" orientation="vertical" />
+
+          <NavLink
+            to={routes.groups()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            Groups
           </NavLink>
         </div>
 

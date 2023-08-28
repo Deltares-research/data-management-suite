@@ -38,11 +38,23 @@ export let routes = {
     return `${appPrefix}/external-catalogs/create`
   },
 
+  // Keywords
   keywords() {
     return `${appPrefix}/keywords`
   },
 
-  // Auth
+  // Authorization
+  groups() {
+    return `${appPrefix}/groups`
+  },
+  group(id: string) {
+    return `${appPrefix}/groups/${id}`
+  },
+  createGroup() {
+    return `${appPrefix}/groups/create`
+  },
+
+  // Authentication
   login() {
     return `/auth/microsoft`
   },

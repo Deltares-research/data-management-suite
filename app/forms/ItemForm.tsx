@@ -17,7 +17,7 @@ import {
 import { zfd } from 'zod-form-data'
 import { MultiCombobox } from '~/components/Combobox'
 import { CollectionSelector } from '~/components/CollectionSelector'
-import { authenticator } from '~/services/auth.server'
+import { requireAuthentication } from '~/services/auth.server'
 import { Separator } from '~/components/ui/separator'
 import type { Collection, Keyword } from '@prisma/client'
 import type { AllowedGeometry } from '~/types'
@@ -51,9 +51,7 @@ export async function submitItemForm({
   request,
   id,
 }: ActionArgs & { id?: string }) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: '/auth/microsoft',
-  })
+  await requireAuthentication(request)
 
   let form = await metadataValidator.validate(await request.formData())
 
