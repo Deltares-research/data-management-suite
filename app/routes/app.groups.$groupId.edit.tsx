@@ -3,7 +3,7 @@ import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { zx } from 'zodix'
-import { CatalogForm, submitCatalogForm } from '~/forms/CatalogForm'
+import { GroupForm, submitGroupForm } from '~/forms/GroupForm'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
@@ -11,29 +11,29 @@ import { db } from '~/utils/db.server'
 export async function action(args: ActionArgs) {
   await requireAuthentication(args.request)
 
-  let { catalogId } = zx.parseParams(args.params, { catalogId: z.string() })
+  let { groupId } = zx.parseParams(args.params, { groupId: z.string() })
 
-  await submitCatalogForm({ ...args, id: catalogId })
+  await submitGroupForm({ ...args, id: groupId })
 
-  return redirect(routes.catalogs())
+  return redirect(routes.groups())
 }
 
 export async function loader({ request, params }: LoaderArgs) {
   await requireAuthentication(request)
 
-  let { catalogId } = await zx.parseParams(params, {
-    catalogId: z.string(),
+  let { groupId } = await zx.parseParams(params, {
+    groupId: z.string(),
   })
 
-  return db.catalog.findUniqueOrThrow({
+  return db.group.findUniqueOrThrow({
     where: {
-      id: catalogId,
+      id: groupId,
     },
   })
 }
 
-export default function CreateCatalogPage() {
+export default function EditGroupPage() {
   let defaultValues = useLoaderData<typeof loader>()
 
-  return <CatalogForm defaultValues={defaultValues} />
+  return <GroupForm defaultValues={defaultValues} />
 }

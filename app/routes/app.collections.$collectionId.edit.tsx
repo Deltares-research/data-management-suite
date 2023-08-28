@@ -6,11 +6,11 @@ import { zx } from 'zodix'
 import { submitCatalogForm } from '~/forms/CatalogForm'
 import { CollectionForm } from '~/forms/CollectionForm'
 import { routes } from '~/routes'
-import { authenticator } from '~/services/auth.server'
+import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
 export async function action(args: ActionArgs) {
-  await authenticator.isAuthenticated(args.request)
+  await requireAuthentication(args.request)
 
   let { collectionId } = zx.parseParams(args.params, {
     collectionId: z.string(),

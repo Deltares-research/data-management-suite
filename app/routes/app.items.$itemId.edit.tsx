@@ -4,7 +4,7 @@ import { redirect } from '@remix-run/node'
 import type { LoaderArgs, ActionArgs } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
-import { authenticator } from '~/services/auth.server'
+import { requireAuthentication } from '~/services/auth.server'
 import { ItemForm, submitItemForm } from '~/forms/ItemForm'
 import { routes } from '~/routes'
 import { zx } from 'zodix'
@@ -15,7 +15,7 @@ import { keywordCache } from '~/utils/keywordCache'
 import type { Keyword } from '@prisma/client'
 
 export async function loader({ request, params }: LoaderArgs) {
-  await authenticator.isAuthenticated(request)
+  await requireAuthentication(request)
 
   let { itemId } = await zx.parseParams(params, { itemId: z.string() })
 

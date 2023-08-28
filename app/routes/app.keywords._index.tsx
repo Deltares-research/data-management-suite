@@ -17,7 +17,7 @@ import { ValidatedForm, validationError } from 'remix-validated-form'
 import { z } from 'zod'
 import { withZod } from '@remix-validated-form/with-zod'
 import type { Prisma } from '@prisma/client'
-import { authenticator } from '~/services/auth.server'
+import { requireAuthentication } from '~/services/auth.server'
 import { SelectItem } from '~/components/ui/select'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
@@ -39,9 +39,7 @@ export async function loader() {
 }
 
 export async function action({ request }: ActionArgs) {
-  await authenticator.isAuthenticated(request, {
-    failureRedirect: '/auth/microsoft',
-  })
+  await requireAuthentication(request)
 
   let formData = await request.formData()
 
