@@ -29,7 +29,6 @@ let tenantId = assert(
 function createMicrosoftStrategy(request: LoaderArgs['request']) {
   let url = new URL(request.url)
 
-  console.log(`${url.protocol}//${url.host}/auth/microsoft/callback`)
   let microsoftStrategy = new MicrosoftStrategy(
     {
       clientId,
