@@ -48,6 +48,17 @@ variable "session_secret" {
   type        = string
 }
 
+variable "app_client_id" {
+  description = "client id of the app registration used by the webapp"
+  type        = string
+}
+
+variable "app_client_secret" {
+  description = "client secret of the app registration used by the webapp"
+  type        = string
+  sensitive   = true
+}
+
 variable "database_connection_string" {
   description = "Connection string to connect to database"
   type        = string

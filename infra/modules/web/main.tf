@@ -15,22 +15,12 @@ terraform {
 
 data "azurerm_client_config" "current" {}
 
-data "azuread_application" "app_registration" {
-  display_name = "data-management-suite-local-dev"
-}
-
-resource "azuread_application_password" "app_secret" {
-  display_name          = "deployed-app-${var.environment_name}"
-  application_object_id = data.azuread_application.app_registration.object_id
-}
-
 resource "azurerm_user_assigned_identity" "webapp" {
   name                = "id-${var.stack_name}-webapp"
   resource_group_name = var.resource_group_name
   location            = var.location
   tags                = var.default_tags
 }
-
 
 resource "azurerm_container_app" "web" {
   name                         = "ca-${var.short_app_name}-${var.environment_name}-web"
@@ -85,7 +75,7 @@ resource "azurerm_container_app" "web" {
       }
       env {
         name  = "AZURE_CLIENT_ID"
-        value = data.azuread_application.app_registration.application_id
+        value = var.app_client_id
       }
       env {
         name  = "AZURE_TENANT_ID"
@@ -93,7 +83,7 @@ resource "azurerm_container_app" "web" {
       }
       env {
         name  = "AZURE_CLIENT_SECRET"
-        value = azuread_application_password.app_secret.value
+        value = var.app_client_secret
       }
     }
   }

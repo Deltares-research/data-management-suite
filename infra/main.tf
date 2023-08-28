@@ -43,6 +43,8 @@ module "web" {
   default_tags                           = local.default_tags
   image_name                             = "data-management-suite/web-${var.environment_name}"
   session_secret                         = var.session_secret
+  app_client_id                          = var.app_client_id
+  app_client_secret                      = var.app_client_secret
   application_insights_connection_string = module.monitoring.application_insights_conn_string
   database_connection_string             = module.db.db_connection_string
   container_app_environment_id           = module.container_app.container_app_environment_id
