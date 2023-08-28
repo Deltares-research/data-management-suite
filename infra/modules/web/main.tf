@@ -5,7 +5,23 @@ terraform {
       version = "~>3.70.0"
       source  = "hashicorp/azurerm"
     }
+
+    azuread = {
+      version = "~>2.41.0"
+      source  = "hashicorp/azuread"
+    }
   }
+}
+
+data "azurerm_client_config" "current" {}
+
+data "azuread_application" "app_registration" {
+  display_name = "data-management-suite-local-dev"
+}
+
+resource "azuread_application_password" "app_secret" {
+  display_name          = "deployed-app-${var.environment_name}"
+  application_object_id = data.azuread_application.app_registration.object_id
 }
 
 resource "azurerm_user_assigned_identity" "webapp" {
@@ -21,7 +37,9 @@ resource "azurerm_container_app" "web" {
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
-  tags                         = var.default_tags
+  tags = {
+    "azd-service-name" : "web"
+  }
   identity {
     type         = "SystemAssigned, UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.webapp.id]
@@ -30,13 +48,20 @@ resource "azurerm_container_app" "web" {
     server   = var.container_registry_server
     identity = azurerm_user_assigned_identity.webapp.id
   }
+  ingress {
+    external_enabled = true
+    target_port      = 80
+    transport        = "auto"
+    traffic_weight {
+      percentage = 100
+    }
+  }
   template {
     container {
-      name   = "remix-main"
-      image  = "${var.container_registry_server}/${var.image_name}:latest"
+      name   = "web"
+      image  = "${var.container_registry_server}/${var.image_name}"
       cpu    = 0.5
       memory = "1Gi"
-
 
       env {
         name  = "APPLICATIONINSIGHTS_CONNECTION_STRING"
@@ -57,6 +82,18 @@ resource "azurerm_container_app" "web" {
       env {
         name  = "NODE_ENV"
         value = "production"
+      }
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = data.azuread_application.app_registration.application_id
+      }
+      env {
+        name  = "AZURE_TENANT_ID"
+        value = data.azurerm_client_config.current.tenant_id
+      }
+      env {
+        name  = "AZURE_CLIENT_SECRET"
+        value = azuread_application_password.app_secret.value
       }
     }
   }

@@ -35,4 +35,5 @@ variable "log_analytics_workspace_id" {
 
 variable "container_app_identity_principal_id" {
   description = "System managed identity of the container app"
+  type        = string
 }

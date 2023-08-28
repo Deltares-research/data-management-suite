@@ -17,9 +17,11 @@ variable "web_image_name" {
 variable "database_password" {
   description = "Password of the database"
   type        = string
+  sensitive   = true
 }
 
 variable "session_secret" {
   description = "Web session secret"
   type        = string
+  sensitive   = true
 }

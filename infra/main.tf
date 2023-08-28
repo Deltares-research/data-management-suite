@@ -4,9 +4,10 @@ locals {
   stack_name     = "${local.app}-${var.location}-${var.environment_name}"
 
   default_tags = {
-    environment = var.environment_name
-    owner       = "Wolk"
-    app         = local.app
+    environment  = var.environment_name
+    azd-env-name = var.environment_name
+    owner        = "Wolk"
+    app          = local.app
   }
 }
 
@@ -40,7 +41,7 @@ module "web" {
   stack_name                             = local.stack_name
   short_app_name                         = local.short_app_name
   default_tags                           = local.default_tags
-  image_name                             = "dms_remix_web"
+  image_name                             = "data-management-suite/web-${var.environment_name}"
   session_secret                         = var.session_secret
   application_insights_connection_string = module.monitoring.application_insights_conn_string
   database_connection_string             = module.db.db_connection_string
