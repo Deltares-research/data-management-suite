@@ -5,7 +5,7 @@ import { SelectItem } from '~/components/ui/select'
 import { z } from 'zod'
 import type { ActionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
-import { upsertItem } from '~/services/item.server'
+import { updateGeometry } from '~/services/item.server'
 import { ValidatedForm, validationError } from 'remix-validated-form'
 import { withZod } from '@remix-validated-form/with-zod'
 import {
@@ -19,10 +19,11 @@ import { MultiCombobox } from '~/components/Combobox'
 import { CollectionSelector } from '~/components/CollectionSelector'
 import { authenticator } from '~/services/auth.server'
 import { Separator } from '~/components/ui/separator'
-import type { Collection } from '@prisma/client'
+import type { Collection, Keyword } from '@prisma/client'
 import type { AllowedGeometry } from '~/types'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
 import { DateRangePicker } from '~/components/DateRangePicker'
+import React from 'react'
 
 let geometrySchema = z.object({
   coordinates: zfd.numeric().array().length(2).array().array(),
@@ -50,7 +51,7 @@ export async function submitItemForm({
   request,
   id,
 }: ActionArgs & { id?: string }) {
-  let user = await authenticator.isAuthenticated(request, {
+  await authenticator.isAuthenticated(request, {
     failureRedirect: '/auth/microsoft',
   })
 
@@ -60,7 +61,7 @@ export async function submitItemForm({
     throw validationError(form.error)
   }
 
-  let { geometry, dateRange } = form.data
+  let { geometry, dateRange, ...formData } = form.data
 
   let dates =
     dateRange.to && dateRange.to !== dateRange.from
@@ -72,30 +73,30 @@ export async function submitItemForm({
           dateTime: dateRange.from,
         }
 
-  let item = await upsertItem({
-    ...form.data,
-    id,
-    ownerId: user.id,
-    collectionId: form.data.collectionId,
-    geometry,
-    dates,
+  let item = await db.item.upsert({
+    where: {
+      id,
+    },
+    create: {
+      ...formData,
+      ...dates,
+      keywords: {
+        connect: form.data.keywords?.map(id => ({ id })),
+      },
+    },
+    update: {
+      ...formData,
+      ...dates,
+      keywords: {
+        set: form.data.keywords?.map(id => ({ id })),
+      },
+    },
   })
 
-  // Gross, but easier than a raw query for now
-  for (let keywordId of form.data.keywords ?? []) {
-    await db.keyword.update({
-      where: {
-        id: keywordId,
-      },
-      data: {
-        items: {
-          connect: {
-            id: item.id,
-          },
-        },
-      },
-    })
-  }
+  await updateGeometry({
+    id: item.id,
+    geometry,
+  })
 
   return item
 }
@@ -103,11 +104,13 @@ export async function submitItemForm({
 export function ItemForm({
   defaultValues,
   collections,
+  initialKeywordCache,
 }: {
   collections: SerializeFrom<
     Collection & { catalog: { title: string | null } }
   >[]
   defaultValues?: z.infer<typeof metadataSchema>
+  initialKeywordCache?: Record<string, Keyword>
 }) {
   // let { fieldErrors } = useFormContext('myform')
   let [searchParams] = useSearchParams()
@@ -171,7 +174,11 @@ export function ItemForm({
               <SelectItem value="nuxt">Nuxt.js</SelectItem>
             </FormSelect>
 
-            <MultiCombobox label="Keywords" name="keywords" />
+            <MultiCombobox
+              label="Keywords"
+              name="keywords"
+              initialCache={initialKeywordCache}
+            />
 
             <Separator />
 

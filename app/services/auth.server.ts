@@ -5,18 +5,32 @@ import { Authenticator, Strategy } from 'remix-auth'
 import { sessionStorage } from '~/services/session.server'
 import { db } from '~/utils/db.server'
 import type { SessionStorage, SessionData } from '@remix-run/node'
+import { assert } from '~/utils/assert'
 
 export let authenticator = new Authenticator<{
   id: string
   name: string | null
 }>(sessionStorage)
 
+let clientId = assert(
+  process.env.AZURE_CLIENT_ID,
+  'AZURE_CLIENT_ID should be set',
+)
+let clientSecret = assert(
+  process.env.AZURE_CLIENT_SECRET,
+  'AZURE_CLIENT_SECRET should be set',
+)
+let tenantId = assert(
+  process.env.AZURE_TENANT_ID,
+  'AZURE_TENANT_ID should be set',
+)
+
 let microsoftStrategy = new MicrosoftStrategy(
   {
-    clientId: '35a69d8f-fe0e-403a-9d55-de7e7f63423c',
-    clientSecret: 'EnC8Q~ljcDHw4jPuT09IalEj07EEhibPhtYpebeO',
+    clientId,
+    clientSecret,
+    tenantId,
     redirectUri: 'http://localhost:3000/auth/microsoft/callback',
-    tenantId: '0ee307a7-424f-48d1-9e9d-9732f0b76328',
     scope: 'openid profile email', // optional
     prompt: 'login', // optional,
   },

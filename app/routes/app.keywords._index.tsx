@@ -1,4 +1,4 @@
-import { Form, useActionData, useLoaderData } from '@remix-run/react'
+import { useActionData, useLoaderData } from '@remix-run/react'
 import { db } from '~/utils/db.server'
 
 import React from 'react'
@@ -94,8 +94,6 @@ export default function KeywordListPage() {
   let [selectedKeyword, setSelectedKeyword] = React.useState<
     KeywordTree | undefined
   >(undefined)
-
-  let selectedParent = keywords.find(kw => kw.id === selectedKeyword?.parentId)
 
   return (
     <div className="max-h-[calc(100vh-64px)]">

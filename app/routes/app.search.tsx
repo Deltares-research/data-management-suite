@@ -6,7 +6,7 @@ import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
 import { useLoaderData, useSearchParams } from '@remix-run/react'
 import rewind from '@mapbox/geojson-rewind'
 
-// TODO: Put token in .env
+// TODO: Get token from BE
 const MAPBOX_TOKEN =
   'pk.eyJ1Ijoicm9iZXJ0YnJvZXJzbWEiLCJhIjoiY2tjMjVwbnRuMjBoMjM0bXh1eHR5d2o0YSJ9.xZxWCeY2LEaGHDzME5JqfA'
 

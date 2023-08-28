@@ -22,6 +22,11 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
       }
     : undefined
 
+  let geonetworkProperties: Record<string, any> = {}
+  for (let key in item) {
+    geonetworkProperties[`geonetwork:${key}`] = item[key]
+  }
+
   let stacItem = {
     type: 'Feature',
     stac_version: stacPackageJson.version,
@@ -32,6 +37,7 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
       datetime: undefined,
       start_datetime: undefined,
       end_datetime: undefined,
+      ...geonetworkProperties,
     },
     geometry,
     assets: {},

@@ -99,7 +99,7 @@ export default function AppLayout() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
-                <Form method="post">
+                <Form method="post" action="/app">
                   <button>Logout</button>
                 </Form>
               </DropdownMenuItem>

@@ -19,15 +19,14 @@ import {
 } from '~/components/ui/popover'
 import { useFetcher } from '@remix-run/react'
 import type { loader } from '~/routes/api.keywords'
-import type { Keyword } from '@prisma/client'
 import { Separator } from './ui/separator'
 import { Label } from './ui/label'
 import { useField } from 'remix-validated-form'
 import { ErrorMessage } from './typography'
-
-let keywordCache: Record<string, Keyword> = {}
+import type { Keyword } from '@prisma/client'
 
 export function Combobox() {
+  let { current: keywordCache } = React.useRef<Record<string, Keyword>>({})
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState('')
   let [search, setSearch] = React.useState('')
@@ -105,12 +104,17 @@ export function Combobox() {
 export function MultiCombobox({
   label,
   name,
+  initialCache,
 }: {
   label: string
   name: string
+  initialCache: Record<string, Keyword>
 }) {
+  let { current: keywordCache } =
+    React.useRef<Record<string, Keyword>>(initialCache)
+  let { defaultValue } = useField(name)
   let [open, setOpen] = React.useState(false)
-  let [value, setValue] = React.useState<string[]>([])
+  let [value, setValue] = React.useState<string[]>(defaultValue ?? [])
   let [search, setSearch] = React.useState('')
   let { error } = useField(name)
   let id = React.useId()
@@ -147,7 +151,7 @@ export function MultiCombobox({
             size="sm"
             variant="secondary"
           >
-            {keywordCache[v].title}
+            {keywordCache[v]?.title}
             <Separator orientation="vertical" className="h-[16px] mx-2" />
             <X className="w-4 h-4" />
           </Button>

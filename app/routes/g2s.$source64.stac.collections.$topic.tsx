@@ -41,7 +41,6 @@ export let loader = withCors(async ({ request, params, ...args }) => {
       {
         rel: 'self',
         type: 'application/json',
-        // TODO: Fetch collections from GN
         href: `${baseUrl}/collections/${topic}`,
       },
     ],

@@ -31,7 +31,19 @@ export let loader = withCors(async ({ request }: LoaderArgs) => {
         rel: 'search',
         type: 'application/geo+json',
         href: `${baseUrl}/search`,
+        method: 'POST',
+      },
+      {
+        rel: 'search',
+        type: 'application/geo+json',
+        href: `${baseUrl}/search`,
         method: 'GET',
+      },
+      {
+        title: 'Queryables',
+        href: `${baseUrl}/queryables`,
+        rel: 'http://www.opengis.net/def/rel/ogc/1.0/queryables',
+        type: 'application/schema+json',
       },
       // {
       //   rel: 'data',

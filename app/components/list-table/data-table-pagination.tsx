@@ -49,9 +49,12 @@ export function DataTablePagination<TData>({
           <Select
             value={`${take}`}
             onValueChange={value => {
-              searchParams.set('take', value)
-              setSearchParams(searchParams)
-              // table.setPageSize(Number(value))
+              setSearchParams(current => {
+                current.set('take', value)
+                current.set('page', '1')
+
+                return current
+              })
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
@@ -74,8 +77,10 @@ export function DataTablePagination<TData>({
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => {
-              searchParams.set('page', '0')
-              setSearchParams(searchParams)
+              setSearchParams(current => {
+                current.set('page', '0')
+                return current
+              })
             }}
             disabled={page <= 0}
           >
@@ -86,8 +91,10 @@ export function DataTablePagination<TData>({
             variant="outline"
             className="h-8 w-8 p-0"
             onClick={() => {
-              searchParams.set('page', (page - 1).toString())
-              setSearchParams(searchParams)
+              setSearchParams(current => {
+                current.set('page', (page - 1).toString())
+                return current
+              })
             }}
             disabled={page <= 0}
           >
@@ -98,8 +105,10 @@ export function DataTablePagination<TData>({
             variant="outline"
             className="h-8 w-8 p-0"
             onClick={() => {
-              searchParams.set('page', (page + 1).toString())
-              setSearchParams(searchParams)
+              setSearchParams(current => {
+                current.set('page', (page + 1).toString())
+                return current
+              })
             }}
             disabled={page >= totalPages - 1}
           >
@@ -110,8 +119,10 @@ export function DataTablePagination<TData>({
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() => {
-              searchParams.set('page', (totalPages - 1).toString())
-              setSearchParams(searchParams)
+              setSearchParams(current => {
+                current.set('page', (totalPages - 1).toString())
+                return current
+              })
             }}
             disabled={page >= totalPages - 1}
           >
