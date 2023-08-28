@@ -29,12 +29,19 @@ let tenantId = assert(
 function createMicrosoftStrategy(request: LoaderArgs['request']) {
   let url = new URL(request.url)
 
+  console.log(
+    'url',
+    `${url.hostname === 'localhost' ? 'http' : 'https'}//${
+      url.host
+    }/auth/microsoft/callback`,
+  )
+
   let microsoftStrategy = new MicrosoftStrategy(
     {
       clientId,
       clientSecret,
       tenantId,
-      redirectUri: `${url.hostname === 'localhost' ? 'http' : 'https'}//${
+      redirectUri: `${url.hostname === 'localhost' ? 'http' : 'https'}://${
         url.host
       }/auth/microsoft/callback`,
       scope: 'openid profile email', // optional
