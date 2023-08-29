@@ -29,33 +29,37 @@ export function PersonSelector({
 }) {
   let { current: personCache } =
     React.useRef<Record<string, Person>>(initialCache)
-  let { defaultValue } = useField(name)
+  let { defaultValue, error } = useField(name)
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string[]>(defaultValue ?? [])
   let [search, setSearch] = React.useState('')
-  let { error } = useField(name)
   let id = React.useId()
 
   let fetcher = useFetcher<typeof loader>()
 
   React.useEffect(() => {
-    fetcher.load(`/api/keywords?q=${search}`)
+    fetcher.load(`/api/person?q=${search}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search])
 
   React.useEffect(() => {
     if (!fetcher.data) return
 
-    for (let keyword of fetcher.data) {
-      personCache[keyword.id] = keyword
+    for (let person of fetcher.data) {
+      personCache[person.id] = person
     }
   }, [fetcher.data, personCache])
 
   return (
     <div>
       <Label htmlFor={id}>{label}</Label>
-      {value.map((kw, i) => (
-        <input key={kw} type="hidden" name={`${name}[${i}]`} value={kw} />
+      {value.map((personId, i) => (
+        <input
+          key={personId}
+          type="hidden"
+          name={`${name}[${i}]`}
+          value={personId}
+        />
       ))}
       <div className="mb-1.5 flex gap-1.5 flex-wrap">
         {value.map(v => (
@@ -68,7 +72,10 @@ export function PersonSelector({
             size="sm"
             variant="secondary"
           >
-            {personCache[v]?.name}
+            {personCache[v]?.name}{' '}
+            <small className="ml-2 text-muted-foreground">
+              ({personCache[v]?.email})
+            </small>
             <Separator orientation="vertical" className="h-[16px] mx-2" />
             <X className="w-4 h-4" />
           </Button>
@@ -83,7 +90,7 @@ export function PersonSelector({
             aria-expanded={open}
             className="w-full justify-between"
           >
-            Select keywords...
+            Select person...
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

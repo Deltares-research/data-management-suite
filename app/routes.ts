@@ -58,4 +58,9 @@ export let routes = {
   login() {
     return `/auth/microsoft`
   },
+
+  // STAC
+  stacAPIRoot() {
+    return `/stac`
+  },
 }
