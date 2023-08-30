@@ -10,6 +10,8 @@ node_modules
 
 .azure
 
+infra/infra
+
 # Local .terraform directories
 **/.terraform/*
 

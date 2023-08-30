@@ -1,0 +1,6 @@
+{
+    "storage_account_name": "${RS_STORAGE_ACCOUNT}",
+    "container_name": "${RS_CONTAINER_NAME}",
+    "key": "data-management-suite/${AZURE_ENV_NAME}/azdremotestate.tfstate",
+    "resource_group_name": "${RS_RESOURCE_GROUP}"
+}
