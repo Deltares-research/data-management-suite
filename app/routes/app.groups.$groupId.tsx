@@ -1,12 +1,11 @@
 import type { Person } from '@prisma/client'
 import { Role } from '@prisma/client'
-import { DialogProps } from '@radix-ui/react-dialog'
 import type { ActionArgs, LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { useLoaderData, useNavigation } from '@remix-run/react'
 import { withZod } from '@remix-validated-form/with-zod'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
-import React, { useTransition } from 'react'
+import React from 'react'
 import {
   ValidatedForm,
   useFormContext,
@@ -18,7 +17,6 @@ import { PersonSelector } from '~/components/PersonSelector'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
 import { H3 } from '~/components/typography'
-import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -28,7 +26,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog'
-import { FormSubmit } from '~/components/ui/form'
+import { FormSelect, FormSubmit } from '~/components/ui/form'
+import { SelectItem } from '~/components/ui/select'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
@@ -37,6 +36,13 @@ let addPeopleSchema = z.object({
 })
 
 let addPeopleValidator = withZod(addPeopleSchema)
+
+let updateRoleSchema = z.object({
+  role: z.nativeEnum(Role),
+  personId: z.string(),
+})
+
+let updateRoleValidator = withZod(updateRoleSchema)
 
 export async function loader({ request, params }: LoaderArgs) {
   let user = await requireAuthentication(request)
@@ -63,20 +69,50 @@ export async function loader({ request, params }: LoaderArgs) {
   })
 }
 
-export async function action({ request, id }: ActionArgs & { id?: string }) {
-  let form = await addPeopleValidator.validate(await request.formData())
+export async function action({
+  request,
+  params,
+}: ActionArgs & { id?: string }) {
+  let user = await requireAuthentication(request)
+  let { groupId } = zx.parseParams(params, { groupId: z.string() })
 
-  if (form.error) {
-    return validationError(form.error)
+  let formData = await request.formData()
+  let subaction = formData.get('subaction')
+
+  if (subaction === 'updateRole') {
+    let form = await updateRoleValidator.validate(formData)
+
+    if (form.error) {
+      console.log(form.error)
+      return validationError(form.error)
+    }
+
+    return db.member.update({
+      where: {
+        personId_groupId: {
+          personId: form.data.personId,
+          groupId,
+        },
+      },
+      data: {
+        role: form.data.role,
+      },
+    })
+  } else {
+    let form = await addPeopleValidator.validate(formData)
+
+    if (form.error) {
+      return validationError(form.error)
+    }
+
+    return db.member.createMany({
+      data: form.data.peopleIds.map(id => ({
+        personId: id,
+        role: Role.READER,
+        groupId,
+      })),
+    })
   }
-
-  return db.member.createMany({
-    data: form.data.peopleIds.map(id => ({
-      personId: id,
-      role: Role.READER,
-      groupId: id,
-    })),
-  })
 }
 
 let columns: ColumnDef<SerializeFrom<typeof loader>['members'][number]>[] = [
@@ -85,29 +121,43 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['members'][number]>[] = [
     accessorFn(row) {
       return row.person.name
     },
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
-    ),
+    header: 'Name',
   },
   {
     id: 'email',
     accessorFn(row) {
       return row.person.email
     },
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
-    ),
+    header: 'Email',
   },
   {
     id: 'role',
     accessorFn(row) {
       return row.role
     },
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
-    ),
-    cell({ row }) {
-      return <Badge>{row.original.role}</Badge>
+    header: 'Role',
+    cell: function Cell({ row }) {
+      let id = React.useId()
+      let { submit } = useFormContext(id)
+
+      return (
+        <ValidatedForm
+          id={id}
+          defaultValues={{ role: row.original.role }}
+          validator={updateRoleValidator}
+          subaction="updateRole"
+          method="post"
+        >
+          <input type="hidden" name="personId" value={row.original.personId} />
+          <FormSelect name="role" onValueChange={submit}>
+            {Object.values(Role).map(value => (
+              <SelectItem key={value} value={value}>
+                {value}
+              </SelectItem>
+            ))}
+          </FormSelect>
+        </ValidatedForm>
+      )
     },
   },
 ]
@@ -135,7 +185,7 @@ export default function GroupPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
-            <ValidatedForm id="form" validator={addPeopleValidator}>
+            <ValidatedForm method="post" validator={addPeopleValidator}>
               <DialogHeader>
                 <DialogTitle>Add people to `{group.name}`</DialogTitle>
               </DialogHeader>
