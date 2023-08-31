@@ -3,13 +3,13 @@ import { withZod } from '@remix-validated-form/with-zod'
 import {
   ValidatedForm,
   useControlField,
-  useField,
   validationError,
 } from 'remix-validated-form'
 import { z } from 'zod'
 import { Muted } from '~/components/typography'
 import { FormInput, FormSubmit } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
+import { getHost } from '~/routes'
 
 let schema = z.object({
   url: z.string(),
@@ -26,8 +26,7 @@ export async function action({ request }: ActionArgs) {
 
   let source64 = Buffer.from(form.data.url).toString('base64')
 
-  let url = new URL(request.url)
-  let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
+  let baseUrl = `${getHost(request)}/g2s/${source64}/stac`
 
   return redirect(
     `https://radiantearth.github.io/stac-browser/#/external/${baseUrl}`,

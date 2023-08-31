@@ -5,15 +5,15 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import type { Item } from '@prisma/client'
 import { polygonsToBbox } from '~/utils/stacspec'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }) => {
   let { collectionId, catalogId } = zx.parseParams(params, {
     collectionId: z.string(),
     catalogId: z.string(),
   })
-  let url = new URL(request.url)
 
-  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
+  let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
 
   let collection = await db.collection.findUniqueOrThrow({
     where: {

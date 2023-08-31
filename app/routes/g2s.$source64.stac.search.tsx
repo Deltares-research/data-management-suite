@@ -2,6 +2,7 @@ import { getStacValidator } from '~/utils/stacspec'
 import { geonetworkItem2StacItem } from '~/utils/geonetwork'
 import { cachedFetch } from '~/utils/cachedFetch'
 import { withCors } from '~/utils/withCors'
+import { getHost } from '~/routes'
 
 let GN_BASE_URL = 'https://deltaresdata.openearth.eu'
 
@@ -11,7 +12,7 @@ export let loader = withCors(async ({ request }) => {
   let validate = await getStacValidator('Item')
 
   let url = new URL(request.url)
-  let baseUrl = `${url.protocol}//${url.host}/oe/stac`
+  let baseUrl = `${getHost(request)}/oe/stac`
   let collectionsString = url.searchParams.get('collections')
   let collections = collectionsString?.split(',') ?? []
 

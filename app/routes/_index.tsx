@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
-import { routes } from '~/routes'
+import { getHost, routes } from '~/routes'
 
 export let meta: V2_MetaFunction = () => {
   return [
@@ -22,9 +22,9 @@ export let meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request }: LoaderArgs) {
-  let url = new URL(request.url)
-
-  let stacBrowserUrl = `https://radiantearth.github.io/stac-browser/#/external/${url.protocol}//${url.host}/stac`
+  let stacBrowserUrl = `https://radiantearth.github.io/stac-browser/#/external/${getHost(
+    request,
+  )}/stac`
 
   return { stacBrowserUrl }
 }

@@ -3,12 +3,12 @@ import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
 import { conformsTo, getStacValidator } from '~/utils/stacspec'
 import { db } from '~/utils/db.server'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request }: LoaderArgs) => {
   let validate = await getStacValidator('Catalog')
-  let url = new URL(request.url)
 
-  let baseUrl = `${url.protocol}//${url.host}/stac`
+  let baseUrl = `${getHost(request)}/stac`
 
   let [catalogs, externalCatalogs] = await Promise.all([
     db.catalog.findMany(),

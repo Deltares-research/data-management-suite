@@ -100,6 +100,19 @@ export default function AppLayout() {
           >
             Groups
           </NavLink>
+
+          <Separator className="h-4" orientation="vertical" />
+
+          <NavLink
+            to={routes.home()}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-primary ${
+                isActive ? 'text-primary' : 'text-muted-foreground'
+              }`
+            }
+          >
+            Home
+          </NavLink>
         </div>
 
         <div>
