@@ -3,13 +3,17 @@ version: '3'
 services:
   db:
     image: postgis/postgis:15-3.3
-    restart: always
+    restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: '$AzureR0cks!'
+      POSTGRES_PASSWORD: AzureR0cks!
+      POSTGRES_USER: postgres
+      POSTGRES_DB: remix
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -33,11 +37,9 @@ services:
     ports:
       - 3000:3000
     environment:
-      DATABASE_URL: 'postgresql://postgres:$AzureR0cks!@db:5432/remix'
+      DATABASE_URL: 'postgresql://postgres:AzureR0cks!@db:5432/remix'
     links:
       - db
 
 volumes:
   pgdata:
-
-

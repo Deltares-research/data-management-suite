@@ -20,7 +20,8 @@
 		"mhutchie.git-graph",
 		"hashicorp.terraform",
 		"ms-vsliveshare.vsliveshare",
-		"redhat.vscode-yaml"
+		"redhat.vscode-yaml",
+		"mikestead.dotenv"
 	]
     }
   },

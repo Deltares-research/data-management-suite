@@ -7,6 +7,10 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "dev": "remix dev",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
+    "e2e": "npm run e2e:setupdb && npm run e2e:setupplaywright npm run e2e:test",
+    "e2e:setupdb": "prisma migrate reset -f && prisma db seed",
+    "e2e:setupplaywright": "playwright install --with-deps",
+    "e2e:test": "npx remix-serve build & playwright test",
     "start": "prisma migrate deploy ; remix-serve build",
     "typecheck": "tsc -b"
   },
