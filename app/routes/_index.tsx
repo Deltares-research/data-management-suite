@@ -115,7 +115,7 @@ export default function HomePage() {
 
           <li className="flex justify-between gap-5">
             <div>
-              <strong className="font-medium">Deltares Data Council</strong>
+              <strong className="font-medium">Data Governance Council</strong>
               <Muted>
                 Information on who is in the data council, what they do and
                 decisions they’ve made.
