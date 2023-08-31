@@ -19,7 +19,10 @@ let collectionSchema = z.object({
 
 let collectionValidator = withZod(collectionSchema)
 
-export async function action({ request, id }: ActionArgs & { id?: string }) {
+export async function submitCollectionForm({
+  request,
+  id,
+}: ActionArgs & { id?: string }) {
   let form = await collectionValidator.validate(await request.formData())
 
   if (form.error) {

@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client'
+import { Role } from '@prisma/client'
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
@@ -14,16 +16,46 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
+import { requireAuthentication } from '~/services/auth.server'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
+  let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 
+  let where: Prisma.CollectionWhereInput = {
+    catalog: {
+      OR: [
+        {
+          groups: {
+            some: {
+              members: {
+                some: {
+                  personId: user.id,
+                },
+              },
+            },
+          },
+        },
+        {
+          groups: {
+            every: {
+              id: undefined,
+            },
+          },
+        },
+      ],
+    },
+  }
+
   let [count, collections] = await db.$transaction([
-    db.collection.count(),
+    db.collection.count({
+      where,
+    }),
     db.collection.findMany({
       ...filters,
+      where,
       include: {
         _count: {
           select: { items: true },
