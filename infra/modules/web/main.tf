@@ -47,6 +47,7 @@ resource "azurerm_container_app" "web" {
     }
   }
   template {
+    min_replicas = 1
     container {
       name   = "web"
       image  = "${var.container_registry_server}/${var.image_name}"
