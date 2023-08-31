@@ -73,7 +73,7 @@ export async function submitItemForm({
 
   let item = await db.item.upsert({
     where: {
-      id,
+      id: id ?? '',
     },
     create: {
       ...formData,
