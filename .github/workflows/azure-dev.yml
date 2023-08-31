@@ -8,14 +8,13 @@ on: push
 permissions:
   id-token: write
   contents: read
+  actions: write
 
 jobs:
   end2endtest:
     name: End 2 end test
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    permissions:
-      actions: write
     services:
       # Label used to access the service container
       postgres:
