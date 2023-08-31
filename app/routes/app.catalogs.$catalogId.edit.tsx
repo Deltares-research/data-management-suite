@@ -25,15 +25,26 @@ export async function loader({ request, params }: LoaderArgs) {
     catalogId: z.string(),
   })
 
-  return db.catalog.findUniqueOrThrow({
+  let catalog = await db.catalog.findUniqueOrThrow({
     where: {
       id: catalogId,
     },
+    include: {
+      groups: true,
+    },
   })
+
+  return {
+    catalog: {
+      ...catalog,
+      groupIds: catalog.groups.map(c => c.id),
+    },
+    initialGroupCache: catalog.groups,
+  }
 }
 
 export default function CreateCatalogPage() {
-  let defaultValues = useLoaderData<typeof loader>()
+  let { catalog } = useLoaderData<typeof loader>()
 
-  return <CatalogForm defaultValues={defaultValues} />
+  return <CatalogForm defaultValues={catalog} />
 }

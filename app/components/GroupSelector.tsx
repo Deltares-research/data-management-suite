@@ -1,8 +1,8 @@
 import type { Group } from '@prisma/client'
-import { useFetcher } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import React from 'react'
 import { useField } from 'remix-validated-form'
-import type { loader } from '~/routes/api.groups'
+import type { loader as groupsApiLoader } from '~/routes/api.groups'
 import { Label } from './ui/label'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
@@ -17,18 +17,23 @@ import {
   CommandItem,
 } from './ui/command'
 import { cn } from '~/utils'
+import type { loader as catalogEditLoader } from '~/routes/app.catalogs.$catalogId.edit'
 
 export function GroupSelector({
   label,
   name,
-  initialCache,
 }: {
   label: string
   name: string
-  initialCache?: Record<string, Group>
 }) {
+  // TODO: Generalize
+  let { initialGroupCache } = useLoaderData<typeof catalogEditLoader>()
+
   let { current: groupCache } = React.useRef<Record<string, Group>>(
-    initialCache ?? {},
+    initialGroupCache.reduce((acc, current) => {
+      acc[current.id] = current
+      return acc
+    }, {} as Record<string, Group>) ?? {},
   )
   let { defaultValue, error } = useField(name)
   let [open, setOpen] = React.useState(false)
@@ -36,7 +41,7 @@ export function GroupSelector({
   let [search, setSearch] = React.useState('')
   let id = React.useId()
 
-  let fetcher = useFetcher<typeof loader>()
+  let fetcher = useFetcher<typeof groupsApiLoader>()
 
   React.useEffect(() => {
     fetcher.load(`/api/groups?q=${search}`)

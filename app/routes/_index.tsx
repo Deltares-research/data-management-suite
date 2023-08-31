@@ -46,16 +46,16 @@ export default function HomePage() {
       <div className="pt-12 grid grid-cols-1 lg:grid-cols-2 gap-5 w-fit">
         <Card className="flex flex-col">
           <CardHeader>
-            <CardTitle>Register new dataset</CardTitle>
+            <CardTitle>Register data</CardTitle>
 
             <CardDescription>
-              Publish datasets to the central STAC catalog.
+              Create STAC catalogs, collections and publish metadata.
             </CardDescription>
           </CardHeader>
           <CardFooter className="mt-auto">
             <Button asChild className="group">
-              <Link to={routes.createItem()}>
-                Register dataset
+              <Link to={routes.items()}>
+                Register data
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transform transition-transform" />
               </Link>
             </Button>
@@ -74,7 +74,7 @@ export default function HomePage() {
           <CardFooter className="mt-auto">
             <Button asChild className="group">
               <Link to={stacBrowserUrl} target="_blank" rel="noopener">
-                Find data
+                Browse all catalogs
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transform transition-transform" />
               </Link>
             </Button>
