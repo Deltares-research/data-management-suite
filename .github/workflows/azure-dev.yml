@@ -14,6 +14,8 @@ jobs:
     name: End 2 end test
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     services:
       # Label used to access the service container
       postgres:
@@ -42,6 +44,8 @@ jobs:
     steps:
       - name: 🛑 Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
 
       - name: ⬇️ Checkout repo
         uses: actions/checkout@v3
@@ -68,6 +72,10 @@ jobs:
 
       - name: Run Playwright tests
         run: npx remix-serve build & npx playwright test
+        env:   
+          AZURE_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
