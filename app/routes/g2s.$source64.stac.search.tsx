@@ -15,8 +15,9 @@ export let loader = withCors(async ({ request }) => {
   let baseUrl = `${getHost(request)}/oe/stac`
   let collectionsString = url.searchParams.get('collections')
   let collections = collectionsString?.split(',') ?? []
+  let q = url.searchParams.get('q') ?? ''
 
-  let gnUrl = `${GN_BASE_URL}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20`
+  let gnUrl = `${GN_BASE_URL}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=100&any=${q}`
   for (let collection of collections) {
     gnUrl += `&facet.q=topicCat/${collection}`
   }
