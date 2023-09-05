@@ -1,10 +1,10 @@
 import type { LinksFunction, LoaderArgs } from '@remix-run/node'
 import { db } from '~/utils/db.server'
-import type { FillLayer, ViewStateChangeEvent } from 'react-map-gl'
-import Map, { Layer, Marker, Source } from 'react-map-gl'
+import type { ViewStateChangeEvent } from 'react-map-gl'
+import Map, { Layer, Source } from 'react-map-gl'
 import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
 import { useLoaderData, useSearchParams } from '@remix-run/react'
-import rewind from '@mapbox/geojson-rewind'
+import { getHost } from '~/routes'
 
 // TODO: Get token from BE
 const MAPBOX_TOKEN =
@@ -23,6 +23,36 @@ export async function loader({ request }: LoaderArgs) {
   let url = new URL(request.url)
   let bboxString = url.searchParams.get('bbox')
   let bbox = bboxString ? JSON.parse(bboxString) : [-180, -90, 180, 90]
+
+  let externalCatalog = await db.externalCatalog.findFirst()
+
+  // if (externalCatalog?.url) {
+  //   let result = await fetch(`${externalCatalog?.url}/search${url.search}`)
+  //     .then(res => res.json())
+  //     .catch(e => {
+  //       console.error(e)
+
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: [],
+  //       }
+  //     })
+
+  //   return result
+  // }
+
+  let result = await fetch(`${getHost(request)}/stac/search${url.search}`)
+    .then(res => res.json())
+    .catch(e => {
+      console.error(e)
+
+      return {
+        type: 'FeatureCollection',
+        features: [],
+      }
+    })
+
+  return result
 
   let items = await db.$queryRaw`
     SELECT ST_AsGeoJson(geometry) as geometry, "id", "ownerId" FROM "Item"
@@ -45,20 +75,22 @@ export default function SearchPage() {
     })
   }
 
-  let features = results.map(item => {
-    let geometry = JSON.parse(item.geometry)
+  // let features = results.map(item => {
+  //   let geometry = JSON.parse(item.geometry)
 
-    return {
-      type: 'Feature',
-      properties: {},
-      geometry,
-    }
-  })
+  //   return {
+  //     type: 'Feature',
+  //     properties: {},
+  //     geometry,
+  //   }
+  // })
 
-  let data = {
-    type: 'FeatureCollection',
-    features,
-  }
+  // let data = {
+  //   type: 'FeatureCollection',
+  //   features,
+  // }
+
+  let data = results
 
   return (
     <div className="">
@@ -74,7 +106,7 @@ export default function SearchPage() {
           latitude: 52.377,
           zoom: 9,
         }}
-        // onMoveEnd={handleMoveEnd}
+        onMoveEnd={handleMoveEnd}
       >
         <Source type="geojson" data={data}>
           <Layer
