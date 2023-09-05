@@ -35,6 +35,7 @@ import {
   SheetTrigger,
 } from '~/components/ui/sheet'
 import type { FeatureCollection } from 'geojson'
+import { getHost } from '~/routes'
 
 // TODO: Get token from BE
 const MAPBOX_TOKEN =
@@ -71,6 +72,35 @@ export async function loader({ request }: LoaderArgs) {
   // )
 
   let externalFeatures: any[] = []
+  let externalCatalog = await db.externalCatalog.findFirst()
+
+  // if (externalCatalog?.url) {
+  //   let result = await fetch(`${externalCatalog?.url}/search${url.search}`)
+  //     .then(res => res.json())
+  //     .catch(e => {
+  //       console.error(e)
+
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: [],
+  //       }
+  //     })
+
+  //   return result
+  // }
+
+  // let result = await fetch(`${getHost(request)}/stac/search${url.search}`)
+  //   .then(res => res.json())
+  //   .catch(e => {
+  //     console.error(e)
+
+  //     return {
+  //       type: 'FeatureCollection',
+  //       features: [],
+  //     }
+  //   })
+
+  // return result
 
   let items = await db.$queryRaw`
     SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."title", "Item"."description", "Item"."dateTime", "Item"."startTime", "Item"."endTime", "Collection"."title" as "collectionTitle" FROM "Item"
@@ -138,11 +168,22 @@ export default function SearchPage() {
     }),
     ...externalFeatures.flatMap(fc => fc?.features ?? []),
   ]
+  // let features = results.map(item => {
+  //   let geometry = JSON.parse(item.geometry)
+
+  //   return {
+  //     type: 'Feature',
+  //     properties: {},
+  //     geometry,
+  //   }
+  // })
 
   let data = {
     type: 'FeatureCollection',
     features,
   }
+
+  // let data = results
 
   let qId = React.useId()
 
