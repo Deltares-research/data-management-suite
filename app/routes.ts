@@ -6,6 +6,9 @@ export let routes = {
   home() {
     return `/`
   },
+  search() {
+    return `${appPrefix}/search`
+  },
 
   items() {
     return `${appPrefix}/items`

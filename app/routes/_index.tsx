@@ -73,8 +73,8 @@ export default function HomePage() {
           </CardHeader>
           <CardFooter className="mt-auto">
             <Button asChild className="group">
-              <Link to={stacBrowserUrl} target="_blank" rel="noopener">
-                Browse all catalogs
+              <Link to={routes.search()}>
+                Search data
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transform transition-transform" />
               </Link>
             </Button>

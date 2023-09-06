@@ -7,7 +7,12 @@ import { db } from '~/utils/db.server'
 import type { MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl'
 import Map, { Layer, Source } from 'react-map-gl'
 import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
-import { Form, useLoaderData, useSearchParams } from '@remix-run/react'
+import {
+  Form,
+  useLoaderData,
+  useNavigation,
+  useSearchParams,
+} from '@remix-run/react'
 import type { Item } from '@prisma/client'
 import { H3, Muted } from '~/components/typography'
 import { Badge } from '~/components/ui/badge'
@@ -23,7 +28,7 @@ import { format } from 'date-fns'
 import { Button } from '~/components/ui/button'
 import type mapboxgl from 'mapbox-gl'
 import { Input } from '~/components/ui/input'
-import { Search, Sliders } from 'lucide-react'
+import { BookOpen, Loader2, Search, Sliders } from 'lucide-react'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import {
@@ -55,6 +60,7 @@ export let links: LinksFunction = () => {
 }
 
 export async function loader({ request }: LoaderArgs) {
+  let url = new URL(request.url)
   let { bbox: bboxString, q = '' } = zx.parseQuery(request, {
     bbox: z.string().optional(),
     q: z.string().optional(),
@@ -71,23 +77,21 @@ export async function loader({ request }: LoaderArgs) {
   //   }),
   // )
 
-  let externalFeatures: any[] = []
   let externalCatalog = await db.externalCatalog.findFirst()
 
-  // if (externalCatalog?.url) {
-  //   let result = await fetch(`${externalCatalog?.url}/search${url.search}`)
-  //     .then(res => res.json())
-  //     .catch(e => {
-  //       console.error(e)
+  let externalResults: any = {}
+  if (externalCatalog?.url) {
+    externalResults = await fetch(`${externalCatalog?.url}/search${url.search}`)
+      .then(res => res.json())
+      .catch(e => {
+        console.error(e)
 
-  //       return {
-  //         type: 'FeatureCollection',
-  //         features: [],
-  //       }
-  //     })
-
-  //   return result
-  // }
+        return {
+          type: 'FeatureCollection',
+          features: [],
+        }
+      })
+  }
 
   // let result = await fetch(`${getHost(request)}/stac/search${url.search}`)
   //   .then(res => res.json())
@@ -102,9 +106,16 @@ export async function loader({ request }: LoaderArgs) {
 
   // return result
 
-  let items = await db.$queryRaw`
-    SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."title", "Item"."description", "Item"."dateTime", "Item"."startTime", "Item"."endTime", "Collection"."title" as "collectionTitle" FROM "Item"
+  let items = await db.$queryRaw<
+    (Item & {
+      geometry: string
+      collectionTitle: string
+      catalogTitle: string
+    })[]
+  >`
+    SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."title", "Item"."description", "Item"."dateTime", "Item"."startTime", "Item"."endTime", "Collection"."title" as "collectionTitle", "Catalog"."title" as "catalogTitle" FROM "Item"
     JOIN "Collection" ON "Collection"."id" = "Item"."collectionId"
+    JOIN "Catalog" ON "Catalog"."id" = "Collection"."catalogId"
     WHERE ST_Intersects("Item"."geometry", ST_MakeEnvelope(${
       bbox[0]
     }::double precision, ${bbox[1]}::double precision, ${
@@ -119,14 +130,35 @@ export async function loader({ request }: LoaderArgs) {
     LIMIT 100
   `
 
+  console.log({ externalCatalog })
+
+  let features = [
+    ...items.map(item => {
+      let geometry = JSON.parse(item.geometry)
+
+      return {
+        type: 'Feature',
+        properties: item,
+        geometry,
+      }
+    }),
+    ...externalResults.features?.map(feature => ({
+      ...feature,
+      properties: {
+        ...feature.properties,
+        catalogTitle: externalCatalog?.title,
+      },
+    })),
+  ]
+
   return {
-    items: items as (Item & { geometry: string; collectionTitle: string })[],
-    externalFeatures,
+    type: 'FeatureCollection',
+    features,
   }
 }
 
 export default function SearchPage() {
-  let { items, externalFeatures } = useLoaderData<typeof loader>()
+  let data = useLoaderData<typeof loader>()
 
   let [searchParams, setSearchParams] = useSearchParams()
   let [bounds, setBounds] = React.useState<mapboxgl.LngLatBounds>()
@@ -154,42 +186,17 @@ export default function SearchPage() {
     setHoveredItemIds(e.features?.map(f => f.properties?.id) ?? [])
   }
 
-  let features = [
-    ...items.map(item => {
-      let geometry = JSON.parse(item.geometry)
-
-      return {
-        type: 'Feature',
-        properties: {
-          id: item.id,
-        },
-        geometry,
-      }
-    }),
-    ...externalFeatures.flatMap(fc => fc?.features ?? []),
-  ]
-  // let features = results.map(item => {
-  //   let geometry = JSON.parse(item.geometry)
-
-  //   return {
-  //     type: 'Feature',
-  //     properties: {},
-  //     geometry,
-  //   }
-  // })
-
-  let data = {
-    type: 'FeatureCollection',
-    features,
-  }
-
-  // let data = results
-
   let qId = React.useId()
+  let navigation = useNavigation()
 
   return (
-    <>
-      <div className="h-full grid grid-cols-2">
+    <div className="h-full grid grid-cols-2">
+      <div className="overflow-auto relative">
+        {navigation.state === 'loading' && (
+          <div className="absolute inset-0 bg-white/70 animate-in z-10 flex items-center justify-center">
+            <Loader2 className="animate-spin" />
+          </div>
+        )}
         <div className="p-5">
           <Form method="get">
             <input
@@ -234,46 +241,60 @@ export default function SearchPage() {
           </Form>
 
           <div className="mt-8">
-            <H3>{items.length} Results</H3>
+            <H3>{data.features.length} Results</H3>
           </div>
-          <div className="mt-6 flex flex-col gap-8 max-h-full overflow-auto">
-            {items.map(item => (
+          <div className="mt-6 flex flex-col gap-8">
+            {data.features.map(({ properties }) => (
               <Card
-                onMouseEnter={() => setHoveredItemIds([item.id])}
+                onMouseEnter={() => setHoveredItemIds([properties.id])}
                 onMouseLeave={() => setHoveredItemIds([])}
-                key={item.id}
+                key={properties.id}
                 className={
-                  hoveredItemIds.includes(item.id) ? 'border-green-500' : ''
+                  hoveredItemIds.includes(properties.id)
+                    ? 'border-green-500'
+                    : ''
                 }
               >
                 <CardHeader>
-                  <CardTitle>{item.title}</CardTitle>
-                  <CardDescription>{item.description}</CardDescription>
+                  <CardTitle>{properties.title}</CardTitle>
+                  <Muted className="flex items-center mt-0.5">
+                    <BookOpen className="w-4 h-4 mr-1.5" />{' '}
+                    {properties.catalogTitle}
+                  </Muted>
+                  <CardDescription>{properties.description}</CardDescription>
                 </CardHeader>
                 <CardFooter>
                   <div className="w-full flex justify-between gap-8 items-center">
-                    {item.startTime && item.endTime ? (
+                    {properties.startTime && properties.endTime ? (
                       <div className="flex gap-0.5">
                         <Muted>
-                          {item.startTime &&
-                            format(new Date(item.startTime), 'd MMM, yyyy')}
+                          {properties.startTime &&
+                            format(
+                              new Date(properties.startTime),
+                              'd MMM, yyyy',
+                            )}
                           —
-                          {item.endTime &&
-                            format(new Date(item.endTime), 'd MMM, yyyy')}
+                          {properties.endTime &&
+                            format(new Date(properties.endTime), 'd MMM, yyyy')}
                         </Muted>
                       </div>
                     ) : (
                       <>
-                        {item.dateTime && (
+                        {properties.dateTime && (
                           <Muted>
-                            {format(new Date(item.dateTime), 'd MMM, yyyy')}
+                            {format(
+                              new Date(properties.dateTime),
+                              'd MMM, yyyy',
+                            )}
                           </Muted>
                         )}
                       </>
                     )}
 
                     <div className="ml-auto">
-                      <Badge variant="secondary">{item.collectionTitle}</Badge>
+                      <Badge variant="secondary">
+                        {properties.collectionTitle}
+                      </Badge>
                     </div>
                   </div>
                 </CardFooter>
@@ -281,71 +302,71 @@ export default function SearchPage() {
             ))}
           </div>
         </div>
-        <div className="h-full">
-          <div className="relative h-full">
-            {bounds && (
-              <div className="z-10 absolute top-0 inset-x-0 p-8 flex justify-center">
-                <Button variant="secondary" onClick={setSearchBounds}>
-                  Search this area
-                </Button>
-              </div>
-            )}
-            <Map
-              mapboxAccessToken={MAPBOX_TOKEN}
-              // hackerino: 100vh minus top bar. Mapbox won't fill % height
-              style={{ height: 'calc(100vh - 64px)', width: '50vw' }}
-              mapStyle="mapbox://styles/mapbox/streets-v12"
-              initialViewState={{
-                longitude: 4.897,
-                latitude: 52.377,
-                zoom: 9,
-              }}
-              onMoveEnd={handleMoveEnd}
-              onMouseMove={handleMapHover}
-              onMouseOut={() => setHoveredItemIds([])}
-              interactiveLayerIds={['data-fill']}
-            >
-              <Source type="geojson" data={data}>
-                <Layer
-                  id="data-line"
-                  type="line"
-                  paint={{
-                    'line-color': '#d53e4f',
-                    'line-width': 2,
-                  }}
-                />
-                <Layer
-                  id="data-line-highlighted"
-                  type="line"
-                  paint={{
-                    'line-color': '#00ff00',
-                    'line-width': 2,
-                  }}
-                  filter={['in', 'id', hoveredItemIds?.[0] ?? '']}
-                />
+      </div>
+      <div className="h-full">
+        <div className="relative h-full">
+          {bounds && (
+            <div className="z-10 absolute top-0 inset-x-0 p-8 flex justify-center">
+              <Button variant="secondary" onClick={setSearchBounds}>
+                Search this area
+              </Button>
+            </div>
+          )}
+          <Map
+            mapboxAccessToken={MAPBOX_TOKEN}
+            // hackerino: 100vh minus top bar. Mapbox won't fill % height
+            style={{ height: 'calc(100vh - 64px)', width: '50vw' }}
+            mapStyle="mapbox://styles/mapbox/streets-v12"
+            initialViewState={{
+              longitude: 4.897,
+              latitude: 52.377,
+              zoom: 9,
+            }}
+            onMoveEnd={handleMoveEnd}
+            onMouseMove={handleMapHover}
+            onMouseOut={() => setHoveredItemIds([])}
+            interactiveLayerIds={['data-fill']}
+          >
+            <Source type="geojson" data={data}>
+              <Layer
+                id="data-line"
+                type="line"
+                paint={{
+                  'line-color': '#d53e4f',
+                  'line-width': 2,
+                }}
+              />
+              <Layer
+                id="data-line-highlighted"
+                type="line"
+                paint={{
+                  'line-color': '#00ff00',
+                  'line-width': 2,
+                }}
+                filter={['in', 'id', hoveredItemIds?.[0] ?? '']}
+              />
 
-                <Layer
-                  id="data-fill"
-                  type="fill"
-                  paint={{
-                    'fill-color': '#d53e4f',
-                    'fill-opacity': 0.2,
-                  }}
-                />
-                <Layer
-                  id="data-fill-highlighted"
-                  type="fill"
-                  paint={{
-                    'fill-color': '#00ff00',
-                    'fill-opacity': 0.2,
-                  }}
-                  filter={['in', 'id', hoveredItemIds?.[0] ?? '']}
-                />
-              </Source>
-            </Map>
-          </div>
+              <Layer
+                id="data-fill"
+                type="fill"
+                paint={{
+                  'fill-color': '#d53e4f',
+                  'fill-opacity': 0.2,
+                }}
+              />
+              <Layer
+                id="data-fill-highlighted"
+                type="fill"
+                paint={{
+                  'fill-color': '#00ff00',
+                  'fill-opacity': 0.2,
+                }}
+                filter={['in', 'id', hoveredItemIds?.[0] ?? '']}
+              />
+            </Source>
+          </Map>
         </div>
       </div>
-    </>
+    </div>
   )
 }

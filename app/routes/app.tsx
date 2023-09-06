@@ -135,7 +135,7 @@ export default function AppLayout() {
           </DropdownMenu>
         </div>
       </div>
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col h-full">
         <Outlet />
       </main>
     </div>

@@ -37,10 +37,13 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
     id: item.identifier,
     description: item.abstract,
     properties: {
+      id: item.identifier,
       title: item.title,
       datetime: undefined,
       start_datetime: undefined,
       end_datetime: undefined,
+      collectionTitle: '',
+      catalogTitle: '',
       ...geonetworkProperties,
     },
     geometry,
