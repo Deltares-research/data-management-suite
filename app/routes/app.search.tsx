@@ -9,6 +9,7 @@ import Map, { Layer, Source } from 'react-map-gl'
 import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
 import {
   Form,
+  Link,
   useLoaderData,
   useNavigation,
   useSearchParams,
@@ -77,21 +78,21 @@ export async function loader({ request }: LoaderArgs) {
   //   }),
   // )
 
-  let externalCatalog = await db.externalCatalog.findFirst()
+  // let externalCatalog = await db.externalCatalog.findFirst()
 
   let externalResults: any = {}
-  if (externalCatalog?.url) {
-    externalResults = await fetch(`${externalCatalog?.url}/search${url.search}`)
-      .then(res => res.json())
-      .catch(e => {
-        console.error(e)
+  // if (externalCatalog?.url) {
+  //   externalResults = await fetch(`${externalCatalog?.url}/search${url.search}`)
+  //     .then(res => res.json())
+  //     .catch(e => {
+  //       console.error(e)
 
-        return {
-          type: 'FeatureCollection',
-          features: [],
-        }
-      })
-  }
+  //       return {
+  //         type: 'FeatureCollection',
+  //         features: [],
+  //       }
+  //     })
+  // }
 
   // let result = await fetch(`${getHost(request)}/stac/search${url.search}`)
   //   .then(res => res.json())
@@ -130,8 +131,6 @@ export async function loader({ request }: LoaderArgs) {
     LIMIT 100
   `
 
-  console.log({ externalCatalog })
-
   let features = [
     ...items.map(item => {
       let geometry = JSON.parse(item.geometry)
@@ -142,23 +141,26 @@ export async function loader({ request }: LoaderArgs) {
         geometry,
       }
     }),
-    ...externalResults.features?.map(feature => ({
-      ...feature,
-      properties: {
-        ...feature.properties,
-        catalogTitle: externalCatalog?.title,
-      },
-    })),
+    // ...externalResults.features?.map(feature => ({
+    //   ...feature,
+    //   properties: {
+    //     ...feature.properties,
+    //     catalogTitle: externalCatalog?.title,
+    //   },
+    // })),
   ]
 
   return {
-    type: 'FeatureCollection',
-    features,
+    data: {
+      type: 'FeatureCollection',
+      features,
+    },
+    host: getHost(request),
   }
 }
 
 export default function SearchPage() {
-  let data = useLoaderData<typeof loader>()
+  let { data, host } = useLoaderData<typeof loader>()
 
   let [searchParams, setSearchParams] = useSearchParams()
   let [bounds, setBounds] = React.useState<mapboxgl.LngLatBounds>()
@@ -167,8 +169,10 @@ export default function SearchPage() {
   function handleMoveEnd(e: ViewStateChangeEvent) {
     let newBounds = e.target.getBounds()
 
-    setSearchParams({
-      bbox: JSON.stringify([...newBounds.toArray().flat()]),
+    setSearchParams(csp => {
+      csp.set('bbox', JSON.stringify([...newBounds.toArray().flat()]))
+
+      return csp
     })
   }
 
@@ -221,7 +225,7 @@ export default function SearchPage() {
 
               <Sheet>
                 <SheetTrigger>
-                  <Button variant="outline">
+                  <Button type="button" variant="outline">
                     Filter <Sliders className="ml-2 w-4 h-4" />
                   </Button>
                 </SheetTrigger>
@@ -245,60 +249,69 @@ export default function SearchPage() {
           </div>
           <div className="mt-6 flex flex-col gap-8">
             {data.features.map(({ properties }) => (
-              <Card
-                onMouseEnter={() => setHoveredItemIds([properties.id])}
-                onMouseLeave={() => setHoveredItemIds([])}
+              <Link
                 key={properties.id}
-                className={
-                  hoveredItemIds.includes(properties.id)
-                    ? 'border-green-500'
-                    : ''
-                }
+                to={`https://radiantearth.github.io/stac-browser/#/external/${host}/stac/items/${properties.id}`}
+                target="_blank"
+                rel="noopener"
               >
-                <CardHeader>
-                  <CardTitle>{properties.title}</CardTitle>
-                  <Muted className="flex items-center mt-0.5">
-                    <BookOpen className="w-4 h-4 mr-1.5" />{' '}
-                    {properties.catalogTitle}
-                  </Muted>
-                  <CardDescription>{properties.description}</CardDescription>
-                </CardHeader>
-                <CardFooter>
-                  <div className="w-full flex justify-between gap-8 items-center">
-                    {properties.startTime && properties.endTime ? (
-                      <div className="flex gap-0.5">
-                        <Muted>
-                          {properties.startTime &&
-                            format(
-                              new Date(properties.startTime),
-                              'd MMM, yyyy',
-                            )}
-                          —
-                          {properties.endTime &&
-                            format(new Date(properties.endTime), 'd MMM, yyyy')}
-                        </Muted>
-                      </div>
-                    ) : (
-                      <>
-                        {properties.dateTime && (
+                <Card
+                  onMouseEnter={() => setHoveredItemIds([properties.id])}
+                  onMouseLeave={() => setHoveredItemIds([])}
+                  className={
+                    hoveredItemIds.includes(properties.id)
+                      ? 'border-green-500'
+                      : ''
+                  }
+                >
+                  <CardHeader>
+                    <CardTitle>{properties.title}</CardTitle>
+                    <Muted className="flex items-center mt-0.5">
+                      <BookOpen className="w-4 h-4 mr-1.5" />{' '}
+                      {properties.catalogTitle}
+                    </Muted>
+                    <CardDescription>{properties.description}</CardDescription>
+                  </CardHeader>
+                  <CardFooter>
+                    <div className="w-full flex justify-between gap-8 items-center">
+                      {properties.startTime && properties.endTime ? (
+                        <div className="flex gap-0.5">
                           <Muted>
-                            {format(
-                              new Date(properties.dateTime),
-                              'd MMM, yyyy',
-                            )}
+                            {properties.startTime &&
+                              format(
+                                new Date(properties.startTime),
+                                'd MMM, yyyy',
+                              )}
+                            —
+                            {properties.endTime &&
+                              format(
+                                new Date(properties.endTime),
+                                'd MMM, yyyy',
+                              )}
                           </Muted>
-                        )}
-                      </>
-                    )}
+                        </div>
+                      ) : (
+                        <>
+                          {properties.dateTime && (
+                            <Muted>
+                              {format(
+                                new Date(properties.dateTime),
+                                'd MMM, yyyy',
+                              )}
+                            </Muted>
+                          )}
+                        </>
+                      )}
 
-                    <div className="ml-auto">
-                      <Badge variant="secondary">
-                        {properties.collectionTitle}
-                      </Badge>
+                      <div className="ml-auto">
+                        <Badge variant="secondary">
+                          {properties.collectionTitle}
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                </CardFooter>
-              </Card>
+                  </CardFooter>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
