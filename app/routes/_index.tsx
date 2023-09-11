@@ -23,7 +23,7 @@ export let meta: V2_MetaFunction = () => {
 
 export default function HomePage() {
   return (
-    <div className="px-8 py-16 w-full max-w-screen-lg">
+    <div className="px-8 py-16 w-full max-w-screen-lg mx-auto">
       <div className="max-w-lg">
         <H2>Data Management Suite</H2>
         <div className="pt-1">

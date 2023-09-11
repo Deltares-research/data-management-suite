@@ -1,4 +1,6 @@
+import { Role } from '@prisma/client'
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
+import type { NavLinkProps } from '@remix-run/react'
 import { Form, NavLink, Outlet, useLoaderData } from '@remix-run/react'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import {
@@ -13,9 +15,24 @@ import {
   createAuthenticator,
   requireAuthentication,
 } from '~/services/auth.server'
+import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
-  return requireAuthentication(request)
+  let authenticator = createAuthenticator(request)
+  let user = await authenticator.isAuthenticated(request)
+
+  return db.person.findUnique({
+    where: {
+      id: user?.id ?? '',
+    },
+    include: {
+      memberOf: {
+        include: {
+          group: true,
+        },
+      },
+    },
+  })
 }
 
 export async function action({ request }: ActionArgs) {
@@ -25,94 +42,43 @@ export async function action({ request }: ActionArgs) {
 
 export default function AppLayout() {
   let user = useLoaderData<typeof loader>()
-  let [firstName, lastName] = (user.name ?? '? ?').split(' ')
+  let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
+
+  let canWrite = user?.memberOf.some(
+    member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
+  )
+  let isAdmin = user?.memberOf.some(
+    member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
+  )
 
   return (
     <div className="h-full flex flex-col">
       <div className="border-b flex-shrink-0 h-16 px-8 flex items-center justify-between">
         <div className="flex gap-5 items-center">
-          <NavLink
-            to={routes.items()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            Datasets
-          </NavLink>
+          <MenuItem to={routes.home()}>Home</MenuItem>
+          <MenuItem to={routes.search()}>Search</MenuItem>
 
-          <NavLink
-            to={routes.collections()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            Collections
-          </NavLink>
+          {canWrite && (
+            <>
+              <Separator className="h-4" orientation="vertical" />
+              <MenuItem to={routes.items()}>Datasets</MenuItem>
+              <MenuItem to={routes.collections()}>Collections</MenuItem>
+              <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
+              <MenuItem to={routes.keywords()}>Keywords</MenuItem>
+            </>
+          )}
 
-          <NavLink
-            to={routes.catalogs()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            Catalogs
-          </NavLink>
+          {isAdmin && (
+            <>
+              <Separator className="h-4" orientation="vertical" />
+              <MenuItem to={routes.externalCatalogs()}>
+                External Catalogs
+              </MenuItem>
+              <Separator className="h-4" orientation="vertical" />
 
-          <NavLink
-            to={routes.keywords()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            Keywords
-          </NavLink>
-
-          <Separator className="h-4" orientation="vertical" />
-
-          <NavLink
-            to={routes.externalCatalogs()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            External Catalogs
-          </NavLink>
-
-          <Separator className="h-4" orientation="vertical" />
-
-          <NavLink
-            to={routes.groups()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            Groups
-          </NavLink>
-
-          <Separator className="h-4" orientation="vertical" />
-
-          <NavLink
-            to={routes.home()}
-            className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-primary ${
-                isActive ? 'text-primary' : 'text-muted-foreground'
-              }`
-            }
-          >
-            Home
-          </NavLink>
+              <MenuItem to={routes.groups()}>Groups</MenuItem>
+            </>
+          )}
         </div>
 
         <div>
@@ -139,5 +105,19 @@ export default function AppLayout() {
         <Outlet />
       </main>
     </div>
+  )
+}
+
+function MenuItem(props: NavLinkProps) {
+  return (
+    // eslint-disable-next-line jsx-a11y/anchor-has-content
+    <NavLink
+      className={({ isActive }) =>
+        `text-sm font-medium transition-colors hover:text-primary ${
+          isActive ? 'text-primary' : 'text-muted-foreground'
+        }`
+      }
+      {...props}
+    />
   )
 }
