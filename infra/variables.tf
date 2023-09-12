@@ -9,11 +9,6 @@ variable "environment_name" {
   type        = string
 }
 
-variable "web_image_name" {
-  description = "The image name for the web service"
-  type        = string
-}
-
 variable "database_password" {
   description = "Password of the database"
   type        = string
