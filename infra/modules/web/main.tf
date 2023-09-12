@@ -72,11 +72,11 @@ resource "azurerm_container_app" "web" {
       }
       env {
         name  = "DATABASE_URL"
-        value = var.database_connection_string
+        secret_name = "database-url"
       }
       env {
         name  = "SESSION_SECRET"
-        value = var.session_secret
+        secret_name = "session-secret"
       }
       env {
         name  = "PORT"
@@ -96,8 +96,23 @@ resource "azurerm_container_app" "web" {
       }
       env {
         name  = "AZURE_CLIENT_SECRET"
-        value = var.app_client_secret
+        secret_name = "client-secret"
       }
     }
+  }
+
+  secret {
+    name = "database-url"
+    value= var.database_connection_string
+  }
+
+  secret {
+    name = "session-secret"
+    value= var.session_secret
+  }
+
+  secret {
+    name = "client-secret"
+    value = var.app_client_secret
   }
 }
