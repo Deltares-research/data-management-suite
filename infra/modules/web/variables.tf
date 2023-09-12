@@ -8,6 +8,11 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "container_app_already_exists" {
+  description = "Bool stating whether the container app should already exists, so we dont change the used image during infra deploy"
+  type        = bool 
+}
+
 variable "location" {
   description = "Azure region the resources should be deployed in"
   type        = string
@@ -35,11 +40,6 @@ variable "container_app_environment_id" {
 
 variable "container_registry_server" {
   description = "location of the container registry"
-  type        = string
-}
-
-variable "image_name" {
-  description = "name of the web service image"
   type        = string
 }
 
