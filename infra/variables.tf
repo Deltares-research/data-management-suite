@@ -36,3 +36,8 @@ variable "app_client_secret" {
   type        = string
   sensitive   = true
 }
+
+variable "web_app_exists" {
+  description = "Web app already exists and we should not change the running image"
+  type        = bool
+}

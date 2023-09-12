@@ -13,6 +13,17 @@ terraform {
   }
 }
 
+locals {
+  container_app_name = "ca-${var.short_app_name}-${var.environment_name}-web"
+  initial_container = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+  container_name = var.container_app_already_exists ?  data.azurerm_container_app.existing_container_app.template[0].container[0].image  : local.initial_container
+}
+
+data "azurerm_container_app" "existing_container_app" {
+  name = local.container_app_name
+  resource_group_name = var.resource_group_name
+}
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "webapp" {
@@ -23,7 +34,7 @@ resource "azurerm_user_assigned_identity" "webapp" {
 }
 
 resource "azurerm_container_app" "web" {
-  name                         = "ca-${var.short_app_name}-${var.environment_name}-web"
+  name                         = local.container_app_name
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
@@ -43,6 +54,7 @@ resource "azurerm_container_app" "web" {
     target_port      = 80
     transport        = "auto"
     traffic_weight {
+      latest_revision = true
       percentage = 100
     }
   }
@@ -50,7 +62,7 @@ resource "azurerm_container_app" "web" {
     min_replicas = 1
     container {
       name   = "web"
-      image  = "${var.container_registry_server}/${var.image_name}"
+      image  = local.container_name
       cpu    = 0.5
       memory = "1Gi"
 
