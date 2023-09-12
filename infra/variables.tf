@@ -9,11 +9,6 @@ variable "environment_name" {
   type        = string
 }
 
-variable "web_image_name" {
-  description = "The image name for the web service"
-  type        = string
-}
-
 variable "database_password" {
   description = "Password of the database"
   type        = string
@@ -35,4 +30,9 @@ variable "app_client_secret" {
   description = "client secret of the app registration used by the webapp"
   type        = string
   sensitive   = true
+}
+
+variable "web_app_exists" {
+  description = "Web app already exists and we should not change the running image"
+  type        = bool
 }
