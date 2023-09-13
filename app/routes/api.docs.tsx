@@ -1,14 +1,7 @@
+import { useLoaderData } from '@remix-run/react'
 import { CodeBlock, dracula } from 'react-code-blocks'
-import type {
-  ZodObject,
-  ZodObjectDef,
-  ZodRawShape,
-  ZodSchema,
-  ZodTypeAny,
-  ZodTypeDef,
-} from 'zod'
-import { ZodType } from 'zod'
-import { H3, H4 } from '~/components/typography'
+import type { ZodRawShape, ZodTypeAny } from 'zod'
+import { H4 } from '~/components/typography'
 import {
   Table,
   TableBody,
@@ -17,9 +10,23 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
+import { createCreateItemExample } from '~/docs/items/create'
+import { createGetItemExample } from '~/docs/items/get'
 import { itemSchema } from '~/forms/ItemForm'
 
+export async function loader() {
+  let createItemExample = await createCreateItemExample()
+  let getItemExample = await createGetItemExample()
+
+  return {
+    createItemExample,
+    getItemExample,
+  }
+}
+
 export default function ApiDocs() {
+  let { createItemExample, getItemExample } = useLoaderData<typeof loader>()
+
   return (
     <div className="pl-8 grid grid-cols-[240px_minmax(0,1fr)] gap-10">
       <div>
@@ -58,17 +65,75 @@ export default function ApiDocs() {
         </aside>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="py-8 grid grid-flow-row lg:grid-cols-2 gap-6">
         <div className="bg-white">
-          <H4>Item Input</H4>
-          <SchemaTable shape={itemSchema.shape} />
+          <H4>Get Item</H4>
         </div>
-        <div className="bg-[#282A36]">
+        <div className="bg-foreground text-background/80 p-6">
+          <h3 className="text-lg my-5">Endpoint</h3>
           <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
-            text="let kek: Kek = 'kek'"
+            text={`${getItemExample.method} ${
+              new URL(getItemExample.endpoint).pathname
+            }`}
             theme={dracula}
+            wrapLongLines
+          />
+
+          <h3 className="text-lg my-5">Example Response</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={JSON.stringify(getItemExample.exampleResponseBody, null, 2)}
+            theme={dracula}
+            wrapLongLines
+          />
+        </div>
+
+        <div className="bg-white">
+          <H4>Item Input</H4>
+          <div className="pt-3">
+            <SchemaTable shape={itemSchema.shape} />
+          </div>
+        </div>
+        <div className="bg-foreground text-background/80 p-6">
+          <h3 className="text-lg my-5">Example Input</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={JSON.stringify(createItemExample.exampleRequestBody, null, 2)}
+            theme={dracula}
+            wrapLongLines
+          />
+
+          <h3 className="text-lg my-5">Endpoint</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={`${createItemExample.method} ${
+              new URL(createItemExample.endpoint).pathname
+            }`}
+            theme={dracula}
+            wrapLongLines
+          />
+
+          <h3 className="text-lg my-5">Example Response</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={JSON.stringify(
+              createItemExample.exampleResponseBody,
+              null,
+              2,
+            )}
+            theme={dracula}
+            wrapLongLines
           />
         </div>
       </div>
@@ -93,7 +158,9 @@ function SchemaTable({ shape }: { shape: ZodRawShape }) {
               <code>{key}</code>
             </TableCell>
             <TableCell>
-              <TypeDef def={value._def} name={key} />
+              <code>
+                <TypeDef def={value._def} name={key} />
+              </code>
             </TableCell>
             <TableCell>{value.description}</TableCell>
           </TableRow>
@@ -113,7 +180,9 @@ function SchemaTableCondensed({ shape }: { shape: ZodRawShape }) {
               <code>{key}</code>
             </TableCell>
             <TableCell>
-              <TypeDef def={value._def} name={key} />
+              <code>
+                <TypeDef def={value._def} name={key} />
+              </code>
             </TableCell>
           </TableRow>
         ))}
@@ -151,8 +220,10 @@ function TypeDef({ name, def }: { name?: string; def: ZodTypeAny['_def'] }) {
       return <>string</>
     case 'ZodNumber':
       return <>number</>
+    case 'ZodEffects':
+      return <TypeDef def={def?.schema?._def} />
     default:
-      console.log(def.typeName, 'not implemented')
+      console.log(def.typeName, 'not implemented', def)
       return
   }
 }
