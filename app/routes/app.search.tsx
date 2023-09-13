@@ -194,8 +194,8 @@ export default function SearchPage() {
   let navigation = useNavigation()
 
   return (
-    <div className="h-full grid grid-cols-2">
-      <div className="overflow-auto relative">
+    <div className="grid grid-cols-2" style={{ height: 'calc(100vh - 64px)' }}>
+      <div className="h-full overflow-auto relative">
         {navigation.state === 'loading' && (
           <div className="absolute inset-0 bg-white/70 animate-in z-10 flex items-center justify-center">
             <Loader2 className="animate-spin" />

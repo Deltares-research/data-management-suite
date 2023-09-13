@@ -15,7 +15,7 @@ import { keywordCache } from '~/utils/keywordCache'
 import type { Keyword } from '@prisma/client'
 
 export async function loader({ request, params }: LoaderArgs) {
-  await requireAuthentication(request)
+  // await requireAuthentication(request)
 
   let { itemId } = await zx.parseParams(params, { itemId: z.string() })
 

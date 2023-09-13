@@ -11,10 +11,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Separator } from '~/components/ui/separator'
 import { routes } from '~/routes'
-import {
-  createAuthenticator,
-  requireAuthentication,
-} from '~/services/auth.server'
+import { createAuthenticator } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
@@ -101,7 +98,7 @@ export default function AppLayout() {
           </DropdownMenu>
         </div>
       </div>
-      <main className="flex-1 flex flex-col h-full">
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
     </div>
