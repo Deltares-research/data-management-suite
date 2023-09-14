@@ -40,7 +40,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '~/components/ui/sheet'
-import type { FeatureCollection } from 'geojson'
 import { getHost } from '~/routes'
 
 // TODO: Get token from BE
@@ -60,12 +59,17 @@ export let links: LinksFunction = () => {
   ]
 }
 
+export let searchQuerySchema = {
+  bbox: z
+    .string()
+    .optional()
+    .describe('JSON stringified representation of a bbox'),
+  q: z.string().optional().describe('Will search item title and description'),
+}
+
 export async function loader({ request }: LoaderArgs) {
   let url = new URL(request.url)
-  let { bbox: bboxString, q = '' } = zx.parseQuery(request, {
-    bbox: z.string().optional(),
-    q: z.string().optional(),
-  })
+  let { bbox: bboxString, q = '' } = zx.parseQuery(request, searchQuerySchema)
   let bbox = bboxString ? JSON.parse(bboxString) : [-180, -90, 180, 90]
 
   // let externalCatalogs = await db.externalCatalog.findMany()

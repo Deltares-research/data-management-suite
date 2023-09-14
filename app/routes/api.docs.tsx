@@ -1,4 +1,12 @@
-import { useLoaderData } from '@remix-run/react'
+import {
+  randAnimal,
+  randNumber,
+  randParagraph,
+  randRecentDate,
+  randSoonDate,
+  randUuid,
+} from '@ngneat/falso'
+import { randomPolygon } from '@turf/turf'
 import { CodeBlock, dracula } from 'react-code-blocks'
 import type { ZodRawShape, ZodTypeAny } from 'zod'
 import { H4 } from '~/components/typography'
@@ -10,25 +18,91 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import { createCreateItemExample } from '~/docs/items/create'
-import { createGetItemExample } from '~/docs/items/get'
+import type { ItemSchema } from '~/forms/ItemForm'
 import { itemSchema } from '~/forms/ItemForm'
+import type { action as createItemAction } from './api.items'
+import {
+  getItemParams,
+  type action as getItemAction,
+} from './api.items_.$itemId'
+import { searchQuerySchema } from './app.search'
+import type { loader as searchLoader } from './api.search'
 
-export async function loader() {
-  let createItemExample = await createCreateItemExample()
-  let getItemExample = await createGetItemExample()
+let createItemRequestBody: ItemSchema = {
+  title: randAnimal(),
+  projectNumber: randNumber().toFixed(0),
+  description: randParagraph(),
+  geometry: randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
+  dateRange: {
+    from: randRecentDate().toISOString(),
+    to: randSoonDate().toISOString(),
+  },
+  location: '',
+  license: '',
+  collectionId: randUuid(),
+}
 
-  return {
-    createItemExample,
-    getItemExample,
-  }
+let itemResponseBody: Awaited<ReturnType<typeof createItemAction>> = {
+  id: randUuid(),
+  title: createItemRequestBody.title,
+  projectNumber: createItemRequestBody.projectNumber,
+  assets: null,
+  collectionId: createItemRequestBody.collectionId,
+  description: createItemRequestBody.description,
+  dateTime: null,
+  startTime: new Date(createItemRequestBody.dateRange.from),
+  endTime: new Date(createItemRequestBody.dateRange.to ?? 0),
+  location: '',
+  license: '',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  ownerId: randUuid(),
+  properties: {},
+}
+
+let createItemExample = {
+  requestBody: createItemRequestBody,
+  responseBody: itemResponseBody,
+  method: 'POST',
+  url: '/api/items',
+}
+
+let getItemResponseBody: Awaited<ReturnType<typeof getItemAction>> =
+  itemResponseBody
+
+let getItemExample = {
+  responseBody: getItemResponseBody,
+  method: 'GET',
+  url: '/api/items/:itemId',
+}
+
+let searchItemsResponseBody: Awaited<ReturnType<typeof searchLoader>> = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
+      properties: {
+        geometry: JSON.stringify(
+          randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
+        ),
+        collectionTitle: randAnimal(),
+        catalogTitle: 'Animals',
+        ...itemResponseBody,
+      },
+    },
+  ],
+}
+
+let searchItemsExample = {
+  responseBody: searchItemsResponseBody,
+  method: 'GET',
+  url: '/api/search',
 }
 
 export default function ApiDocs() {
-  let { createItemExample, getItemExample } = useLoaderData<typeof loader>()
-
   return (
-    <div className="pl-8 grid grid-cols-[240px_minmax(0,1fr)] gap-10">
+    <div className="pl-8 grid grid-cols-[240px_minmax(0,1fr)] gap-x-10">
       <div>
         <aside className="fixed top-14">
           <div className="pb-4">
@@ -65,9 +139,13 @@ export default function ApiDocs() {
         </aside>
       </div>
 
-      <div className="py-8 grid grid-flow-row lg:grid-cols-2 gap-6">
-        <div className="bg-white">
+      <div className="grid grid-flow-row lg:grid-cols-2 gap-x-6">
+        <div className="bg-white py-6">
           <H4>Get Item</H4>
+          <div className="pt-3">
+            <strong>Route Params</strong>
+            <SchemaTable shape={getItemParams} />
+          </div>
         </div>
         <div className="bg-foreground text-background/80 p-6">
           <h3 className="text-lg my-5">Endpoint</h3>
@@ -75,9 +153,7 @@ export default function ApiDocs() {
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
-            text={`${getItemExample.method} ${
-              new URL(getItemExample.endpoint).pathname
-            }`}
+            text={`${getItemExample.method} ${getItemExample.url}`}
             theme={dracula}
             wrapLongLines
           />
@@ -87,14 +163,14 @@ export default function ApiDocs() {
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
-            text={JSON.stringify(getItemExample.exampleResponseBody, null, 2)}
+            text={JSON.stringify(getItemExample.responseBody, null, 2)}
             theme={dracula}
             wrapLongLines
           />
         </div>
 
-        <div className="bg-white">
-          <H4>Item Input</H4>
+        <div className="bg-white py-6">
+          <H4>Create Item</H4>
           <div className="pt-3">
             <SchemaTable shape={itemSchema.shape} />
           </div>
@@ -105,7 +181,7 @@ export default function ApiDocs() {
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
-            text={JSON.stringify(createItemExample.exampleRequestBody, null, 2)}
+            text={JSON.stringify(createItemExample.requestBody, null, 2)}
             theme={dracula}
             wrapLongLines
           />
@@ -115,9 +191,7 @@ export default function ApiDocs() {
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
-            text={`${createItemExample.method} ${
-              new URL(createItemExample.endpoint).pathname
-            }`}
+            text={`${createItemExample.method} ${createItemExample.url}`}
             theme={dracula}
             wrapLongLines
           />
@@ -127,11 +201,36 @@ export default function ApiDocs() {
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
-            text={JSON.stringify(
-              createItemExample.exampleResponseBody,
-              null,
-              2,
-            )}
+            text={JSON.stringify(createItemExample.responseBody, null, 2)}
+            theme={dracula}
+            wrapLongLines
+          />
+        </div>
+
+        <div className="bg-white py-6">
+          <H4>Item Search</H4>
+          <div className="pt-3">
+            <strong>Query Params</strong>
+            <SchemaTable shape={searchQuerySchema} />
+          </div>
+        </div>
+        <div className="bg-foreground text-background/80 p-6">
+          <h3 className="text-lg my-5">Endpoint</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={`${searchItemsExample.method} ${searchItemsExample.url}`}
+            theme={dracula}
+            wrapLongLines
+          />
+
+          <h3 className="text-lg my-5">Example Response</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={JSON.stringify(searchItemsExample.responseBody, null, 2)}
             theme={dracula}
             wrapLongLines
           />

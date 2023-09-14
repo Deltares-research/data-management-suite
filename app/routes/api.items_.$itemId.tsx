@@ -5,11 +5,13 @@ import { submitItemForm } from '~/forms/ItemForm'
 import type { AllowedGeometry } from '~/types'
 import { db } from '~/utils/db.server'
 
+export let getItemParams = { itemId: z.string() }
+
 export async function loader({ request, params }: LoaderArgs) {
   // TODO TURN ON
   // await requireAuthentication(request)
 
-  let { itemId } = await zx.parseParams(params, { itemId: z.string() })
+  let { itemId } = await zx.parseParams(params, getItemParams)
 
   let item = await db.item.findUniqueOrThrow({
     where: {
