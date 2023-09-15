@@ -58,7 +58,7 @@ export function CatalogForm({
   return (
     <div className="py-12 w-full h-full flex flex-col items-center justify-center">
       <div className="max-w-2xl w-full">
-        <H3>Create Catalog</H3>
+        <H3>{defaultValues ? 'Edit' : 'Create'} Catalog</H3>
         <ValidatedForm
           method="post"
           validator={catalogValidator}
