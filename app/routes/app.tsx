@@ -11,10 +11,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Separator } from '~/components/ui/separator'
 import { routes } from '~/routes'
-import {
-  createAuthenticator,
-  requireAuthentication,
-} from '~/services/auth.server'
+import { createAuthenticator } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
@@ -64,7 +61,7 @@ export default function AppLayout() {
               <MenuItem to={routes.items()}>Datasets</MenuItem>
               <MenuItem to={routes.collections()}>Collections</MenuItem>
               <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
-              <MenuItem to={routes.keywords()}>Keywords</MenuItem>
+              {/* <MenuItem to={routes.keywords()}>Keywords</MenuItem> */}
             </>
           )}
 
