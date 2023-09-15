@@ -121,7 +121,5 @@ test('can list items', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Items/i })
 
-  await new Promise(r => setTimeout(r, 1000))
-
   expect(title).toBeInViewport()
 })
