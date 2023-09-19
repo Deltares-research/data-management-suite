@@ -41,13 +41,6 @@ export default function AppLayout() {
   let user = useLoaderData<typeof loader>()
   let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
 
-  let canWrite = user?.memberOf.some(
-    member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
-  )
-  let isAdmin = user?.memberOf.some(
-    member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
-  )
-
   return (
     <div className="h-full flex flex-col">
       <div className="border-b flex-shrink-0 h-16 px-8 flex items-center justify-between">
@@ -55,27 +48,17 @@ export default function AppLayout() {
           <MenuItem to={routes.home()}>Home</MenuItem>
           <MenuItem to={routes.search()}>Search</MenuItem>
 
-          {canWrite && (
-            <>
-              <Separator className="h-4" orientation="vertical" />
-              <MenuItem to={routes.items()}>Datasets</MenuItem>
-              <MenuItem to={routes.collections()}>Collections</MenuItem>
-              <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
-              {/* <MenuItem to={routes.keywords()}>Keywords</MenuItem> */}
-            </>
-          )}
+          <Separator className="h-4" orientation="vertical" />
+          <MenuItem to={routes.items()}>Items</MenuItem>
+          <MenuItem to={routes.collections()}>Collections</MenuItem>
+          <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
+          {/* <MenuItem to={routes.keywords()}>Keywords</MenuItem> */}
 
-          {isAdmin && (
-            <>
-              <Separator className="h-4" orientation="vertical" />
-              <MenuItem to={routes.externalCatalogs()}>
-                External Catalogs
-              </MenuItem>
-              <Separator className="h-4" orientation="vertical" />
+          <Separator className="h-4" orientation="vertical" />
+          <MenuItem to={routes.externalCatalogs()}>External Catalogs</MenuItem>
+          <Separator className="h-4" orientation="vertical" />
 
-              <MenuItem to={routes.groups()}>Groups</MenuItem>
-            </>
-          )}
+          <MenuItem to={routes.groups()}>Groups</MenuItem>
         </div>
 
         <div>

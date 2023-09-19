@@ -27,7 +27,8 @@ export function GroupSelector({
   name: string
 }) {
   // TODO: Generalize
-  let { initialGroupCache } = useLoaderData<typeof catalogEditLoader>()
+  let loaderData = useLoaderData<typeof catalogEditLoader>()
+  let { initialGroupCache = [] } = loaderData ?? {}
 
   let { current: groupCache } = React.useRef<Record<string, Group>>(
     initialGroupCache.reduce((acc, current) => {
