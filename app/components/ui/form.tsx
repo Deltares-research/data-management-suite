@@ -60,7 +60,7 @@ export function FormTextarea({
   ...rest
 }: {
   name: string
-  label: React.ReactNode
+  label?: React.ReactNode
   helper?: React.ReactNode
 } & TextareaProps) {
   let { error, getInputProps } = useField(name)
@@ -68,7 +68,7 @@ export function FormTextarea({
 
   return (
     <div className="flex flex-col space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
+      {label && <Label htmlFor={id}>{label}</Label>}
       <Textarea id={id} {...rest} {...getInputProps()} />
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -82,20 +82,21 @@ export function FormSelect({
   helper,
   placeholder,
   children,
+  ...props
 }: {
   name: string
-  label: React.ReactNode
+  label?: React.ReactNode
   helper?: React.ReactNode
   children: React.ReactNode
   placeholder?: string
-}) {
+} & React.ComponentPropsWithoutRef<typeof Select>) {
   let { error, getInputProps } = useField(name)
   let id = React.useId()
 
   return (
     <div className="flex flex-col space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <Select name={name} {...getInputProps()}>
+      {label && <Label htmlFor={id}>{label}</Label>}
+      <Select name={name} {...getInputProps()} {...props}>
         <SelectTrigger id={id}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

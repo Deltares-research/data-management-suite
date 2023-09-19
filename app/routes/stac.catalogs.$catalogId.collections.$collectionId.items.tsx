@@ -5,15 +5,19 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import type { Item } from '@prisma/client'
 import { polygonsToBbox } from '~/utils/stacspec'
+import { getHost } from '~/routes'
+
+function maybeDate(dateString?: string | Date | null) {
+  return dateString ? new Date(dateString)?.toISOString() : undefined
+}
 
 export let loader = withCors(async ({ request, params }) => {
   let { collectionId, catalogId } = zx.parseParams(params, {
     collectionId: z.string(),
     catalogId: z.string(),
   })
-  let url = new URL(request.url)
 
-  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
+  let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
 
   let collection = await db.collection.findUniqueOrThrow({
     where: {
@@ -37,9 +41,9 @@ export let loader = withCors(async ({ request, params }) => {
     description: item.description,
     properties: {
       title: item.title,
-      datetime: item.dateTime?.toISOString(),
-      start_datetime: item.startTime?.toISOString(),
-      end_datetime: item.endTime?.toISOString(),
+      datetime: maybeDate(item.dateTime),
+      start_datetime: maybeDate(item.startTime),
+      end_datetime: maybeDate(item.endTime),
     },
     geometry: JSON.parse(item.geometry),
     assets: {},
@@ -103,7 +107,8 @@ export let loader = withCors(async ({ request, params }) => {
       },
       temporal: {
         interval: [
-          [new Date(minTime).toISOString(), new Date(maxTime).toISOString()],
+          // TODO: Fix
+          // [new Date(minTime).toISOString(), new Date(maxTime).toISOString()],
         ],
       },
     },

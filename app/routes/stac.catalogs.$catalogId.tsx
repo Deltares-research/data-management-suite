@@ -5,12 +5,12 @@ import { conformsTo, getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { db } from '~/utils/db.server'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let { catalogId } = zx.parseParams(params, { catalogId: z.string() })
 
   let validate = await getStacValidator('Catalog')
-  let url = new URL(request.url)
 
   let catalog = await db.catalog.findUniqueOrThrow({
     where: {
@@ -18,7 +18,7 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
     },
   })
 
-  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
+  let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
 
   let data = {
     type: 'Catalog',

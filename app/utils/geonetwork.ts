@@ -1,5 +1,9 @@
 import stacPackageJson from 'stac-spec/package.json'
 import { getStacValidator } from './stacspec'
+import { getHost } from '~/routes'
+import { z } from 'zod'
+import { zx } from 'zodix'
+import type { LoaderArgs } from '@remix-run/node'
 
 // TODO: Geonetwork types?
 export async function geonetworkItem2StacItem({ item, baseUrl }) {
@@ -33,10 +37,13 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
     id: item.identifier,
     description: item.abstract,
     properties: {
+      id: item.identifier,
       title: item.title,
       datetime: undefined,
       start_datetime: undefined,
       end_datetime: undefined,
+      collectionTitle: '',
+      catalogTitle: '',
       ...geonetworkProperties,
     },
     geometry,
@@ -65,4 +72,12 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
   validate(stacItem)
 
   return stacItem
+}
+
+export function getBaseUrl({ params, request }: LoaderArgs) {
+  let { source64 } = zx.parseParams(params, {
+    source64: z.string(),
+  })
+
+  return `${getHost(request)}/g2s/${source64}/stac`
 }

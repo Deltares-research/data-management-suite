@@ -13,6 +13,18 @@ terraform {
   }
 }
 
+locals {
+  container_app_name = "ca-${var.short_app_name}-${var.environment_name}-web"
+  initial_container = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+  container_name = var.container_app_already_exists ?  data.azurerm_container_app.existing_container_app[0].template[0].container[0].image  : local.initial_container
+}
+
+data "azurerm_container_app" "existing_container_app" {
+  count = var.container_app_already_exists ? 1 : 0
+  name = local.container_app_name
+  resource_group_name = var.resource_group_name
+}
+
 data "azurerm_client_config" "current" {}
 
 resource "azurerm_user_assigned_identity" "webapp" {
@@ -23,7 +35,7 @@ resource "azurerm_user_assigned_identity" "webapp" {
 }
 
 resource "azurerm_container_app" "web" {
-  name                         = "ca-${var.short_app_name}-${var.environment_name}-web"
+  name                         = local.container_app_name
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
   revision_mode                = "Single"
@@ -43,13 +55,15 @@ resource "azurerm_container_app" "web" {
     target_port      = 80
     transport        = "auto"
     traffic_weight {
+      latest_revision = true
       percentage = 100
     }
   }
   template {
+    min_replicas = 1
     container {
       name   = "web"
-      image  = "${var.container_registry_server}/${var.image_name}"
+      image  = local.container_name
       cpu    = 0.5
       memory = "1Gi"
 
@@ -59,11 +73,11 @@ resource "azurerm_container_app" "web" {
       }
       env {
         name  = "DATABASE_URL"
-        value = var.database_connection_string
+        secret_name = "database-url"
       }
       env {
         name  = "SESSION_SECRET"
-        value = var.session_secret
+        secret_name = "session-secret"
       }
       env {
         name  = "PORT"
@@ -83,8 +97,23 @@ resource "azurerm_container_app" "web" {
       }
       env {
         name  = "AZURE_CLIENT_SECRET"
-        value = var.app_client_secret
+        secret_name = "client-secret"
       }
     }
+  }
+
+  secret {
+    name = "database-url"
+    value= var.database_connection_string
+  }
+
+  secret {
+    name = "session-secret"
+    value= var.session_secret
+  }
+
+  secret {
+    name = "client-secret"
+    value = var.app_client_secret
   }
 }

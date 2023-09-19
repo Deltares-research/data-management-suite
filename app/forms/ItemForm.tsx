@@ -73,7 +73,7 @@ export async function submitItemForm({
 
   let item = await db.item.upsert({
     where: {
-      id,
+      id: id ?? '',
     },
     create: {
       ...formData,
@@ -114,10 +114,10 @@ export function ItemForm({
   let [searchParams] = useSearchParams()
 
   return (
-    <div className="py-12 w-full h-full flex flex-col items-center justify-center">
+    <div className="py-12 w-full flex flex-col items-center justify-center">
       <div className="max-w-2xl w-full">
-        <H3>{defaultValues ? 'Edit' : 'Create'} metadata record</H3>
-        <Muted>Publish your dataset directly to the metadata service</Muted>
+        <H3>{defaultValues ? 'Edit' : 'Register'} metadata record</H3>
+        <Muted>Values can be edited later</Muted>
         <ValidatedForm
           id="myform"
           method="post"

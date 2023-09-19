@@ -4,6 +4,7 @@ import stacPackageJson from 'stac-spec/package.json'
 import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }) => {
   let { collectionId, catalogId } = zx.parseParams(params, {
@@ -12,9 +13,7 @@ export let loader = withCors(async ({ request, params }) => {
   })
   let validate = await getStacValidator('Collection')
 
-  let url = new URL(request.url)
-
-  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
+  let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
 
   let collection = await db.collection.findUniqueOrThrow({
     where: {

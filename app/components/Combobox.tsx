@@ -108,10 +108,11 @@ export function MultiCombobox({
 }: {
   label: string
   name: string
-  initialCache: Record<string, Keyword>
+  initialCache?: Record<string, Keyword>
 }) {
-  let { current: keywordCache } =
-    React.useRef<Record<string, Keyword>>(initialCache)
+  let { current: keywordCache } = React.useRef<Record<string, Keyword>>(
+    initialCache ?? {},
+  )
   let { defaultValue } = useField(name)
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string[]>(defaultValue ?? [])
@@ -132,7 +133,7 @@ export function MultiCombobox({
     for (let keyword of fetcher.data) {
       keywordCache[keyword.id] = keyword
     }
-  }, [fetcher.data])
+  }, [fetcher.data, keywordCache])
 
   return (
     <div>

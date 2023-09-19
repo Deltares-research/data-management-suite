@@ -10,6 +10,18 @@ import {
 import { db } from '~/utils/db.server'
 
 async function seed() {
+  /**
+   * 1. Create group for access control
+   * 2. Create private catalog
+   * 2.1 Create collection
+   * 2.1.1 Create 100 items
+   *
+   * 3. Create public catalog
+   * 3.1 Create collection
+   * 3.1.1 Create 100 items
+   *
+   * */
+
   // let group = await db.group.upsert({
   //   where: {
   //     name: 'Test Group',
@@ -43,28 +55,28 @@ async function seed() {
   //   update: newPerson,
   // })
 
-  let animal = randAnimal()
   let collection = await db.collection.create({
     data: {
-      title: `${animal} Collection`,
+      title: `Animals`,
       startTime: new Date(),
       catalog: {
         create: {
-          title: 'Animals',
-          description: 'Catalog of animals',
+          title: 'Organisms',
+          description: 'Catalog of organisms',
         },
       },
     },
   })
 
-  await db.$queryRaw`
-    UPDATE 
-      "public"."Collection"
-    SET 
-      "geometry" = ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326)
-    WHERE
-      "id" =  ${collection.id};
-  `
+  // Set collection geometry
+  // await db.$queryRaw`
+  //   UPDATE
+  //     "public"."Collection"
+  //   SET
+  //     "geometry" = ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326)
+  //   WHERE
+  //     "id" =  ${collection.id};
+  // `
 
   await Promise.all(
     Array(100)
@@ -74,71 +86,85 @@ async function seed() {
           data: {
             collectionId: collection.id,
             projectNumber: `${randColor()}-${randNumber()}`,
-            title: `${animal} Item ${randNumber()}`,
+            title: `${randAnimal()}`,
             location: randFilePath(),
           },
         })
 
+        let centerLon = Math.random() * 360 - 180
+        let centerLat = Math.random() * 180 - 90
+
+        let lons = [
+          centerLon + (Math.random() * -4 - 1),
+          centerLon + (Math.random() * 4 + 1),
+        ]
+        let lats = [
+          centerLat + (Math.random() * -4 - 1),
+          centerLat + (Math.random() * 4 + 1),
+        ]
+
+        let polygon = `POLYGON((${lons[0]} ${lats[0]}, ${lons[1]} ${lats[0]}, ${lons[1]} ${lats[1]}, ${lons[0]} ${lats[1]}, ${lons[0]} ${lats[0]}))`
+
         await db.$queryRaw`
-    UPDATE 
-      "public"."Item"
-    SET 
-      "geometry" = ST_SetSRID(ST_MakePoint(52.377956, 4.897070), 4326)
-    WHERE
-      "id" =  ${item.id};
-  `
+          UPDATE 
+            "public"."Item"
+          SET 
+            "geometry" = ST_GeomFromText(${polygon}, 4326)
+          WHERE
+            "id" =  ${item.id};
+        `
       }),
   )
 
-  let standardIds = await Promise.all(
-    Array(3)
-      .fill('')
-      .map(async () => {
-        let standard = await db.standard.create({
-          data: {
-            name: randWord(),
-            description: randLine(),
-          },
-        })
+  // let standardIds = await Promise.all(
+  //   Array(3)
+  //     .fill('')
+  //     .map(async () => {
+  //       let standard = await db.standard.create({
+  //         data: {
+  //           name: randWord(),
+  //           description: randLine(),
+  //         },
+  //       })
 
-        return standard.id
-      }),
-  )
+  //       return standard.id
+  //     }),
+  // )
 
-  let parents = await Promise.all(
-    Array(100)
-      .fill('')
-      .map(async () => {
-        let parentKeyword = await db.keyword.create({
-          data: {
-            title: randWord(),
-            description: randLine(),
-            standardId: rand(standardIds),
-          },
-        })
+  // let parents = await Promise.all(
+  //   Array(100)
+  //     .fill('')
+  //     .map(async () => {
+  //       let parentKeyword = await db.keyword.create({
+  //         data: {
+  //           title: randWord(),
+  //           description: randLine(),
+  //           standardId: rand(standardIds),
+  //         },
+  //       })
 
-        return parentKeyword
-      }),
-  )
+  //       return parentKeyword
+  //     }),
+  // )
 
-  await Promise.all(
-    Array(2000)
-      .fill('')
-      .map(async () => {
-        let parent = rand(parents)
+  // await Promise.all(
+  //   Array(2000)
+  //     .fill('')
+  //     .map(async () => {
+  //       let parent = rand(parents)
 
-        let newKeyword = await db.keyword.create({
-          data: {
-            title: randWord(),
-            description: randLine(),
-            standardId: parent.standardId,
-            parentId: parent.id,
-          },
-        })
+  //       let newKeyword = await db.keyword.create({
+  //         data: {
+  //           title: randWord(),
+  //           description: randLine(),
+  //           standardId: parent.standardId,
+  //           parentId: parent.id,
+  //         },
+  //       })
 
-        parents.push(newKeyword)
-      }),
-  )
+  //       parents.push(newKeyword)
+  //     }),
+  // )
 }
 
 seed()

@@ -1,12 +1,16 @@
 import { useLoaderData } from '@remix-run/react'
 
 import { redirect } from '@remix-run/node'
-import type { LoaderArgs, ActionArgs } from '@remix-run/node'
+import type { LoaderArgs, ActionArgs, V2_MetaFunction } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { requireAuthentication } from '~/services/auth.server'
 import { ItemForm, submitItemForm } from '~/forms/ItemForm'
 import { routes } from '~/routes'
+
+export const meta: V2_MetaFunction = () => {
+  return [{ title: 'Register metadata' }]
+}
 
 export async function loader({ request }: LoaderArgs) {
   await requireAuthentication(request)

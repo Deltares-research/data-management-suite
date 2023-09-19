@@ -19,7 +19,6 @@ export async function loader({ request }: LoaderArgs) {
       members: {
         some: {
           personId: user.id,
-          role: Role.ADMIN,
         },
       },
     },

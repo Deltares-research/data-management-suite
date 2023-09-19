@@ -19,7 +19,10 @@ let collectionSchema = z.object({
 
 let collectionValidator = withZod(collectionSchema)
 
-export async function action({ request, id }: ActionArgs & { id?: string }) {
+export async function submitCollectionForm({
+  request,
+  id,
+}: ActionArgs & { id?: string }) {
   let form = await collectionValidator.validate(await request.formData())
 
   if (form.error) {
@@ -47,7 +50,7 @@ export function CollectionForm({
   return (
     <div className="py-12 w-full h-full flex flex-col items-center justify-center">
       <div className="max-w-2xl w-full">
-        <H3>Create Collection</H3>
+        <H3>{defaultValues ? 'Edit' : 'Create'} Collection</H3>
         <ValidatedForm
           method="post"
           validator={collectionValidator}

@@ -5,6 +5,7 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import { geonetworkItem2StacItem } from '~/utils/geonetwork'
 import { cachedFetch } from '~/utils/cachedFetch'
+import { getHost } from '~/routes'
 
 const RESULTS_PER_PAGE = 20
 
@@ -20,9 +21,7 @@ export let loader = withCors(async ({ request, params }) => {
 
   let validate = await getStacValidator('Collection')
 
-  let url = new URL(request.url)
-
-  let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
+  let baseUrl = `${getHost(request)}/g2s/${source64}/stac`
 
   let result = await cachedFetch(
     `${sourceUrl}/geonetwork/srv/eng/q?_content_type=json&fast=index&sortOrder=&facet.q=topicCat%2F${topic}&from=${

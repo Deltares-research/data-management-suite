@@ -1,8 +1,8 @@
-import type { Person } from '@prisma/client'
-import { useFetcher } from '@remix-run/react'
+import type { Group } from '@prisma/client'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import React from 'react'
 import { useField } from 'remix-validated-form'
-import type { loader } from '~/routes/api.person'
+import type { loader as groupsApiLoader } from '~/routes/api.groups'
 import { Label } from './ui/label'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
@@ -17,48 +17,55 @@ import {
   CommandItem,
 } from './ui/command'
 import { cn } from '~/utils'
+import type { loader as catalogEditLoader } from '~/routes/app.catalogs.$catalogId.edit'
 
-export function PersonSelector({
+export function GroupSelector({
   label,
   name,
-  initialCache,
 }: {
   label: string
   name: string
-  initialCache: Record<string, Person>
 }) {
-  let { current: personCache } =
-    React.useRef<Record<string, Person>>(initialCache)
+  // TODO: Generalize
+  let loaderData = useLoaderData<typeof catalogEditLoader>()
+  let { initialGroupCache = [] } = loaderData ?? {}
+
+  let { current: groupCache } = React.useRef<Record<string, Group>>(
+    initialGroupCache.reduce((acc, current) => {
+      acc[current.id] = current
+      return acc
+    }, {} as Record<string, Group>) ?? {},
+  )
   let { defaultValue, error } = useField(name)
   let [open, setOpen] = React.useState(false)
   let [value, setValue] = React.useState<string[]>(defaultValue ?? [])
   let [search, setSearch] = React.useState('')
   let id = React.useId()
 
-  let fetcher = useFetcher<typeof loader>()
+  let fetcher = useFetcher<typeof groupsApiLoader>()
 
   React.useEffect(() => {
-    fetcher.load(`/api/person?q=${search}`)
+    fetcher.load(`/api/groups?q=${search}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search])
 
   React.useEffect(() => {
     if (!fetcher.data) return
 
-    for (let person of fetcher.data) {
-      personCache[person.id] = person
+    for (let group of fetcher.data) {
+      groupCache[group.id] = group
     }
-  }, [fetcher.data, personCache])
+  }, [fetcher.data, groupCache])
 
   return (
     <div>
       <Label htmlFor={id}>{label}</Label>
-      {value.map((personId, i) => (
+      {value.map((groupId, i) => (
         <input
-          key={personId}
+          key={groupId}
           type="hidden"
           name={`${name}[${i}]`}
-          value={personId}
+          value={groupId}
         />
       ))}
       <div className="mb-1.5 flex gap-1.5 flex-wrap">
@@ -72,10 +79,7 @@ export function PersonSelector({
             size="sm"
             variant="secondary"
           >
-            {personCache[v]?.name}{' '}
-            <small className="ml-2 text-muted-foreground">
-              ({personCache[v]?.email})
-            </small>
+            {groupCache[v]?.name}{' '}
             <Separator orientation="vertical" className="h-[16px] mx-2" />
             <X className="w-4 h-4" />
           </Button>
@@ -90,7 +94,7 @@ export function PersonSelector({
             aria-expanded={open}
             className="w-full justify-between"
           >
-            Select person...
+            Select group...
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -106,10 +110,10 @@ export function PersonSelector({
             />
             <CommandEmpty>No people found.</CommandEmpty>
             <CommandGroup>
-              {fetcher.data?.map(person => (
+              {fetcher.data?.map(group => (
                 <CommandItem
-                  key={person.id}
-                  value={person.id}
+                  key={group.id}
+                  value={group.id}
                   onSelect={newValue => {
                     setValue(currentValue =>
                       currentValue.includes(newValue)
@@ -121,16 +125,13 @@ export function PersonSelector({
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      value.includes(person.id) ? 'opacity-100' : 'opacity-0',
+                      value.includes(group.id) ? 'opacity-100' : 'opacity-0',
                     )}
                   />
                   <div className="flex items-center gap-1">
                     <strong className="text-foreground flex items-center gap-1.5 font-medium">
-                      {person.name}
+                      {group.name}
                     </strong>
-                    <small className="text-muted-foreground">
-                      {person.email}
-                    </small>
                   </div>
                 </CommandItem>
               ))}

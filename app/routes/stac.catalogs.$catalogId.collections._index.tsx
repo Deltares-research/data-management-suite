@@ -5,15 +5,14 @@ import { withCors } from '~/utils/withCors'
 import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let { catalogId } = zx.parseParams(params, { catalogId: z.string() })
 
   let validate = await getStacValidator('Collection')
 
-  let url = new URL(request.url)
-
-  let baseUrl = `${url.protocol}//${url.host}/stac/catalogs/${catalogId}`
+  let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
 
   let collections = await db.collection.findMany({
     where: {
