@@ -17,6 +17,12 @@ test('can create item', async ({ page }) => {
     },
   })
 
+  await db.keyword.create({
+    data: {
+      title: 'Test Keyword',
+    },
+  })
+
   await page.goto('/auth/mock')
   await page.goto('/app/items/create')
 
