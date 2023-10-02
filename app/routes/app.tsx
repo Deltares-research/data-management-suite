@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client'
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
-import { Form, NavLink, Outlet, useLoaderData } from '@remix-run/react'
+import { Form, Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import {
   DropdownMenu,
@@ -89,6 +89,9 @@ export default function AppLayout() {
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              <DropdownMenuItem asChild>
+                <Link to={routes.settings()}>Settings</Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Form method="post" action="/app">
                   <button>Logout</button>

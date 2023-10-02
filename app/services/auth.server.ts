@@ -7,6 +7,7 @@ import { db } from '~/utils/db.server'
 import type { SessionStorage, SessionData, LoaderArgs } from '@remix-run/node'
 import { assert } from '~/utils/assert'
 import { routes } from '~/routes'
+import { createHash } from 'node:crypto'
 
 let authenticator = new Authenticator<{
   id: string
@@ -70,9 +71,36 @@ export function createAuthenticator(request: LoaderArgs['request']) {
 }
 
 export async function requireAuthentication(request: LoaderArgs['request']) {
-  return authenticator.isAuthenticated(request, {
-    failureRedirect: routes.login(),
+  try {
+    return await checkApiKey(request)
+  } catch (e) {
+    return authenticator.isAuthenticated(request, {
+      failureRedirect: routes.login(),
+    })
+  }
+}
+
+// For API
+async function checkApiKey(request: Request) {
+  let header = request.headers.get('Authorization')
+  let token = header?.split(' ')[1]
+
+  if (!token) {
+    throw new Error('Missing Token')
+  }
+
+  let keyHash = createHash('sha256').update(token).digest('hex')
+
+  let apiKeyObject = await db.apiKey.findUniqueOrThrow({
+    where: {
+      key: keyHash,
+    },
+    include: {
+      person: true,
+    },
   })
+
+  return apiKeyObject.person
 }
 
 // For tests

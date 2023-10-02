@@ -9,6 +9,9 @@ export let routes = {
   search() {
     return `${appPrefix}/search`
   },
+  settings() {
+    return `${appPrefix}/settings`
+  },
 
   items() {
     return `${appPrefix}/items`

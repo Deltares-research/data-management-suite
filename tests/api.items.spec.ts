@@ -14,7 +14,7 @@ import { updateGeometry } from '~/services/item.server'
 import { db } from '~/utils/db.server'
 
 test('Create Item', async ({ request }) => {
-  await truncateDatabase
+  // await truncateDatabase()
 
   let exampleRequestBody: ItemSchema = {
     title: randAnimal(),
@@ -57,8 +57,14 @@ test('Create Item', async ({ request }) => {
   let result = await request
     .post(`/api/items`, {
       data: exampleRequestBody,
+      headers: {
+        Authorization: 'Bearer a95af525-d56a-4de5-a9f5-d0a479d90279',
+      },
     })
-    .then(res => res.json())
+    .then(res => {
+      console.log(res)
+      return res.json()
+    })
 
   expect(result).toMatchObject(exampleResponseBody)
 })

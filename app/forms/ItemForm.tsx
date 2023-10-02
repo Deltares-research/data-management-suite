@@ -17,13 +17,13 @@ import {
 import { zfd } from 'zod-form-data'
 import { MultiCombobox } from '~/components/Combobox'
 import { CollectionSelector } from '~/components/CollectionSelector'
-import { requireAuthentication } from '~/services/auth.server'
 import { Separator } from '~/components/ui/separator'
 import type { Collection, Keyword } from '@prisma/client'
 import type { AllowedGeometry } from '~/types'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
 import { DateRangePicker } from '~/components/DateRangePicker'
 import { requestJsonOrFormData } from '~/utils/requestJsonOrFormdata'
+import { requireAuthentication } from '~/services/auth.server'
 
 let geometrySchema = z.object({
   coordinates: zfd.numeric().array().length(2).array().array(),
@@ -53,8 +53,7 @@ export async function submitItemForm({
   request,
   id,
 }: ActionArgs & { id?: string }) {
-  // TODO LOL TURN IT ON
-  // await requireAuthentication(request)
+  await requireAuthentication(request)
 
   let form = await itemValidator.validate(await requestJsonOrFormData(request))
 

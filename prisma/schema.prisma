@@ -16,6 +16,16 @@ model Person {
 
   items    Item[]
   memberOf Member[]
+  apiKeys  ApiKey[]
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  key       String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+
+  person   Person @relation(fields: [personId], references: [id])
+  personId String
 }
 
 model Group {
