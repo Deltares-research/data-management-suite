@@ -11,10 +11,11 @@ import { test, expect } from '@playwright/test'
 import { randomPolygon } from '@turf/turf'
 import type { ItemSchema } from '~/forms/ItemForm'
 import { updateGeometry } from '~/services/item.server'
+import { encodeToken } from '~/utils/apiKey'
 import { db } from '~/utils/db.server'
 
 test('Create Item', async ({ request }) => {
-  // await truncateDatabase()
+  await truncateDatabase()
 
   let exampleRequestBody: ItemSchema = {
     title: randAnimal(),
@@ -54,11 +55,13 @@ test('Create Item', async ({ request }) => {
     license: '',
   }
 
+  let token = createToken()
+
   let result = await request
     .post(`/api/items`, {
       data: exampleRequestBody,
       headers: {
-        Authorization: 'Bearer a95af525-d56a-4de5-a9f5-d0a479d90279',
+        Authorization: `Bearer ${token}`,
       },
     })
     .then(res => {
@@ -200,4 +203,21 @@ async function truncateDatabase() {
   } catch (error) {
     console.log({ error })
   }
+}
+
+async function createToken() {
+  let token = 'TestKey'
+  await db.apiKey.create({
+    data: {
+      key: encodeToken(token),
+      person: {
+        create: {
+          name: 'Test Person',
+          email: 'test@test.test',
+        },
+      },
+    },
+  })
+
+  return token
 }

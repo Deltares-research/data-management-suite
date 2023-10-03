@@ -6,11 +6,19 @@ import { Trash2 } from 'lucide-react'
 import { v4 as uuid } from 'uuid'
 import { ValidatedForm, validationError } from 'remix-validated-form'
 import { z } from 'zod'
-import { FormSubmit } from '~/components/ui/form'
+import { FormInput, FormSubmit } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
-import { createHash } from 'node:crypto'
+import { encodeToken } from '~/utils/apiKey'
+import { H3 } from '~/components/typography'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card'
 
 export async function loader({ request }: LoaderArgs) {
   let user = await requireAuthentication(request)
@@ -35,6 +43,12 @@ let idSchema = z.object({
 
 let idValidator = withZod(idSchema)
 
+let newApiKeySchema = z.object({
+  name: z.string(),
+})
+
+let newApiKeyValidator = withZod(newApiKeySchema)
+
 export async function action({ request }: ActionArgs) {
   let formData = await request.formData()
   let subaction = formData.get('subaction')?.toString()
@@ -42,16 +56,24 @@ export async function action({ request }: ActionArgs) {
   let user = await requireAuthentication(request)
 
   if (subaction === ActionTypes.CREATE) {
+    let form = await newApiKeyValidator.validate(formData)
+
+    if (form.error) {
+      throw validationError(form.error)
+    }
+
     let newKey = uuid()
-    let hashedKey = createHash('sha256').update(newKey).digest('hex')
+    let hashedKey = encodeToken(newKey)
 
     let newKeyObject = await db.apiKey.create({
       data: {
+        name: form.data.name,
         personId: user.id,
         key: hashedKey,
       },
       select: {
         id: true,
+        name: true,
       },
     })
 
@@ -87,16 +109,33 @@ export default function SettingsPage() {
 
   return (
     <div className="mx-auto max-w-2xl w-full px-8 py-12">
+      <H3>Settings</H3>
+
       <ValidatedForm
         subaction={ActionTypes.CREATE}
         method="POST"
-        validator={withZod(z.any())}
+        validator={newApiKeyValidator}
+        className="mt-12 w-full flex items-end gap-3"
       >
+        <div className="flex-1">
+          <FormInput name="name" label="Name" />
+        </div>
         <FormSubmit>Create new API Key</FormSubmit>
       </ValidatedForm>
       <div className="mt-8 grid grid-flow-row gap-2">
         {newKeyObject && 'newKey' in newKeyObject && (
-          <Input value={newKeyObject.newKey} />
+          <Card className="my-5">
+            <CardHeader>
+              <CardTitle>{newKeyObject.name}</CardTitle>
+              <CardDescription>
+                Your new API Key. Copy it somewhere safe as it won't be
+                displayed again.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Input value={newKeyObject.newKey} />
+            </CardContent>
+          </Card>
         )}
 
         {apiKeys.map(apiKey => (
@@ -108,8 +147,8 @@ export default function SettingsPage() {
             className="flex items-center gap-3"
           >
             <input type="hidden" name="id" value={apiKey.id} />
-            <Input disabled key={apiKey.id} value={apiKey.id} />
-            <div className="flex-shrink-0 text-sm text-muted-foreground">
+            <div>{apiKey.name}</div>
+            <div className="ml-auto flex-shrink-0 text-sm text-muted-foreground">
               {formatDistanceToNow(new Date(apiKey.createdAt), {
                 addSuffix: true,
               })}

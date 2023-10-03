@@ -104,7 +104,7 @@ export default function ApiDocs() {
   return (
     <div className="pl-8 grid grid-cols-[240px_minmax(0,1fr)] gap-x-10">
       <div>
-        <aside className="fixed top-14">
+        <aside className="fixed top-20">
           <div className="pb-4">
             <h4 className="mb-1 rounded-md px-2 py-1 text-sm font-semibold">
               Items
@@ -114,7 +114,7 @@ export default function ApiDocs() {
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="./docs"
+                href="#get"
               >
                 Get
               </a>
@@ -122,7 +122,7 @@ export default function ApiDocs() {
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="./docs"
+                href="#create"
               >
                 Create
               </a>
@@ -130,7 +130,7 @@ export default function ApiDocs() {
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="./docs"
+                href="#search"
               >
                 Search
               </a>
@@ -140,7 +140,7 @@ export default function ApiDocs() {
       </div>
 
       <div className="grid grid-flow-row lg:grid-cols-2 gap-x-6">
-        <div className="bg-white py-6">
+        <div id="get" className="bg-white py-6">
           <H4>Get Item</H4>
           <div className="pt-3">
             <strong>Route Params</strong>
@@ -169,7 +169,7 @@ export default function ApiDocs() {
           />
         </div>
 
-        <div className="bg-white py-6">
+        <div id="create" className="bg-white py-6">
           <H4>Create Item</H4>
           <div className="pt-3">
             <SchemaTable shape={itemSchema.shape} />
@@ -207,7 +207,7 @@ export default function ApiDocs() {
           />
         </div>
 
-        <div className="bg-white py-6">
+        <div id="search" className="bg-white py-6">
           <H4>Item Search</H4>
           <div className="pt-3">
             <strong>Query Params</strong>

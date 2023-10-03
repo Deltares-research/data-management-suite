@@ -21,6 +21,7 @@ model Person {
 
 model ApiKey {
   id        String   @id @default(uuid())
+  name      String
   key       String   @unique @default(uuid())
   createdAt DateTime @default(now())
 

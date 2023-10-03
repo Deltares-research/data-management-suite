@@ -7,7 +7,7 @@ import { db } from '~/utils/db.server'
 import type { SessionStorage, SessionData, LoaderArgs } from '@remix-run/node'
 import { assert } from '~/utils/assert'
 import { routes } from '~/routes'
-import { createHash } from 'node:crypto'
+import { encodeToken } from '~/utils/apiKey'
 
 let authenticator = new Authenticator<{
   id: string
@@ -89,7 +89,7 @@ async function checkApiKey(request: Request) {
     throw new Error('Missing Token')
   }
 
-  let keyHash = createHash('sha256').update(token).digest('hex')
+  let keyHash = encodeToken(token)
 
   let apiKeyObject = await db.apiKey.findUniqueOrThrow({
     where: {
