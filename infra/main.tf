@@ -31,6 +31,9 @@ module "db" {
   database_password   = var.database_password
   subnet              = azurerm_subnet.subnet_db
   private_dns_zone    = azurerm_private_dns_zone.dns
+  allowed_ips         = {
+    webapp = azurerm_subnet.subnet_app.address_prefixes[0]
+  }
 }
 
 module "web" {
