@@ -1,13 +1,12 @@
 import type { ActionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
-import { submitCatalogForm } from '~/forms/CatalogForm'
-import { CollectionForm } from '~/forms/CollectionForm'
+import { CollectionForm, submitCollectionForm } from '~/forms/CollectionForm'
 import { routes } from '~/routes'
 import { db } from '~/utils/db.server'
 
 export async function action(args: ActionArgs) {
-  await submitCatalogForm(args)
+  await submitCollectionForm(args)
 
   return redirect(routes.collections())
 }

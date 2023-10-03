@@ -21,17 +21,7 @@ export let meta: V2_MetaFunction = () => {
   ]
 }
 
-export async function loader({ request }: LoaderArgs) {
-  let url = new URL(request.url)
-
-  let stacBrowserUrl = `https://radiantearth.github.io/stac-browser/#/external/${url.protocol}//${url.host}/stac`
-
-  return { stacBrowserUrl }
-}
-
 export default function HomePage() {
-  let { stacBrowserUrl } = useLoaderData<typeof loader>()
-
   return (
     <div className="px-8 py-16 w-full max-w-screen-lg mx-auto">
       <div className="max-w-lg">
@@ -46,16 +36,16 @@ export default function HomePage() {
       <div className="pt-12 grid grid-cols-1 lg:grid-cols-2 gap-5 w-fit">
         <Card className="flex flex-col">
           <CardHeader>
-            <CardTitle>Register new dataset</CardTitle>
+            <CardTitle>Register data</CardTitle>
 
             <CardDescription>
-              Publish datasets to the central STAC catalog.
+              Create STAC catalogs, collections and publish metadata.
             </CardDescription>
           </CardHeader>
           <CardFooter className="mt-auto">
             <Button asChild className="group">
-              <Link to={routes.createItem()}>
-                Register dataset
+              <Link to={routes.items()}>
+                Register data
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transform transition-transform" />
               </Link>
             </Button>
@@ -73,8 +63,8 @@ export default function HomePage() {
           </CardHeader>
           <CardFooter className="mt-auto">
             <Button asChild className="group">
-              <Link to={stacBrowserUrl} target="_blank" rel="noopener">
-                Find data
+              <Link to={routes.search()}>
+                Search data
                 <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transform transition-transform" />
               </Link>
             </Button>
@@ -115,7 +105,7 @@ export default function HomePage() {
 
           <li className="flex justify-between gap-5">
             <div>
-              <strong className="font-medium">Deltares Data Council</strong>
+              <strong className="font-medium">Data Governance Council</strong>
               <Muted>
                 Information on who is in the data council, what they do and
                 decisions they’ve made.

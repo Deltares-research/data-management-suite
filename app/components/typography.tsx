@@ -1,3 +1,5 @@
+import { cn } from '~/utils'
+
 export function H2({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight">
@@ -22,8 +24,16 @@ export function H4({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function Muted({ children }: { children: React.ReactNode }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>
+export function Muted({
+  children,
+  className,
+  ...rest
+}: { children: React.ReactNode } & React.ComponentPropsWithoutRef<'p'>) {
+  return (
+    <p className={cn('text-sm text-muted-foreground', className)} {...rest}>
+      {children}
+    </p>
+  )
 }
 
 export function ErrorMessage({ children }: { children: React.ReactNode }) {

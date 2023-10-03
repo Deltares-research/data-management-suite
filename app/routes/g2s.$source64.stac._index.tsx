@@ -5,6 +5,7 @@ import { conformsTo, getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { cachedFetch } from '~/utils/cachedFetch'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let { source64 } = zx.parseParams(params, { source64: z.string() })
@@ -12,7 +13,6 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
   let sourceUrl = Buffer.from(source64, 'base64').toString()
 
   let validate = await getStacValidator('Catalog')
-  let url = new URL(request.url)
 
   let siteUrl = `${sourceUrl}/geonetwork/srv/api/site`
 
@@ -25,7 +25,7 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
     cacheOptions: { ttl: 1000 * 60 * 60 * 24 },
   })
 
-  let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
+  let baseUrl = `${getHost(request)}/g2s/${source64}/stac`
 
   let data = {
     type: 'Catalog',

@@ -3,13 +3,21 @@
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
+    "format": "prettier --write .",
+    "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "dev": "remix dev",
-    "start": "remix-serve build",
-    "typecheck": "tsc"
+    "setup": "prisma generate && prisma migrate deploy && prisma db seed",
+    "start": "prisma migrate deploy ; remix-serve build",
+    "typecheck": "tsc -b"
   },
   "prisma": {
     "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
   },
+  "eslintIgnore": [
+    "/node_modules",
+    "/build",
+    "/public/build"
+  ],
   "dependencies": {
     "@azure/msal-browser": "^2.37.1",
     "@hookform/resolvers": "^3.1.1",

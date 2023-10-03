@@ -55,7 +55,6 @@ export async function loader({ request, params }: LoaderArgs) {
       members: {
         some: {
           personId: user.id,
-          role: Role.ADMIN,
         },
       },
     },

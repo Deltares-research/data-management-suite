@@ -3,15 +3,15 @@ import { withCors } from '~/utils/withCors'
 import stacPackageJson from 'stac-spec/package.json'
 import type { Item } from '@prisma/client'
 import { getStacValidator } from '~/utils/stacspec'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }) => {
   let validate = await getStacValidator('Item')
 
-  let url = new URL(request.url)
   let { id } = params
   if (!id) throw new Response(null, { status: 400 })
 
-  let baseUrl = `${url.protocol}//${url.host}/stac`
+  let baseUrl = `${getHost(request)}/stac`
 
   let [item] = (await db.$queryRaw`
     SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "dateTime", "title", "startTime", "endTime", "location"

@@ -4,6 +4,7 @@ import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { loader as itemsLoader } from './g2s.$source64.stac.collections.$topic.items'
+import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params, ...args }) => {
   let { source64, topic } = zx.parseParams(params, {
@@ -13,9 +14,7 @@ export let loader = withCors(async ({ request, params, ...args }) => {
 
   let validate = await getStacValidator('Collection')
 
-  let url = new URL(request.url)
-
-  let baseUrl = `${url.protocol}//${url.host}/g2s/${source64}/stac`
+  let baseUrl = `${getHost(request)}/g2s/${source64}/stac`
 
   let { extent } = await itemsLoader({ request, params, ...args }).then(res =>
     res.json(),

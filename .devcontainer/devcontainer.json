@@ -1,0 +1,49 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.227.0/containers/typescript-node
+{
+  "name": "Azure Remix Stack template",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/data-management-suite",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+		"dbaeumer.vscode-eslint",
+		"EditorConfig.EditorConfig",
+		"esbenp.prettier-vscode",
+		"Prisma.prisma",
+		"ms-vscode.vscode-node-azure-pack",
+		"ms-azuretools.vscode-docker",
+		"ms-azuretools.vscode-bicep",
+		"github.vscode-github-actions",
+		"mhutchie.git-graph",
+		"hashicorp.terraform",
+		"ms-vsliveshare.vsliveshare",
+		"redhat.vscode-yaml",
+		"cweijan.vscode-postgresql-client2"
+	]
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "yarn install",
+
+  // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  "remoteUser": "node",
+
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "postCreateCommand": "npm run setup"
+}

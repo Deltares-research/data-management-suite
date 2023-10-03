@@ -1,6 +1,15 @@
+import type { LoaderArgs } from '@remix-run/node'
+
 let appPrefix = `/app`
 
 export let routes = {
+  home() {
+    return `/`
+  },
+  search() {
+    return `${appPrefix}/search`
+  },
+
   items() {
     return `${appPrefix}/items`
   },
@@ -63,4 +72,10 @@ export let routes = {
   stacAPIRoot() {
     return `/stac`
   },
+}
+
+export function getHost(request: LoaderArgs['request']) {
+  let url = new URL(request.url)
+
+  return `${url.hostname === 'localhost' ? 'http' : 'https'}://${url.host}`
 }
