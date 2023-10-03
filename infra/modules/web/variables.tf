@@ -10,7 +10,7 @@ variable "resource_group_name" {
 
 variable "container_app_already_exists" {
   description = "Bool stating whether the container app should already exists, so we dont change the used image during infra deploy"
-  type        = bool 
+  type        = bool
 }
 
 variable "location" {

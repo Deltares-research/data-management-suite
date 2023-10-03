@@ -32,12 +32,18 @@ variable "database_password" {
   type        = string
 }
 
-variable "virtual_network_name" {
-  description = "Name of virtual network to place the database in"
-  type        = string
+variable "subnet" {
+  description = "Subnet to place the database in"
+  type = object({
+    name = string
+    id   = string
+  })
 }
 
-variable "subnet" {
-  description = "Name of subnet to place the database in"
-  type        = string
+variable "private_dns_zone" {
+  description = "Private DNS Zone linking to the database"
+  type = object({
+    name = string
+    id   = string
+  })
 }

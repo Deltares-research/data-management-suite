@@ -13,6 +13,8 @@ resource "azurerm_postgresql_flexible_server" "db_server" {
   resource_group_name    = var.resource_group_name
   location               = var.location
   version                = "15"
+  delegated_subnet_id    = var.subnet.id
+  private_dns_zone_id    = var.private_dns_zone.id
   administrator_login    = var.database_admin
   administrator_password = var.database_password
   zone                   = "1"

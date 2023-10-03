@@ -15,13 +15,13 @@ terraform {
 
 locals {
   container_app_name = "ca-${var.short_app_name}-${var.environment_name}-web"
-  initial_container = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
-  container_name = var.container_app_already_exists ?  data.azurerm_container_app.existing_container_app[0].template[0].container[0].image  : local.initial_container
+  initial_container  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+  container_name     = var.container_app_already_exists ? data.azurerm_container_app.existing_container_app[0].template[0].container[0].image : local.initial_container
 }
 
 data "azurerm_container_app" "existing_container_app" {
-  count = var.container_app_already_exists ? 1 : 0
-  name = local.container_app_name
+  count               = var.container_app_already_exists ? 1 : 0
+  name                = local.container_app_name
   resource_group_name = var.resource_group_name
 }
 
@@ -56,7 +56,7 @@ resource "azurerm_container_app" "web" {
     transport        = "auto"
     traffic_weight {
       latest_revision = true
-      percentage = 100
+      percentage      = 100
     }
   }
   template {
@@ -72,11 +72,11 @@ resource "azurerm_container_app" "web" {
         value = var.application_insights_connection_string
       }
       env {
-        name  = "DATABASE_URL"
+        name        = "DATABASE_URL"
         secret_name = "database-url"
       }
       env {
-        name  = "SESSION_SECRET"
+        name        = "SESSION_SECRET"
         secret_name = "session-secret"
       }
       env {
@@ -96,24 +96,24 @@ resource "azurerm_container_app" "web" {
         value = data.azurerm_client_config.current.tenant_id
       }
       env {
-        name  = "AZURE_CLIENT_SECRET"
+        name        = "AZURE_CLIENT_SECRET"
         secret_name = "client-secret"
       }
     }
   }
 
   secret {
-    name = "database-url"
-    value= var.database_connection_string
+    name  = "database-url"
+    value = var.database_connection_string
   }
 
   secret {
-    name = "session-secret"
-    value= var.session_secret
+    name  = "session-secret"
+    value = var.session_secret
   }
 
   secret {
-    name = "client-secret"
+    name  = "client-secret"
     value = var.app_client_secret
   }
 }
