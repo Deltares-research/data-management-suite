@@ -41,8 +41,8 @@ module "web" {
   stack_name                             = local.stack_name
   short_app_name                         = local.short_app_name
   default_tags                           = local.default_tags
-  image_name                             = "data-management-suite/web-${var.environment_name}"
   session_secret                         = var.session_secret
+  container_app_already_exists           = var.web_app_exists
   app_client_id                          = var.app_client_id
   app_client_secret                      = var.app_client_secret
   application_insights_connection_string = module.monitoring.application_insights_conn_string

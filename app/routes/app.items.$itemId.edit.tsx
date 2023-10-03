@@ -1,7 +1,7 @@
 import { useLoaderData } from '@remix-run/react'
 
 import { redirect } from '@remix-run/node'
-import type { LoaderArgs, ActionArgs } from '@remix-run/node'
+import type { LoaderArgs, ActionArgs, V2_MetaFunction } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { requireAuthentication } from '~/services/auth.server'
@@ -13,6 +13,10 @@ import type { AllowedGeometry } from '~/types'
 import React from 'react'
 import { keywordCache } from '~/utils/keywordCache'
 import type { Keyword } from '@prisma/client'
+
+export const meta: V2_MetaFunction = () => {
+  return [{ title: 'Edit metadata' }]
+}
 
 export async function loader({ request, params }: LoaderArgs) {
   // await requireAuthentication(request)
