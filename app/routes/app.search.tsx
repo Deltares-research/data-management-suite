@@ -117,11 +117,13 @@ export async function loader({ request }: LoaderArgs) {
     SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."title", "Item"."description", "Item"."dateTime", "Item"."startTime", "Item"."endTime", "Collection"."title" as "collectionTitle", "Catalog"."title" as "catalogTitle" FROM "Item"
     JOIN "Collection" ON "Collection"."id" = "Item"."collectionId"
     JOIN "Catalog" ON "Catalog"."id" = "Collection"."catalogId"
-    WHERE ST_Intersects("Item"."geometry", ST_MakeEnvelope(${
-      bbox[0]
-    }::double precision, ${bbox[1]}::double precision, ${
-    bbox[2]
-  }::double precision, ${bbox[3]}::double precision, 4326))
+    WHERE ST_Intersects("Item"."geometry", ST_MakeEnvelope(${bbox[0].toFixed(
+      12,
+    )}::double precision, ${bbox[1].toFixed(
+    12,
+  )}::double precision, ${bbox[2].toFixed(
+    12,
+  )}::double precision, ${bbox[3].toFixed(12)}::double precision, 4326))
 
     AND 
       ("Item"."title" ILIKE ${'%' + q + '%'} OR "Item"."description" ILIKE ${
