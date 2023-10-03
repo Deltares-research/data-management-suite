@@ -21,7 +21,8 @@
 		"hashicorp.terraform",
 		"ms-vsliveshare.vsliveshare",
 		"redhat.vscode-yaml",
-		"cweijan.vscode-postgresql-client2"
+		"cweijan.vscode-postgresql-client2",
+		"mikestead.dotenv"
 	]
     }
   },

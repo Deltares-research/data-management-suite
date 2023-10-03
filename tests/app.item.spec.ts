@@ -17,6 +17,12 @@ test('can create item', async ({ page }) => {
     },
   })
 
+  await db.keyword.create({
+    data: {
+      title: 'Test Keyword',
+    },
+  })
+
   await page.goto('/auth/mock')
   await page.goto('/app/items/create')
 
@@ -120,8 +126,6 @@ test('can list items', async ({ page }) => {
   await page.goto(routes.items())
 
   let title = await page.getByRole('heading', { name: /Items/i })
-
-  await new Promise(r => setTimeout(r, 1000))
 
   expect(title).toBeInViewport()
 })
