@@ -37,3 +37,11 @@ variable "container_app_identity_principal_id" {
   description = "System managed identity of the container app"
   type        = string
 }
+
+variable "subnet" {
+  description = "Subnet to place the database in"
+  type = object({
+    name = string
+    id   = string
+  })
+}

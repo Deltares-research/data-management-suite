@@ -21,16 +21,19 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "db" {
-  source               = "./modules/db"
-  environment_name     = var.environment_name
-  resource_group_name  = azurerm_resource_group.rg.name
-  location             = azurerm_resource_group.rg.location
-  stack_name           = local.stack_name
-  default_tags         = local.default_tags
-  database_admin       = "dms_psqladmin"
-  database_password    = var.database_password
-  virtual_network_name = azurerm_virtual_network.vnet.name
-  subnet               = azurerm_subnet.subnet1.name
+  source              = "./modules/db"
+  environment_name    = var.environment_name
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  stack_name          = local.stack_name
+  default_tags        = local.default_tags
+  database_admin      = "dms_psqladmin"
+  database_password   = var.database_password
+  subnet              = azurerm_subnet.subnet_db
+  private_dns_zone    = azurerm_private_dns_zone.dns
+  allowed_ips         = {
+    webapp = azurerm_subnet.subnet_app.address_prefixes[0]
+  }
 }
 
 module "web" {
@@ -70,4 +73,5 @@ module "container_app" {
   default_tags                        = local.default_tags
   log_analytics_workspace_id          = module.monitoring.log_analytics_workspace_id
   container_app_identity_principal_id = module.web.container_app_identity_principal_id
+  subnet                              = azurerm_subnet.subnet_app  
 }

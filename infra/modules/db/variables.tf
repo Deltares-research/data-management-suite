@@ -15,6 +15,7 @@ variable "location" {
 
 variable "stack_name" {
   description = "Name of the stack being deployed, consisting of app name, env and location"
+  type = string
 }
 
 variable "default_tags" {
@@ -32,12 +33,31 @@ variable "database_password" {
   type        = string
 }
 
-variable "virtual_network_name" {
-  description = "Name of virtual network to place the database in"
-  type        = string
+variable "subnet" {
+  description = "Subnet to place the database in"
+  type = object({
+    name = string
+    id   = string
+  })
 }
 
-variable "subnet" {
-  description = "Name of subnet to place the database in"
-  type        = string
+variable "private_dns_zone" {
+  description = "Private DNS Zone linking to the database"
+  type = object({
+    name = string
+    id   = string
+  })
+}
+
+variable "allowed_ips" {
+  description = <<EOT
+  IP addresses, in CIDR notation, allowed to access this Sql Server.
+
+  Example:
+  {
+    CompanyHQ = "192.168.0.0/24"
+  }
+  EOT
+  type    = map(string)
+  default = {}
 }
