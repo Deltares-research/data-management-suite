@@ -55,7 +55,7 @@ test('Create Item', async ({ request }) => {
     license: '',
   }
 
-  let token = createToken()
+  let token = await createToken()
 
   let result = await request
     .post(`/api/items`, {
@@ -135,7 +135,7 @@ test('Edit Item', async ({ request }) => {
     license: '',
   }
 
-  let token = createToken()
+  let token = await createToken()
 
   let result = await request
     .patch(`/api/items/${testItem.id}`, {
