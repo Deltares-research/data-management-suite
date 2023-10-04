@@ -39,6 +39,7 @@ export let itemSchema = z.object({
   keywords: z.string().array().optional(),
   collectionId: z.string().nonempty({ message: 'Please select a collection' }),
   geometry: geometrySchema,
+  properties: z.record(z.string()).optional(),
   dateRange: z.object({
     from: z.string().nonempty({ message: 'Please select a date' }),
     to: z.string().optional(),
