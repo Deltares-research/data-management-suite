@@ -5,13 +5,13 @@ import { submitItemForm } from '~/forms/ItemForm'
 import type { AllowedGeometry } from '~/types'
 import { db } from '~/utils/db.server'
 
-export let getItemParams = { itemId: z.string() }
+export let itemRouteParams = { itemId: z.string() }
 
-export async function loader({ request, params }: LoaderArgs) {
+export async function loader({ params }: LoaderArgs) {
   // TODO TURN ON
   // await requireAuthentication(request)
 
-  let { itemId } = await zx.parseParams(params, getItemParams)
+  let { itemId } = await zx.parseParams(params, itemRouteParams)
 
   let item = await db.item.findUniqueOrThrow({
     where: {
@@ -36,7 +36,7 @@ export async function loader({ request, params }: LoaderArgs) {
 }
 
 export async function action(args: ActionArgs) {
-  let { itemId } = zx.parseParams(args.params, { itemId: z.string() })
+  let { itemId } = zx.parseParams(args.params, itemRouteParams)
 
   return submitItemForm({ ...args, id: itemId })
 }

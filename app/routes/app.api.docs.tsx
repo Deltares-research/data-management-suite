@@ -22,11 +22,14 @@ import type { ItemSchema } from '~/forms/ItemForm'
 import { itemSchema } from '~/forms/ItemForm'
 import type { action as createItemAction } from './api.items'
 import {
-  getItemParams,
+  itemRouteParams,
   type action as getItemAction,
 } from './api.items_.$itemId'
 import { searchQuerySchema } from './app.search'
 import type { loader as searchLoader } from './api.search'
+import { Link, useLoaderData } from '@remix-run/react'
+import { routes } from '~/routes'
+import type { LoaderArgs } from '@remix-run/node'
 
 let createItemRequestBody: ItemSchema = {
   title: randAnimal(),
@@ -67,6 +70,13 @@ let createItemExample = {
   url: '/api/items',
 }
 
+let editItemExample = {
+  requestBody: createItemRequestBody,
+  responseBody: itemResponseBody,
+  method: 'PATCH',
+  url: '/api/items/:id',
+}
+
 let getItemResponseBody: Awaited<ReturnType<typeof getItemAction>> =
   itemResponseBody
 
@@ -100,7 +110,13 @@ let searchItemsExample = {
   url: '/api/search',
 }
 
+export function loader({ request }: LoaderArgs) {
+  return { host: new URL(request.url).host }
+}
+
 export default function ApiDocs() {
+  let { host } = useLoaderData<typeof loader>()
+
   return (
     <div className="pl-8 grid grid-cols-[240px_minmax(0,1fr)] gap-x-10">
       <div>
@@ -110,6 +126,14 @@ export default function ApiDocs() {
               Items
             </h4>
             <div className="grid grid-flow-row auto-rows-max text-sm">
+              <a
+                className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
+                target=""
+                rel=""
+                href="#auth"
+              >
+                Authorization
+              </a>
               <a
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
@@ -130,6 +154,14 @@ export default function ApiDocs() {
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
+                href="#edit"
+              >
+                Edit
+              </a>
+              <a
+                className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
+                target=""
+                rel=""
                 href="#search"
               >
                 Search
@@ -141,10 +173,35 @@ export default function ApiDocs() {
 
       <div className="grid grid-flow-row lg:grid-cols-2 gap-x-6">
         <div id="get" className="bg-white py-6">
+          <H4>Authorization</H4>
+          <div className="pt-3">
+            Endpoints that perform mutations require authorization through a{' '}
+            <code>Bearer</code> token. Go to{' '}
+            <Link to={routes.settings()}>your settings page</Link> to create and
+            manage your API keys. Include the generated token in the{' '}
+            <code>Authorization</code> header of your request
+          </div>
+        </div>
+        <div className="bg-foreground text-background/80 p-6">
+          <h3 className="text-lg my-5">Example Request</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="bash"
+            text={`
+curl -X POST "https://${host}/items"
+-H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+            `}
+            theme={dracula}
+            wrapLongLines
+          />
+        </div>
+
+        <div id="get" className="bg-white py-6">
           <H4>Get Item</H4>
           <div className="pt-3">
             <strong>Route Params</strong>
-            <SchemaTable shape={getItemParams} />
+            <SchemaTable shape={itemRouteParams} />
           </div>
         </div>
         <div className="bg-foreground text-background/80 p-6">
@@ -202,6 +259,49 @@ export default function ApiDocs() {
             showLineNumbers={false}
             language="ts"
             text={JSON.stringify(createItemExample.responseBody, null, 2)}
+            theme={dracula}
+            wrapLongLines
+          />
+        </div>
+
+        <div id="edit" className="bg-white py-6">
+          <H4>Edit Item</H4>
+          <div className="pt-3">
+            <strong>Route Params</strong>
+            <SchemaTable shape={itemRouteParams} />
+          </div>
+          <div className="pt-5">
+            <strong>Request Body</strong>
+            <SchemaTable shape={itemSchema.shape} />
+          </div>
+        </div>
+        <div className="bg-foreground text-background/80 p-6">
+          <h3 className="text-lg my-5">Example Input</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={JSON.stringify(editItemExample.requestBody, null, 2)}
+            theme={dracula}
+            wrapLongLines
+          />
+
+          <h3 className="text-lg my-5">Endpoint</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={`${editItemExample.method} ${editItemExample.url}`}
+            theme={dracula}
+            wrapLongLines
+          />
+
+          <h3 className="text-lg my-5">Example Response</h3>
+          <CodeBlock
+            customStyle={{ fontFamily: 'monospace' }}
+            showLineNumbers={false}
+            language="ts"
+            text={JSON.stringify(editItemExample.responseBody, null, 2)}
             theme={dracula}
             wrapLongLines
           />

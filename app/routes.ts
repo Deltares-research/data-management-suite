@@ -12,6 +12,9 @@ export let routes = {
   settings() {
     return `${appPrefix}/settings`
   },
+  docs() {
+    return `${appPrefix}/api/docs`
+  },
 
   items() {
     return `${appPrefix}/items`

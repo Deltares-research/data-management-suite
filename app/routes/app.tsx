@@ -66,6 +66,8 @@ export default function AppLayout() {
           <Separator className="h-4" orientation="vertical" />
 
           <MenuItem to={routes.groups()}>Groups</MenuItem>
+          <Separator className="h-4" orientation="vertical" />
+          <MenuItem to={routes.docs()}>API</MenuItem>
         </div>
 
         <div>

@@ -65,6 +65,86 @@ test('Create Item', async ({ request }) => {
       },
     })
     .then(res => {
+      return res.json()
+    })
+
+  expect(result).toMatchObject(exampleResponseBody)
+})
+
+test('Edit Item', async ({ request }) => {
+  await truncateDatabase()
+
+  let testItem = await db.item.create({
+    data: {
+      title: randAnimal(),
+      projectNumber: randNumber().toFixed(0),
+      description: randParagraph(),
+      startTime: randRecentDate().toISOString(),
+      endTime: randSoonDate().toISOString(),
+      location: '',
+      license: '',
+      collection: {
+        create: {
+          title: 'Test Collection',
+          catalog: {
+            create: {
+              title: 'Test Catalog',
+              description: 'Catalog created during automated test',
+            },
+          },
+        },
+      },
+    },
+  })
+
+  let exampleRequestBody: ItemSchema = {
+    title: randAnimal(),
+    projectNumber: randNumber().toFixed(0),
+    description: randParagraph(),
+    geometry: randomPolygon().features[0].geometry,
+    dateRange: {
+      from: randRecentDate().toISOString(),
+      to: randSoonDate().toISOString(),
+    },
+    location: '',
+    license: '',
+    collectionId: await db.collection
+      .create({
+        data: {
+          title: 'Test Collection',
+          catalog: {
+            create: {
+              title: 'Test Catalog',
+              description: 'Catalog created during automated test',
+            },
+          },
+        },
+      })
+      .then(c => c.id),
+  }
+
+  let exampleResponseBody = {
+    title: exampleRequestBody.title,
+    assets: null,
+    collectionId: exampleRequestBody.collectionId,
+    description: exampleRequestBody.description,
+    dateTime: null,
+    startTime: exampleRequestBody.dateRange.from,
+    endTime: exampleRequestBody.dateRange.to,
+    location: '',
+    license: '',
+  }
+
+  let token = createToken()
+
+  let result = await request
+    .patch(`/api/items/${testItem.id}`, {
+      data: exampleRequestBody,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then(res => {
       console.log(res)
       return res.json()
     })
@@ -210,6 +290,7 @@ async function createToken() {
   await db.apiKey.create({
     data: {
       key: encodeToken(token),
+      name: 'Test Token',
       person: {
         create: {
           name: 'Test Person',
