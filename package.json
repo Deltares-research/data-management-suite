@@ -27,6 +27,7 @@
     "@hookform/resolvers": "^3.1.1",
     "@mapbox/geojson-rewind": "^0.5.2",
     "@mapbox/mapbox-gl-draw": "^1.4.2",
+    "@ngneat/falso": "^7.0.1",
     "@prisma/client": "^5.0.0",
     "@radix-ui/react-avatar": "^1.0.3",
     "@radix-ui/react-checkbox": "^1.0.4",
@@ -79,7 +80,6 @@
     "zodix": "^0.4.1"
   },
   "devDependencies": {
-    "@ngneat/falso": "^7.0.1",
     "@playwright/test": "^1.36.1",
     "@remix-run/dev": "^1.19.1",
     "@remix-run/eslint-config": "^1.19.1",
