@@ -25,6 +25,7 @@ export let loader = withCors(async ({ request, params }) => {
     id: item.title,
     description: item.description,
     properties: {
+      ...(typeof item.properties === 'object' ? item.properties : {}),
       title: item.title,
       datetime: item.dateTime?.toISOString(),
       start_datetime: item.startTime?.toISOString(),

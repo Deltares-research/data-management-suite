@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")
-  extensions = [postgis(version: "3.3.2")]
+  extensions = [postgis]
 }
 
 model Person {
@@ -16,6 +16,17 @@ model Person {
 
   items    Item[]
   memberOf Member[]
+  apiKeys  ApiKey[]
+}
+
+model ApiKey {
+  id        String   @id @default(uuid())
+  name      String
+  key       String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+
+  person   Person @relation(fields: [personId], references: [id])
+  personId String
 }
 
 model Group {

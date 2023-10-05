@@ -40,7 +40,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '~/components/ui/sheet'
-import type { FeatureCollection } from 'geojson'
 import { getHost } from '~/routes'
 
 // TODO: Get token from BE
@@ -60,12 +59,17 @@ export let links: LinksFunction = () => {
   ]
 }
 
+export let searchQuerySchema = {
+  bbox: z
+    .string()
+    .optional()
+    .describe('JSON stringified representation of a bbox'),
+  q: z.string().optional().describe('Will search item title and description'),
+}
+
 export async function loader({ request }: LoaderArgs) {
   let url = new URL(request.url)
-  let { bbox: bboxString, q = '' } = zx.parseQuery(request, {
-    bbox: z.string().optional(),
-    q: z.string().optional(),
-  })
+  let { bbox: bboxString, q = '' } = zx.parseQuery(request, searchQuerySchema)
   let bbox = bboxString ? JSON.parse(bboxString) : [-180, -90, 180, 90]
 
   // let externalCatalogs = await db.externalCatalog.findMany()
@@ -196,8 +200,8 @@ export default function SearchPage() {
   let navigation = useNavigation()
 
   return (
-    <div className="h-full grid grid-cols-2">
-      <div className="overflow-auto relative">
+    <div className="grid grid-cols-2" style={{ height: 'calc(100vh - 64px)' }}>
+      <div className="h-full overflow-auto relative">
         {navigation.state === 'loading' && (
           <div className="absolute inset-0 bg-white/70 animate-in z-10 flex items-center justify-center">
             <Loader2 className="animate-spin" />

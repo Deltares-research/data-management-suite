@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client'
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
-import { Form, NavLink, Outlet, useLoaderData } from '@remix-run/react'
+import { Form, Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import {
   DropdownMenu,
@@ -41,6 +41,13 @@ export default function AppLayout() {
   let user = useLoaderData<typeof loader>()
   let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
 
+  // let canWrite = user?.memberOf.some(
+  //   member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
+  // )
+  // let isAdmin = user?.memberOf.some(
+  //   member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
+  // )
+
   return (
     <div className="h-full flex flex-col">
       <div className="border-b flex-shrink-0 h-16 px-8 flex items-center justify-between">
@@ -49,16 +56,18 @@ export default function AppLayout() {
           <MenuItem to={routes.search()}>Search</MenuItem>
 
           <Separator className="h-4" orientation="vertical" />
-          <MenuItem to={routes.items()}>Items</MenuItem>
+          <MenuItem to={routes.items()}>Datasets</MenuItem>
           <MenuItem to={routes.collections()}>Collections</MenuItem>
           <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
-          {/* <MenuItem to={routes.keywords()}>Keywords</MenuItem> */}
+          <MenuItem to={routes.keywords()}>Keywords</MenuItem>
 
           <Separator className="h-4" orientation="vertical" />
           <MenuItem to={routes.externalCatalogs()}>External Catalogs</MenuItem>
           <Separator className="h-4" orientation="vertical" />
 
           <MenuItem to={routes.groups()}>Groups</MenuItem>
+          <Separator className="h-4" orientation="vertical" />
+          <MenuItem to={routes.docs()}>API</MenuItem>
         </div>
 
         <div>
@@ -73,6 +82,9 @@ export default function AppLayout() {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuItem asChild>
+                <Link to={routes.settings()}>Settings</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Form method="post" action="/app">
                   <button>Logout</button>
                 </Form>
@@ -81,7 +93,7 @@ export default function AppLayout() {
           </DropdownMenu>
         </div>
       </div>
-      <main className="flex-1 flex flex-col h-full">
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
     </div>

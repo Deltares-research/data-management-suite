@@ -17,21 +17,21 @@ import {
 import { zfd } from 'zod-form-data'
 import { MultiCombobox } from '~/components/Combobox'
 import { CollectionSelector } from '~/components/CollectionSelector'
-import { requireAuthentication } from '~/services/auth.server'
 import { Separator } from '~/components/ui/separator'
 import type { Collection, Keyword } from '@prisma/client'
 import type { AllowedGeometry } from '~/types'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
 import { DateRangePicker } from '~/components/DateRangePicker'
-import React from 'react'
+import { requestJsonOrFormData } from '~/utils/requestJsonOrFormdata'
+import { requireAuthentication } from '~/services/auth.server'
 
 let geometrySchema = z.object({
   coordinates: zfd.numeric().array().length(2).array().array(),
   type: z.literal('Polygon'),
 }) satisfies z.ZodType<AllowedGeometry>
 
-let metadataSchema = z.object({
-  projectNumber: z.string().min(3),
+export let itemSchema = z.object({
+  projectNumber: z.string().min(3).describe('A valid maconomy number'),
   title: z.string(),
   description: z.string().nullable(),
   location: z.string(),
@@ -39,13 +39,16 @@ let metadataSchema = z.object({
   keywords: z.string().array().optional(),
   collectionId: z.string().nonempty({ message: 'Please select a collection' }),
   geometry: geometrySchema,
+  properties: z.record(z.string()).optional(),
   dateRange: z.object({
     from: z.string().nonempty({ message: 'Please select a date' }),
     to: z.string().optional(),
   }),
 })
 
-let metadataValidator = withZod(metadataSchema)
+export type ItemSchema = z.infer<typeof itemSchema>
+
+let itemValidator = withZod(itemSchema)
 
 export async function submitItemForm({
   request,
@@ -53,7 +56,7 @@ export async function submitItemForm({
 }: ActionArgs & { id?: string }) {
   await requireAuthentication(request)
 
-  let form = await metadataValidator.validate(await request.formData())
+  let form = await itemValidator.validate(await requestJsonOrFormData(request))
 
   if (form.error) {
     throw validationError(form.error)
@@ -107,7 +110,7 @@ export function ItemForm({
   collections: SerializeFrom<
     Collection & { catalog: { title: string | null } }
   >[]
-  defaultValues?: z.infer<typeof metadataSchema>
+  defaultValues?: z.infer<typeof itemSchema>
   initialKeywordCache?: Record<string, Keyword>
 }) {
   // let { fieldErrors } = useFormContext('myform')
@@ -121,7 +124,7 @@ export function ItemForm({
         <ValidatedForm
           id="myform"
           method="post"
-          validator={metadataValidator}
+          validator={itemValidator}
           defaultValues={{
             collectionId: searchParams.get('collectionId') ?? undefined,
             ...defaultValues,

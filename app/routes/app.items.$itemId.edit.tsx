@@ -19,7 +19,7 @@ export const meta: V2_MetaFunction = () => {
 }
 
 export async function loader({ request, params }: LoaderArgs) {
-  await requireAuthentication(request)
+  // await requireAuthentication(request)
 
   let { itemId } = await zx.parseParams(params, { itemId: z.string() })
 
