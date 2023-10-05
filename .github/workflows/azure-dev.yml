@@ -99,7 +99,7 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       #deploy to prod for main branch and use the branch name as environment for all other brances
       AZURE_ENV_NAME: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
-      WEB_APP_EXISTS: true
+      SERVICE_WEB_RESOURCE_EXISTS: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
