@@ -413,6 +413,16 @@ function TypeDef({ name, def }: { name?: string; def: ZodTypeAny['_def'] }) {
       )
     case 'ZodObject':
       return <SchemaTableCondensed shape={def.shape()} />
+    case 'ZodRecord':
+      console.log(def)
+      return (
+        <>
+          Record&lt;
+          <TypeDef def={def?.keyType._def} />,{' '}
+          <TypeDef def={def?.valueType._def} />
+          &gt;
+        </>
+      )
     case 'ZodLiteral':
       return <>"{def.value}"</>
     case 'ZodString':
@@ -421,6 +431,8 @@ function TypeDef({ name, def }: { name?: string; def: ZodTypeAny['_def'] }) {
       return <>number</>
     case 'ZodEffects':
       return <TypeDef def={def?.schema?._def} />
+    case 'ZodAny':
+      return 'any'
     default:
       console.log(def.typeName, 'not implemented', def)
       return
