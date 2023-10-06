@@ -59,7 +59,7 @@ export default function AppLayout() {
           <MenuItem to={routes.items()}>Datasets</MenuItem>
           <MenuItem to={routes.collections()}>Collections</MenuItem>
           <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
-          <MenuItem to={routes.keywords()}>Keywords</MenuItem>
+          {/* <MenuItem to={routes.keywords()}>Keywords</MenuItem> */}
 
           <Separator className="h-4" orientation="vertical" />
           <MenuItem to={routes.externalCatalogs()}>External Catalogs</MenuItem>
