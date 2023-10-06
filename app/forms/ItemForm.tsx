@@ -171,7 +171,7 @@ export function ItemForm({
 
             <Separator />
 
-            <H3>Experimental Facilities</H3>
+            {/* <H3>Experimental Facilities</H3>
 
             <FormSelect name="facility" label="Facility">
               <SelectItem value="next">Next.js</SelectItem>
@@ -186,7 +186,7 @@ export function ItemForm({
               initialCache={initialKeywordCache}
             />
 
-            <Separator />
+            <Separator /> */}
 
             <div>
               <H3>Geometry</H3>
