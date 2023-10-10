@@ -24,13 +24,15 @@ classifiers = [ #! Update me
   "Topic :: Software Development :: Libraries :: Python Modules",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.11",
 ]
 
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 pystac = "^1.8.4"
+geojson = "^3.0.1"
+requests = "^2.31.0"
 
 [tool.poetry.dev-dependencies]
 bandit = "^1.7.1"
