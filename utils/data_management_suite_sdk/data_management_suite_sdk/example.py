@@ -18,12 +18,12 @@ item_description = "My first DMS item"
 
 # Create a DMSItem object
 dms_item = DataManagementSuiteItem(
+    id="3bc99da9-5feb-428a-827a-6b26b43830bf",
     title=item_name,
     projectNumber="11209789",
     description=item_description,
     location="s3://Minio_on_P_Drive/Python_SDK_test_item",
-    license="LICENSE",
-    keywords=["KEYWORD1", "KEYWORD2"],
+    license="MIT",
     collectionId="61c61481-e717-4283-bb9a-4bd10be210f6",
     geometry=Polygon(
         coordinates=[[
@@ -43,6 +43,6 @@ dms_item = DataManagementSuiteItem(
 )
 
 # Submit the DMSItem object
-updated_item = client.create_item(dms_item)
+updated_item = client.create_or_update_item(dms_item)
 
 print(updated_item.id)

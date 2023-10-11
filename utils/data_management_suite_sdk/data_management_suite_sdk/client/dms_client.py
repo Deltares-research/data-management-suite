@@ -8,24 +8,38 @@ class DataManagementSuiteClient(object):
     _dms_url: str = None
     _dms_api_key: str = None
 
-    def __init__(self, dms_url, dms_api_key):
+    def __init__(self, dms_url: str, dms_api_key: str):
+        """
+        Initialise the client
+        :param dms_url: The URL of the DMS
+        :param dms_api_key: The API key to use for requests
+        """
         self._dms_url = dms_url
         self._dms_api_key = dms_api_key
 
-    #function to submit a STAC item to the DMS
-    def create_item(self, stac_item: DataManagementSuiteItem)-> DataManagementSuiteItem:
+    def create_or_update_item(self, stac_item: DataManagementSuiteItem) -> DataManagementSuiteItem:
         """
-        Submit a metadata item to the DMS
-        :param stac_item: The STAC item to submit
+        Create or update a metadata item in the DMS
+        :param stac_item: The STAC item to create or update
         :return: The response from the DMS
         """
 
-        if stac_item.id is not None:
-            raise ValueError("Cannot submit an item that already has an ID")
+        if stac_item.id is None:
+            # If the STAC item does not have an ID, create a new item
+            return self.create_item(stac_item)
+        else:
+            # If the item exists has an id, update it
+            return self.update_item(stac_item.id, stac_item)
+        
+    def create_item(self, stac_item: DataManagementSuiteItem) -> DataManagementSuiteItem:
+        """
+        Create a metadata item in the DMS
+        :param stac_item: The STAC item to create
+        :return: The response from the DMS
+        """
 
         response = self._make_request("POST", "api/items", json=stac_item.to_dict())
         response.raise_for_status()
-
         return DataManagementSuiteItem.from_dict(response.json())
 
     def update_item(self, item_id: str, stac_item: DataManagementSuiteItem) -> DataManagementSuiteItem:

@@ -37,17 +37,18 @@ class DataManagementSuiteItem:
         projectNumber: str,
         location: str,
         collectionId: str,
-        geometry: Polygon,
         start_datetime: datetime,
+        id: Optional[str] = None,
+        geometry: Optional[Polygon] = None,
         description: Optional[str] = None,
         license: Optional[str] = None,
         keywords: Optional[List[str]] = None,
         properties: Optional[Dict[str, Any]] = None,
         end_datetime: Optional[datetime] = None,
     ):
-        if not geometry.is_valid:
+        if geometry and not geometry.is_valid:
             raise ValueError("Geometry is not valid")
-
+        self.id = id
         self.title = title
         self.projectNumber = projectNumber
         self.description = description
@@ -67,6 +68,7 @@ class DataManagementSuiteItem:
         :param item_dict: The dictionary to create the DMSItem from
         :return: The DMSItem
         """
+        id = item_dict.get("id")
         title = item_dict["title"]
         projectNumber = item_dict["projectNumber"]
         description = item_dict.get("description")
@@ -74,28 +76,42 @@ class DataManagementSuiteItem:
         license = item_dict.get("license")
         keywords = item_dict.get("keywords")
         collectionId = item_dict["collectionId"]
-        geometry = Polygon.to_instance(item_dict["geometry"])
+        geometry = Polygon.to_instance(item_dict["geometry"]) if "geometry" in item_dict else None
         properties = item_dict.get("properties")
-        start_datetime = datetime.fromisoformat(item_dict["dateRange"]["from"])
-        if "to" in item_dict["dateRange"]:
-            end_datetime = datetime.fromisoformat(item_dict["dateRange"].get("to"))
+
+        if item_dict["dateTime"] is not None:
+            start_datetime = datetime.fromisoformat(item_dict["dateTime"])
+        else:
+            start_datetime = datetime.fromisoformat(item_dict["startTime"])
+
+        if ("endTime" in item_dict) and (item_dict["endTime"] is not None):
+            end_datetime = datetime.fromisoformat(item_dict["endTime"])
+        else:
+            end_datetime = None
 
         return cls(
-            title,
-            projectNumber,
-            description,
-            location,
-            license,
-            keywords,
-            collectionId,
-            geometry,
-            properties,
-            start_datetime,
-            end_datetime
+            id=id,
+            title=title,
+            projectNumber=projectNumber,
+            description=description,
+            location=location,
+            license=license,
+            keywords=keywords,
+            collectionId=collectionId,
+            geometry=geometry,
+            properties=properties,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime
         )
 
     def to_dict(self) -> dict:
 
+        if self.start_datetime.tzinfo is None:
+            raise ValueError("Start datetime must have a timezone")
+        
+        if self.end_datetime and self.end_datetime.tzinfo is None:
+            raise ValueError("End datetime must have a timezone")
+        
         item_dict = {
             "title": self.title,
             "projectNumber": self.projectNumber,
@@ -123,3 +139,4 @@ class DataManagementSuiteItem:
             item_dict["dateRange"]["to"] = self.end_datetime.isoformat()
 
         return item_dict
+
