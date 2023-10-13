@@ -5,8 +5,8 @@ class DataManagementSuiteClient(object):
     Client for the Data Management Suite
     """
 
-    _dms_url: str = None
-    _dms_api_key: str = None
+    _dms_url: str
+    _dms_api_key: str
 
     def __init__(self, dms_url: str, dms_api_key: str):
         """
