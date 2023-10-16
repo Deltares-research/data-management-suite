@@ -21,46 +21,40 @@ import {
 import type { ItemSchema } from '~/forms/ItemForm'
 import { itemSchema } from '~/forms/ItemForm'
 import type { action as createItemAction } from './api.items'
-import {
-  itemRouteParams,
-  type action as getItemAction,
-} from './api.items_.$itemId'
+import { itemRouteParams } from './api.items_.$itemId'
+import { itemRouteParams as stacItemRouteParams } from '~/routes/stac.items.$id'
 import { searchQuerySchema } from './app.search'
 import type { loader as searchLoader } from './api.search'
 import { Link, useLoaderData } from '@remix-run/react'
 import { routes } from '~/routes'
 import type { LoaderArgs } from '@remix-run/node'
+import type { StacItem } from '~/utils/prismaToStac'
 
 let createItemRequestBody: ItemSchema = {
-  title: randAnimal(),
-  projectNumber: randNumber().toFixed(0),
-  description: randParagraph(),
   geometry: randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
-  dateRange: {
-    from: randRecentDate().toISOString(),
-    to: randSoonDate().toISOString(),
-  },
-  location: '',
-  license: '',
+  start_datetime: randRecentDate().toISOString(),
+  end_datetime: randSoonDate().toISOString(),
   collectionId: randUuid(),
+  properties: {
+    title: randAnimal(),
+    projectNumber: randNumber().toFixed(0),
+    description: randParagraph(),
+  },
 }
 
 let itemResponseBody: Awaited<ReturnType<typeof createItemAction>> = {
   id: randUuid(),
-  title: createItemRequestBody.title,
-  projectNumber: createItemRequestBody.projectNumber,
-  assets: null,
-  collectionId: createItemRequestBody.collectionId,
-  description: createItemRequestBody.description,
-  dateTime: null,
-  startTime: new Date(createItemRequestBody.dateRange.from),
-  endTime: new Date(createItemRequestBody.dateRange.to ?? 0),
-  location: '',
-  license: '',
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  ownerId: randUuid(),
-  properties: {},
+  properties: {
+    ...createItemRequestBody.properties,
+    datetime: undefined,
+    start_datetime: randRecentDate().toISOString(),
+    end_datetime: randSoonDate().toISOString(),
+  },
+  geometry: createItemRequestBody.geometry,
+  stac_version: '1.0.0',
+  type: 'Feature',
+  links: [],
+  assets: {},
 }
 
 let createItemExample = {
@@ -77,13 +71,12 @@ let editItemExample = {
   url: '/api/items/:id',
 }
 
-let getItemResponseBody: Awaited<ReturnType<typeof getItemAction>> =
-  itemResponseBody
+let getItemResponseBody: StacItem = itemResponseBody
 
 let getItemExample = {
   responseBody: getItemResponseBody,
   method: 'GET',
-  url: '/api/items/:itemId',
+  url: '/stac/items/:itemId',
 }
 
 let searchItemsResponseBody: Awaited<ReturnType<typeof searchLoader>> = {
@@ -91,14 +84,15 @@ let searchItemsResponseBody: Awaited<ReturnType<typeof searchLoader>> = {
   features: [
     {
       type: 'Feature',
+      stac_version: '1.0.0',
+      id: randUuid(),
+      links: [],
+      assets: {},
       geometry: randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
       properties: {
-        geometry: JSON.stringify(
-          randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
-        ),
-        collectionTitle: randAnimal(),
-        catalogTitle: 'Animals',
-        ...itemResponseBody,
+        datetime: undefined,
+        start_datetime: randRecentDate().toISOString(),
+        end_datetime: randRecentDate().toISOString(),
       },
     },
   ],
@@ -201,7 +195,7 @@ curl -X POST "https://${host}/items"
           <H4>Get Item</H4>
           <div className="pt-3">
             <strong>Route Params</strong>
-            <SchemaTable shape={itemRouteParams} />
+            <SchemaTable shape={stacItemRouteParams} />
           </div>
         </div>
         <div className="bg-foreground text-background/80 p-6">
@@ -414,7 +408,6 @@ function TypeDef({ name, def }: { name?: string; def: ZodTypeAny['_def'] }) {
     case 'ZodObject':
       return <SchemaTableCondensed shape={def.shape()} />
     case 'ZodRecord':
-      console.log(def)
       return (
         <>
           Record&lt;

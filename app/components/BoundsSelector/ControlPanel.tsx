@@ -1,6 +1,7 @@
 import * as React from 'react'
 import area from '@turf/area'
 
+// @ts-expect-error TODO: Fix types
 function ControlPanel(props) {
   let polygonArea = 0
   for (const polygon of props.polygons) {

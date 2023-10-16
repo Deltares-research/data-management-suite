@@ -14,7 +14,7 @@ import { db } from '~/utils/db.server'
 let collectionSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
-  catalogId: z.string().nonempty({ message: 'Please select a catalog' }),
+  catalogId: z.string().min(1, { message: 'Please select a catalog' }),
 }) satisfies z.ZodType<Omit<Prisma.CollectionCreateInput, 'catalog'>>
 
 let collectionValidator = withZod(collectionSchema)

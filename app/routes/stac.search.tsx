@@ -5,10 +5,11 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import type { Item } from '@prisma/client'
 import { getHost } from '~/routes'
+import { prismaToStacItem } from '~/utils/prismaToStac'
 
-function maybeDate(dateString?: string | Date | null) {
-  return dateString ? new Date(dateString)?.toISOString() : undefined
-}
+// function maybeDate(dateString?: string | Date | null) {
+//   return dateString ? new Date(dateString)?.toISOString() : undefined
+// }
 
 const ITEMS_PER_PAGE = 20
 
@@ -16,12 +17,12 @@ export let loader = withCors(async ({ request, params }) => {
   let {
     q = '',
     page = 0,
-    collections: collectionsString,
+    // collections: collectionsString,
     bbox: bboxString,
   } = zx.parseQuery(request, {
     q: z.string().optional(),
     page: zx.IntAsString.optional(),
-    collections: z.string().optional(),
+    // collections: z.string().optional(),
     bbox: z.string().optional(),
   })
 
@@ -32,7 +33,7 @@ export let loader = withCors(async ({ request, params }) => {
   let baseUrl = `${getHost(request)}/stac/search`
 
   let items = (await db.$queryRaw`
-    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "title", "description", "startTime", "dateTime", "endTime"
+    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "title", "description", "startTime", "dateTime", "endTime", "collectionId"
     FROM "Item"
     WHERE ST_Intersects(geometry, ST_MakeEnvelope(${
       bbox[0]
@@ -48,42 +49,26 @@ export let loader = withCors(async ({ request, params }) => {
     OFFSET ${ITEMS_PER_PAGE * page}
   `) as (Item & { geometry: string })[]
 
-  let features = items.map(item => ({
-    type: 'Feature',
-    stac_version: stacPackageJson.version,
-    id: item.title,
-    description: item.description,
-    properties: {
-      title: item.title,
-      datetime: maybeDate(item.dateTime),
-      start_datetime: maybeDate(item.startTime),
-      end_datetime: maybeDate(item.endTime),
-    },
-    geometry: JSON.parse(item.geometry),
-    assets: {},
-    links: [
-      // TODO
-      // {
-      //   rel: 'self',
-      //   type: 'application/json',
-      //   href: `${baseUrl}/catalogs`,
-      // },
-    ],
-  }))
+  let features = items.map(item =>
+    prismaToStacItem({
+      ...item,
+      geometry: JSON.parse(item.geometry),
+    }),
+  )
 
-  let dates = features
-    .flatMap(
-      f =>
-        f.properties.datetime ?? [
-          f.properties.start_datetime,
-          f.properties.end_datetime,
-        ],
-    )
-    .filter(Boolean)
-    .map(d => new Date(d!).getTime())
+  // let dates = features
+  //   .flatMap(
+  //     f =>
+  //       f.properties.datetime ?? [
+  //         f.properties.start_datetime,
+  //         f.properties.end_datetime,
+  //       ],
+  //   )
+  //   .filter(Boolean)
+  //   .map(d => new Date(d!).getTime())
 
-  let minTime = Math.min(...dates)
-  let maxTime = Math.max(...dates)
+  // let minTime = Math.min(...dates)
+  // let maxTime = Math.max(...dates)
 
   let pagination = []
   if (page < 9999) {

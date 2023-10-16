@@ -34,7 +34,9 @@ export let loader = withCors(async ({ request, params }) => {
     : [result.metadata]
 
   let features = await Promise.all(
-    metadata.map(async item => geonetworkItem2StacItem({ item, baseUrl })),
+    metadata.map(async (item: any) =>
+      geonetworkItem2StacItem({ item, baseUrl }),
+    ),
   )
 
   let dates = features

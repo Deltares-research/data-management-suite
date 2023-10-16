@@ -25,12 +25,14 @@ export function BoundsSelector({ name }: { name: string }) {
       : undefined,
   )
 
+  // @ts-expect-error
   const onUpdate = useCallback(e => {
     for (const f of e.features) {
       return setFeature(f)
     }
   }, [])
 
+  // @ts-expect-error
   const onDelete = useCallback(e => {
     setFeature(undefined)
   }, [])

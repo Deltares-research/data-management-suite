@@ -1,20 +1,27 @@
 import stacPackageJson from 'stac-spec/package.json'
-import { getStacValidator } from './stacspec'
 import { getHost } from '~/routes'
 import { z } from 'zod'
 import { zx } from 'zodix'
 import type { LoaderArgs } from '@remix-run/node'
+import type { StacItem } from './prismaToStac'
+import type { Geometry } from 'geojson'
 
 // TODO: Geonetwork types?
-export async function geonetworkItem2StacItem({ item, baseUrl }) {
-  let validate = await getStacValidator('Item')
-
-  let geometry = item.geoBox
+export async function geonetworkItem2StacItem({
+  item,
+  baseUrl,
+}: {
+  item: any
+  baseUrl: string
+}): Promise<StacItem> {
+  let geometry: Geometry = item.geoBox
     ? {
         type: 'Polygon',
         coordinates: (Array.isArray(item.geoBox) ? item.geoBox : [item.geoBox])
           .slice(0, 1)
+          // @ts-expect-error
           .map(box => {
+            // @ts-expect-error
             let values = box.split('|').map(v => +v)
             return [
               [values[0], values[1]],
@@ -24,14 +31,37 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
             ]
           }),
       }
-    : undefined
+    : {
+        type: 'Polygon',
+        coordinates: [
+          [-180, -90],
+          [180, -90],
+          [180, 90],
+          [-180, 90],
+        ],
+      }
 
   let geonetworkProperties: Record<string, any> = {}
   for (let key in item) {
     geonetworkProperties[`geonetwork:${key}`] = item[key]
   }
 
-  let stacItem = {
+  let datetime = undefined
+  let start_datetime = undefined
+  let end_datetime = undefined
+
+  if (
+    item.tempExtentBegin &&
+    item.tempExtentEnd &&
+    item.tempExtentBegin !== item.tempExtentEnd
+  ) {
+    start_datetime = item.tempExtentBegin
+    end_datetime = item.tempExtentEnd
+  } else {
+    datetime = item.tempExtentBegin ?? item.revisionDate?.[0]
+  }
+
+  let stacItem: StacItem = {
     type: 'Feature',
     stac_version: stacPackageJson.version,
     id: item.identifier,
@@ -39,9 +69,9 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
     properties: {
       id: item.identifier,
       title: item.title,
-      datetime: undefined,
-      start_datetime: undefined,
-      end_datetime: undefined,
+      datetime,
+      start_datetime,
+      end_datetime,
       collectionTitle: '',
       catalogTitle: '',
       ...geonetworkProperties,
@@ -56,20 +86,6 @@ export async function geonetworkItem2StacItem({ item, baseUrl }) {
       },
     ],
   }
-
-  if (
-    item.tempExtentBegin &&
-    item.tempExtentEnd &&
-    item.tempExtentBegin !== item.tempExtentEnd
-  ) {
-    stacItem.properties.start_datetime = item.tempExtentBegin
-    stacItem.properties.end_datetime = item.tempExtentEnd
-  } else {
-    stacItem.properties.datetime =
-      item.tempExtentBegin ?? item.revisionDate?.[0]
-  }
-
-  validate(stacItem)
 
   return stacItem
 }
