@@ -20,8 +20,11 @@ export default function DrawControl(props: DrawControlProps) {
   let draw = useControl<MapboxDraw>(
     () => new MapboxDraw(props),
     ({ map }) => {
+      // @ts-expect-error TODO: Fix types
       map.on('draw.create', props.onCreate)
+      // @ts-expect-error TODO: Fix types
       map.on('draw.update', props.onUpdate)
+      // @ts-expect-error TODO: Fix types
       map.on('draw.delete', props.onDelete)
 
       function setupInitialGeometry() {

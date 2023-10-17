@@ -19,34 +19,34 @@ import { Label } from './ui/label'
 
 export function DateRangePicker({
   className,
-  name,
   helper,
   label,
 }: React.HTMLAttributes<HTMLDivElement> & {
   label: string
-  name: string
   helper?: string
 }) {
-  let { error, defaultValue } = useField(name)
-  let { error: fromError } = useField(`${name}.from`)
-  let { error: toError } = useField(`${name}.to`)
+  let { error: errorStart, defaultValue: defaultStart } =
+    useField('start_datetime')
+  let { error: errorEnd, defaultValue: defaultEnd } = useField('end_datetime')
+  let { error: fromError } = useField(`start_datetime`)
+  let { error: toError } = useField(`end_datetime`)
   let id = React.useId()
 
   const [dateRange, setDate] = React.useState<DateRange | undefined>({
-    from: defaultValue?.from ? new Date(defaultValue.from) : undefined,
-    to: defaultValue?.to ? new Date(defaultValue.to) : undefined,
+    from: defaultStart ? new Date(defaultStart) : undefined,
+    to: defaultStart ? new Date(defaultEnd) : undefined,
   })
 
   return (
     <div className={cn('grid gap-2', className)}>
       <input
         type="hidden"
-        name={`${name}.from`}
+        name={`start_datetime`}
         value={dateRange?.from?.toJSON()}
       />
       <input
         type="hidden"
-        name={`${name}.to`}
+        name={`end_datetime`}
         value={dateRange?.to?.toJSON()}
       />
       <Label htmlFor={id}>{label}</Label>
@@ -87,7 +87,8 @@ export function DateRangePicker({
         </PopoverContent>
       </Popover>
       {helper && <Muted>{helper}</Muted>}
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {errorStart && <ErrorMessage>{errorStart}</ErrorMessage>}
+      {errorEnd && <ErrorMessage>{errorEnd}</ErrorMessage>}
       {fromError && <ErrorMessage>{fromError}</ErrorMessage>}
       {toError && <ErrorMessage>{toError}</ErrorMessage>}
     </div>

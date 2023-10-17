@@ -1,57 +1,27 @@
 import { db } from '~/utils/db.server'
 import { withCors } from '~/utils/withCors'
-import stacPackageJson from 'stac-spec/package.json'
 import type { Item } from '@prisma/client'
-import { getStacValidator } from '~/utils/stacspec'
-import { getHost } from '~/routes'
+// import { getHost } from '~/routes'
+import type { StacItem } from '~/utils/prismaToStac'
+import { prismaToStacItem } from '~/utils/prismaToStac'
+import { z } from 'zod'
+import { zx } from 'zodix'
 
-export let loader = withCors(async ({ request, params }) => {
-  let validate = await getStacValidator('Item')
+export let itemRouteParams = { id: z.string() }
 
-  let { id } = params
-  if (!id) throw new Response(null, { status: 400 })
-
-  let baseUrl = `${getHost(request)}/stac`
+export let loader = withCors(async ({ params }) => {
+  let { id } = zx.parseParams(params, itemRouteParams)
 
   let [item] = (await db.$queryRaw`
-    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "dateTime", "title", "startTime", "endTime", "location"
+    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "datetime", "start_datetime", "end_datetime", "collectionId"
     FROM "Item"
     WHERE "Item"."id" = ${id}
   `) as [Item & { geometry: string }]
 
-  let stacItem = {
-    type: 'Feature',
-    stac_version: stacPackageJson.version,
-    id: item.title,
-    description: item.description,
-    properties: {
-      ...(typeof item.properties === 'object' ? item.properties : {}),
-      title: item.title,
-      datetime: item.dateTime?.toISOString(),
-      start_datetime: item.startTime?.toISOString(),
-      end_datetime: item.endTime?.toISOString(),
-    },
+  let stacItem = prismaToStacItem({
+    ...item,
     geometry: JSON.parse(item.geometry),
-    assets: {
-      data: {
-        href: item.location,
-        title: `${item.title} Data`,
-        roles: ['data'],
-      },
-    },
-    links: [
-      {
-        rel: 'self',
-        type: 'application/json',
-        href: `${baseUrl}/items/${item.id}`,
-      },
-    ],
-  }
+  }) satisfies StacItem
 
-  if (validate(stacItem)) {
-    return stacItem
-  } else {
-    // return { errors: validate.errors, data: stacItem }
-    return stacItem
-  }
+  return stacItem
 })

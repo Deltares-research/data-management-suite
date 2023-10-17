@@ -1,29 +1,23 @@
 import { Link, useSearchParams } from '@remix-run/react'
 import { H3, Muted } from '~/components/typography'
 import { Button } from '~/components/ui/button'
-import { SelectItem } from '~/components/ui/select'
 import { z } from 'zod'
 import type { ActionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import { updateGeometry } from '~/services/item.server'
 import { ValidatedForm, validationError } from 'remix-validated-form'
 import { withZod } from '@remix-validated-form/with-zod'
-import {
-  FormInput,
-  FormSelect,
-  FormSubmit,
-  FormTextarea,
-} from '~/components/ui/form'
+import { FormInput, FormSubmit, FormTextarea } from '~/components/ui/form'
 import { zfd } from 'zod-form-data'
-import { MultiCombobox } from '~/components/Combobox'
 import { CollectionSelector } from '~/components/CollectionSelector'
 import { Separator } from '~/components/ui/separator'
-import type { Collection, Keyword } from '@prisma/client'
+import type { Collection, Prisma } from '@prisma/client'
 import type { AllowedGeometry } from '~/types'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
 import { DateRangePicker } from '~/components/DateRangePicker'
 import { requestJsonOrFormData } from '~/utils/requestJsonOrFormdata'
 import { requireAuthentication } from '~/services/auth.server'
+import { prismaToStacItem } from '~/utils/prismaToStac'
 
 let geometrySchema = z.object({
   coordinates: zfd.numeric().array().length(2).array().array(),
@@ -31,13 +25,7 @@ let geometrySchema = z.object({
 }) satisfies z.ZodType<AllowedGeometry>
 
 export let itemSchema = z.object({
-  projectNumber: z.string().min(3).describe('A valid maconomy number'),
-  title: z.string(),
-  description: z.string().nullable(),
-  location: z.string(),
-  license: z.string().nullable(),
-  keywords: z.string().array().optional(),
-  collectionId: z.string().nonempty({ message: 'Please select a collection' }),
+  collectionId: z.string().min(1, { message: 'Please select a collection' }),
   geometry: geometrySchema,
   properties: z
     .record(z.string(), z.any())
@@ -45,11 +33,10 @@ export let itemSchema = z.object({
     .describe(
       'Properties can be a record of arbitrary JSON objects or primitives for whatever metadata is relevant to your item. E.g. { "timeScale": { "step": 1, "unit": "day" } }',
     ),
-  dateRange: z.object({
-    from: z.string().nonempty({ message: 'Please select a date' }),
-    to: z.string().optional(),
-  }),
-})
+  datetime: z.string().nullish(),
+  start_datetime: z.string().nullish(),
+  end_datetime: z.string().nullish(),
+}) satisfies z.ZodType<Prisma.ItemUncheckedCreateInput>
 
 export type ItemSchema = z.infer<typeof itemSchema>
 
@@ -67,36 +54,30 @@ export async function submitItemForm({
     throw validationError(form.error)
   }
 
-  let { geometry, dateRange, ...formData } = form.data
+  let { geometry, datetime, start_datetime, end_datetime, ...formData } =
+    form.data
 
   let dates =
-    dateRange.to && dateRange.to !== dateRange.from
+    end_datetime && end_datetime !== start_datetime
       ? {
-          startTime: dateRange.from,
-          endTime: dateRange.to,
+          start_datetime,
+          end_datetime,
         }
       : {
-          dateTime: dateRange.from,
+          datetime: datetime ?? start_datetime,
         }
+
+  let data = {
+    ...formData,
+    ...dates,
+  }
 
   let item = await db.item.upsert({
     where: {
       id: id ?? '',
     },
-    create: {
-      ...formData,
-      ...dates,
-      keywords: {
-        connect: form.data.keywords?.map(id => ({ id })),
-      },
-    },
-    update: {
-      ...formData,
-      ...dates,
-      keywords: {
-        set: form.data.keywords?.map(id => ({ id })),
-      },
-    },
+    create: data,
+    update: data,
   })
 
   await updateGeometry({
@@ -104,19 +85,20 @@ export async function submitItemForm({
     geometry,
   })
 
-  return item
+  return prismaToStacItem({
+    ...item,
+    geometry,
+  })
 }
 
 export function ItemForm({
   defaultValues,
   collections,
-  initialKeywordCache,
 }: {
   collections: SerializeFrom<
     Collection & { catalog: { title: string | null } }
   >[]
   defaultValues?: z.infer<typeof itemSchema>
-  initialKeywordCache?: Record<string, Keyword>
 }) {
   // let { fieldErrors } = useFormContext('myform')
   let [searchParams] = useSearchParams()
@@ -171,23 +153,6 @@ export function ItemForm({
 
             <Separator />
 
-            {/* <H3>Experimental Facilities</H3>
-
-            <FormSelect name="facility" label="Facility">
-              <SelectItem value="next">Next.js</SelectItem>
-              <SelectItem value="sveltekit">SvelteKit</SelectItem>
-              <SelectItem value="astro">Astro</SelectItem>
-              <SelectItem value="nuxt">Nuxt.js</SelectItem>
-            </FormSelect>
-
-            <MultiCombobox
-              label="Keywords"
-              name="keywords"
-              initialCache={initialKeywordCache}
-            />
-
-            <Separator /> */}
-
             <div>
               <H3>Geometry</H3>
               <div className="pt-5">
@@ -200,7 +165,7 @@ export function ItemForm({
             <div>
               <H3>Temporal</H3>
               <div className="pt-5">
-                <DateRangePicker label="Date or date range" name="dateRange" />
+                <DateRangePicker label="Date or date range" />
               </div>
             </div>
 

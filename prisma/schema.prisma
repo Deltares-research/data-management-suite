@@ -64,32 +64,55 @@ model Member {
 
 // STAC Item
 model Item {
-  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // STAC Props
+  id         String                   @id @default(uuid())
+  geometry   Unsupported("geometry")? // Required, but making it optional allows for prisma.create queries
+  properties Json?
+
+  links  Link[]
+  assets Asset[]
+
+  // For calculating datetime, start_datetime and end_datetime in item.properties
+  datetime       DateTime?
+  start_datetime DateTime?
+  end_datetime   DateTime?
+
+  // Not STAC but useful
   owner   Person? @relation(fields: [ownerId], references: [id])
   ownerId String?
-
-  projectNumber String
-  title         String
-  location      String
-  description   String?
-  license       String?
-  keywords      Keyword[]
-
-  // STAC Props
-  geometry   Unsupported("geometry")? // Required, but making it optional allows for prisma.create queries
-  dateTime   DateTime?
-  startTime  DateTime?
-  endTime    DateTime?
-  properties Json?
-  assets     Json? // Dictionary of downloads
 
   collection   Collection @relation(fields: [collectionId], references: [id])
   collectionId String
 
   @@index([geometry], name: "location_idx", type: Gist)
+}
+
+model Link {
+  href  String
+  rel   String
+  type  String?
+  title String?
+
+  item   Item   @relation(fields: [itemId], references: [id])
+  itemId String
+
+  @@id([itemId, href])
+}
+
+model Asset {
+  href        String
+  title       String?
+  description String?
+  type        String?
+  roles       String[]
+
+  item   Item   @relation(fields: [itemId], references: [id])
+  itemId String
+
+  @@id([itemId, href])
 }
 
 // STAC Catalog
@@ -149,8 +172,6 @@ model Keyword {
 
   standard   Standard? @relation(fields: [standardId], references: [id])
   standardId String?
-
-  items Item[]
 }
 
 model Standard {
