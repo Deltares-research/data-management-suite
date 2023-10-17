@@ -8,7 +8,7 @@ import {
 } from '@ngneat/falso'
 import { randomPolygon } from '@turf/turf'
 import { CodeBlock, dracula } from 'react-code-blocks'
-import type { ZodRawShape, ZodTypeAny } from 'zod'
+import type { ZodRawShape, ZodTypeAny, z } from 'zod'
 import { H4 } from '~/components/typography'
 import {
   Table,
@@ -18,8 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import type { ItemSchema } from '~/forms/ItemForm'
-import { itemSchema } from '~/forms/ItemForm'
+import { createItemFormSchema } from '~/forms/ItemForm'
 import type { action as createItemAction } from './api.items'
 import { itemRouteParams } from './api.items_.$itemId'
 import { itemRouteParams as stacItemRouteParams } from '~/routes/stac.items.$id'
@@ -29,6 +28,9 @@ import { Link, useLoaderData } from '@remix-run/react'
 import { routes } from '~/routes'
 import type { LoaderArgs } from '@remix-run/node'
 import type { StacItem } from '~/utils/prismaToStac'
+
+let itemSchema = createItemFormSchema()
+type ItemSchema = z.infer<typeof itemSchema>
 
 let createItemRequestBody: ItemSchema = {
   geometry: randomPolygon(1, { num_vertices: 3 }).features[0].geometry,

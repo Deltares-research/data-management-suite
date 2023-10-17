@@ -22,6 +22,10 @@ export let routes = {
   createItem() {
     return `${appPrefix}/items/create`
   },
+  // TODO: Narrow down type options
+  createItemType(type: string) {
+    return `${appPrefix}/items/create/${type}`
+  },
   editItem(itemId: string) {
     return `${appPrefix}/items/${itemId}/edit`
   },
