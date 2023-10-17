@@ -57,8 +57,6 @@ export async function submitItemForm({
   let { geometry, datetime, start_datetime, end_datetime, ...formData } =
     form.data
 
-  console.log('formdata', form.data)
-
   let dates =
     end_datetime && end_datetime !== start_datetime
       ? {

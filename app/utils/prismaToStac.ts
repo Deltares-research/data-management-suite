@@ -28,7 +28,6 @@ export function prismaToStacItem({
   end_datetime?: Date | null
   collectionId: string
 }): StacItem {
-  console.log(start_datetime, end_datetime)
   return {
     id,
     type: 'Feature',

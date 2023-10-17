@@ -193,7 +193,11 @@ test('Get Item', async ({ request }) => {
   // Assert
   expect(existingItem.ok()).toBeTruthy()
   let exampleResponseBody = {
-    ...exampleItem,
+    properties: {
+      ...(exampleItem.properties as Object),
+      start_datetime: exampleItem.start_datetime,
+      end_datetime: exampleItem.end_datetime,
+    },
     geometry: {
       ...geometry,
       coordinates: geometry.coordinates.map(polygon =>

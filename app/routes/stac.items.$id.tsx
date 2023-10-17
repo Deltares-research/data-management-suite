@@ -13,7 +13,7 @@ export let loader = withCors(async ({ params }) => {
   let { id } = zx.parseParams(params, itemRouteParams)
 
   let [item] = (await db.$queryRaw`
-    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "datetime", "title", "start_datetime", "end_datetime", "location", "collectionId"
+    SELECT ST_AsGeoJson(geometry) as geometry, "id", "createdAt", "properties", "datetime", "start_datetime", "end_datetime", "collectionId"
     FROM "Item"
     WHERE "Item"."id" = ${id}
   `) as [Item & { geometry: string }]
