@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { Check, ChevronRight, ChevronsUpDown, ListTree, X } from 'lucide-react'
+import { Check, ChevronsUpDown, ListTree, X } from 'lucide-react'
 
 import { cn } from '~/utils'
 import { Button } from '~/components/ui/button'
@@ -44,6 +44,8 @@ export function Combobox() {
     for (let keyword of fetcher.data) {
       keywordCache[keyword.id] = keyword
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetcher.data])
 
   return (
@@ -87,7 +89,7 @@ export function Combobox() {
                   )}
                 />
                 <div>
-                  <strong className="block">{keyword.parent?.title}</strong>
+                  {/* <strong className="block">{keyword.parent?.title}</strong> */}
                   <span className="text-muted-foreground flex items-center gap-1.5">
                     <ListTree className="w-4 h-4" /> {keyword.title}
                   </span>
@@ -202,14 +204,14 @@ export function MultiCombobox({
                     )}
                   />
                   <div className="flex items-center gap-1">
-                    {keyword.parent && (
+                    {/* {keyword.parent && (
                       <>
                         <span className="block text-muted-foreground ">
                           {keyword.parent?.title}
                         </span>
                         <ChevronRight className="w-4 h-4" />
                       </>
-                    )}
+                    )} */}
                     <strong className="text-foreground flex items-center gap-1.5 font-medium">
                       {keyword.title}
                     </strong>

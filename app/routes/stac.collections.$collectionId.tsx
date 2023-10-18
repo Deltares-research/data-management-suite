@@ -7,13 +7,12 @@ import { z } from 'zod'
 import { getHost } from '~/routes'
 
 export let loader = withCors(async ({ request, params }) => {
-  let { collectionId, catalogId } = zx.parseParams(params, {
+  let { collectionId } = zx.parseParams(params, {
     collectionId: z.string(),
-    catalogId: z.string(),
   })
   let validate = await getStacValidator('Collection')
 
-  let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
+  let baseUrl = `${getHost(request)}/stac`
 
   let collection = await db.collection.findUniqueOrThrow({
     where: {

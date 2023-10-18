@@ -10,27 +10,29 @@ import { routes } from '~/routes'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import type { AllowedGeometry } from '~/types'
-import React from 'react'
-import { keywordCache } from '~/utils/keywordCache'
-import type { Keyword } from '@prisma/client'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Edit metadata' }]
 }
 
 export async function loader({ request, params }: LoaderArgs) {
-  // await requireAuthentication(request)
+  await requireAuthentication(request)
 
   let { itemId } = await zx.parseParams(params, { itemId: z.string() })
 
-  let collections = await db.collection.findMany()
+  let collections = await db.collection.findMany({
+    include: {
+      catalog: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  })
 
   let defaultValues = await db.item.findUniqueOrThrow({
     where: {
       id: itemId,
-    },
-    include: {
-      keywords: true,
     },
   })
 
@@ -41,14 +43,11 @@ export async function loader({ request, params }: LoaderArgs) {
     WHERE "Item"."id" = ${itemId}
   `
 
-  defaultValues.keywords.forEach(kw => {
-    keywordCache[kw.id] = kw
-  })
-
   return {
     collections,
     defaultValues: {
       ...defaultValues,
+      properties: defaultValues.properties as Record<string, unknown>,
       geometry: JSON.parse(geometry) as AllowedGeometry,
     },
   }
@@ -65,22 +64,5 @@ export async function action(args: ActionArgs) {
 export default function CreatePage() {
   let { collections, defaultValues } = useLoaderData<typeof loader>()
 
-  return (
-    <ItemForm
-      collections={collections}
-      // TODO: Keyword cache very strange, come up with better solution
-      initialKeywordCache={defaultValues?.keywords?.reduce((acc, current) => {
-        acc[current.id] = current
-        return acc
-      }, {} as Record<string, Keyword>)}
-      defaultValues={{
-        ...defaultValues,
-        dateRange: {
-          from: defaultValues.startTime ?? defaultValues.dateTime ?? '',
-          to: defaultValues.endTime ?? '',
-        },
-        keywords: defaultValues.keywords.map(({ id }) => id),
-      }}
-    />
-  )
+  return <ItemForm collections={collections} defaultValues={defaultValues} />
 }

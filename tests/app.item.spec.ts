@@ -85,10 +85,6 @@ test('can create item', async ({ page }) => {
   await grid.getByText(/14/i).click()
   await grid.getByText(/17/i).click()
 
-  // Keywords
-  await page.getByRole('combobox', { name: /Keywords/i }).click()
-  await page.getByRole('option').first().click()
-
   await page.getByRole('button', { name: /Save/i }).click()
 
   await expect.poll(async () => page.url()).toMatch(/\/app\/items$/i)
@@ -97,9 +93,10 @@ test('can create item', async ({ page }) => {
 test('can edit item', async ({ page }) => {
   let item = await db.item.create({
     data: {
-      title: randAnimal(),
-      projectNumber: randNumber().toFixed(),
-      location: 'P://test',
+      properties: {
+        title: randAnimal(),
+        projectNumber: randNumber().toFixed(),
+      },
       collection: {
         create: {
           title: `Test Collection`,

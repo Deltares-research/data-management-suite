@@ -75,7 +75,7 @@
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.6",
     "uuid": "^9.0.0",
-    "zod": "^3.21.4",
+    "zod": "^3.22.4",
     "zod-form-data": "^2.0.1",
     "zodix": "^0.4.1"
   },
@@ -93,6 +93,7 @@
     "eslint": "^8.38.0",
     "playwright": "^1.36.1",
     "prisma": "^5.0.0",
+    "stac-ts": "^1.0.0",
     "tailwindcss": "^3.3.3",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",

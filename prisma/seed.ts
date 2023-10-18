@@ -85,9 +85,11 @@ async function seed() {
         let item = await db.item.create({
           data: {
             collectionId: collection.id,
-            projectNumber: `${randColor()}-${randNumber()}`,
-            title: `${randAnimal()}`,
-            location: randFilePath(),
+            properties: {
+              projectNumber: `${randColor()}-${randNumber()}`,
+              title: `${randAnimal()}`,
+              location: randFilePath(),
+            },
           },
         })
 

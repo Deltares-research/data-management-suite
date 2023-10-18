@@ -3,9 +3,11 @@ import { db } from '~/utils/db.server'
 import type { Item } from '@prisma/client'
 import { zx } from 'zodix'
 import { z } from 'zod'
+import { prismaToStacItem } from '~/utils/prismaToStac'
+import type { FeatureCollection } from 'geojson'
 
 export async function loader({ request }: LoaderArgs) {
-  let url = new URL(request.url)
+  // let url = new URL(request.url)
   let { bbox: bboxString, q = '' } = zx.parseQuery(request, {
     bbox: z.string().optional(),
     q: z.string().optional(),
@@ -24,7 +26,6 @@ export async function loader({ request }: LoaderArgs) {
 
   // let externalCatalog = await db.externalCatalog.findFirst()
 
-  let externalResults: any = {}
   // if (externalCatalog?.url) {
   //   externalResults = await fetch(`${externalCatalog?.url}/search${url.search}`)
   //     .then(res => res.json())
@@ -58,7 +59,7 @@ export async function loader({ request }: LoaderArgs) {
       catalogTitle: string
     })[]
   >`
-    SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."title", "Item"."description", "Item"."dateTime", "Item"."startTime", "Item"."endTime", "Collection"."title" as "collectionTitle", "Catalog"."title" as "catalogTitle" FROM "Item"
+    SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."datetime", "Item"."start_datetime", "Item"."end_datetime", "Item"."properties", "Collection"."title" as "collectionTitle", "Catalog"."title" as "catalogTitle" FROM "Item"
     JOIN "Collection" ON "Collection"."id" = "Item"."collectionId"
     JOIN "Catalog" ON "Catalog"."id" = "Collection"."catalogId"
     WHERE ST_Intersects("Item"."geometry", ST_MakeEnvelope(${
@@ -68,9 +69,9 @@ export async function loader({ request }: LoaderArgs) {
   }::double precision, ${bbox[3]}::double precision, 4326))
 
     AND 
-      ("Item"."title" ILIKE ${'%' + q + '%'} OR "Item"."description" ILIKE ${
-    '%' + q + '%'
-  })
+      ("Item"."properties"->>'title' ILIKE ${
+        '%' + q + '%'
+      } OR "Item"."properties"->>'description' ILIKE ${'%' + q + '%'})
 
     LIMIT 100
   `
@@ -79,11 +80,11 @@ export async function loader({ request }: LoaderArgs) {
     ...items.map(item => {
       let geometry = JSON.parse(item.geometry)
 
-      return {
-        type: 'Feature',
-        properties: item,
+      // TODO: Generate STAC Item
+      return prismaToStacItem({
+        ...item,
         geometry,
-      }
+      })
     }),
     // ...externalResults.features?.map(feature => ({
     //   ...feature,
@@ -97,5 +98,5 @@ export async function loader({ request }: LoaderArgs) {
   return {
     type: 'FeatureCollection',
     features,
-  }
+  } satisfies FeatureCollection
 }

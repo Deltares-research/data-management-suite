@@ -21,11 +21,6 @@ export async function loader({ request }: LoaderArgs) {
         },
       ],
     },
-    orderBy: {
-      items: {
-        _count: 'desc',
-      },
-    },
     take: 10,
     include: {
       parent: {

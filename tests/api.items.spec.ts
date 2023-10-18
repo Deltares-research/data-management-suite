@@ -1,33 +1,30 @@
 import {
   randAnimal,
   randColor,
-  randFilePath,
   randNumber,
   randParagraph,
   randRecentDate,
   randSoonDate,
 } from '@ngneat/falso'
 import { test, expect } from '@playwright/test'
+import type { Prisma } from '@prisma/client'
 import { randomPolygon } from '@turf/turf'
 import type { ItemSchema } from '~/forms/ItemForm'
 import { updateGeometry } from '~/services/item.server'
 import { encodeToken } from '~/utils/apiKey'
 import { db } from '~/utils/db.server'
 
-test('Create Item', async ({ request }) => {
+test('Create Item', async ({ request, baseURL }) => {
   await truncateDatabase()
 
   let exampleRequestBody: ItemSchema = {
-    title: randAnimal(),
-    projectNumber: randNumber().toFixed(0),
-    description: randParagraph(),
-    geometry: randomPolygon().features[0].geometry,
-    dateRange: {
-      from: randRecentDate().toISOString(),
-      to: randSoonDate().toISOString(),
+    properties: {
+      title: randAnimal(),
+      projectNumber: randNumber().toFixed(0),
+      description: randParagraph(),
+      datetime: randRecentDate().toISOString(),
     },
-    location: '',
-    license: '',
+    geometry: randomPolygon().features[0].geometry,
     collectionId: await db.collection
       .create({
         data: {
@@ -44,15 +41,14 @@ test('Create Item', async ({ request }) => {
   }
 
   let exampleResponseBody = {
-    title: exampleRequestBody.title,
-    assets: null,
-    collectionId: exampleRequestBody.collectionId,
-    description: exampleRequestBody.description,
-    dateTime: null,
-    startTime: exampleRequestBody.dateRange.from,
-    endTime: exampleRequestBody.dateRange.to,
-    location: '',
-    license: '',
+    properties: exampleRequestBody.properties,
+    links: expect.arrayContaining([
+      {
+        rel: 'collection',
+        href: `/collections/${exampleRequestBody.collectionId}`,
+        type: 'application/json',
+      },
+    ]),
   }
 
   let token = await createToken()
@@ -76,13 +72,13 @@ test('Edit Item', async ({ request }) => {
 
   let testItem = await db.item.create({
     data: {
-      title: randAnimal(),
-      projectNumber: randNumber().toFixed(0),
-      description: randParagraph(),
-      startTime: randRecentDate().toISOString(),
-      endTime: randSoonDate().toISOString(),
-      location: '',
-      license: '',
+      properties: {
+        title: randAnimal(),
+        projectNumber: randNumber().toFixed(0),
+        description: randParagraph(),
+        start_datetime: randRecentDate().toISOString(),
+        end_datetime: randSoonDate().toISOString(),
+      },
       collection: {
         create: {
           title: 'Test Collection',
@@ -98,16 +94,14 @@ test('Edit Item', async ({ request }) => {
   })
 
   let exampleRequestBody: ItemSchema = {
-    title: randAnimal(),
-    projectNumber: randNumber().toFixed(0),
-    description: randParagraph(),
-    geometry: randomPolygon().features[0].geometry,
-    dateRange: {
-      from: randRecentDate().toISOString(),
-      to: randSoonDate().toISOString(),
+    properties: {
+      title: randAnimal(),
+      projectNumber: randNumber().toFixed(0),
+      description: randParagraph(),
+      start_datetime: randRecentDate().toISOString(),
+      end_datetime: randSoonDate().toISOString(),
     },
-    location: '',
-    license: '',
+    geometry: randomPolygon().features[0].geometry,
     collectionId: await db.collection
       .create({
         data: {
@@ -124,15 +118,15 @@ test('Edit Item', async ({ request }) => {
   }
 
   let exampleResponseBody = {
-    title: exampleRequestBody.title,
-    assets: null,
-    collectionId: exampleRequestBody.collectionId,
-    description: exampleRequestBody.description,
-    dateTime: null,
-    startTime: exampleRequestBody.dateRange.from,
-    endTime: exampleRequestBody.dateRange.to,
-    location: '',
-    license: '',
+    properties: exampleRequestBody.properties,
+    assets: {},
+    links: expect.arrayContaining([
+      {
+        rel: 'collection',
+        href: `/collections/${exampleRequestBody.collectionId}`,
+        type: 'application/json',
+      },
+    ]),
   }
 
   let token = await createToken()
@@ -156,15 +150,14 @@ test('Get Item', async ({ request }) => {
   await truncateDatabase()
 
   // Arrange
-  let exampleItem = {
-    dateTime: null,
-    title: randAnimal(),
-    projectNumber: randNumber().toFixed(0),
-    description: randParagraph(),
-    startTime: randRecentDate().toISOString(),
-    endTime: randSoonDate().toISOString(),
-    location: '',
-    license: '',
+  let exampleItem: Prisma.ItemCreateWithoutCollectionInput = {
+    properties: {
+      title: randAnimal(),
+      projectNumber: randNumber().toFixed(0),
+      description: randParagraph(),
+    },
+    start_datetime: randRecentDate().toISOString(),
+    end_datetime: randSoonDate().toISOString(),
   }
 
   let item = await db.item.create({
@@ -192,12 +185,16 @@ test('Get Item', async ({ request }) => {
   })
 
   // Act
-  let newItem = await request.get(`/api/items/${item.id}`)
+  let existingItem = await request.get(`/stac/items/${item.id}`)
 
   // Assert
-  expect(newItem.ok()).toBeTruthy()
+  expect(existingItem.ok()).toBeTruthy()
   let exampleResponseBody = {
-    ...exampleItem,
+    properties: {
+      ...(exampleItem.properties as Object),
+      start_datetime: exampleItem.start_datetime,
+      end_datetime: exampleItem.end_datetime,
+    },
     geometry: {
       ...geometry,
       coordinates: geometry.coordinates.map(polygon =>
@@ -205,7 +202,7 @@ test('Get Item', async ({ request }) => {
       ),
     },
   }
-  expect(await newItem.json()).toMatchObject(exampleResponseBody)
+  expect(await existingItem.json()).toMatchObject(exampleResponseBody)
 })
 
 test('Item Search', async ({ request }) => {
@@ -231,9 +228,10 @@ test('Item Search', async ({ request }) => {
         let item = await db.item.create({
           data: {
             collectionId: collection.id,
-            projectNumber: `${randColor()}-${randNumber()}`,
-            title: `${randAnimal()}`,
-            location: randFilePath(),
+            properties: {
+              projectNumber: `${randColor()}-${randNumber()}`,
+              title: `${randAnimal()}`,
+            },
           },
         })
 

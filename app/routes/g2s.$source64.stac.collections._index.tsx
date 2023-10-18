@@ -1,6 +1,5 @@
 import type { LoaderArgs } from '@remix-run/node'
 import stacPackageJson from 'stac-spec/package.json'
-import { db } from '~/utils/db.server'
 import { withCors } from '~/utils/withCors'
 import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
@@ -21,7 +20,10 @@ export let loader = withCors(async ({ request, params }: LoaderArgs) => {
     `${sourceUrl}/geonetwork/srv/eng/q?_content_type=json&fast=index&from=1&sortOrder=&to=20`,
   )
 
-  let topics = result.summary.topicCats
+  let topics = result.summary.topicCats as {
+    '@name': string
+    '@label': string
+  }[]
 
   let stacCollections = topics.map(topic => ({
     type: 'Collection',
