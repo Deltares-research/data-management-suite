@@ -37,6 +37,20 @@ RUN npx prisma generate
 ADD . .
 RUN npm run build
 
+# Build the dev image with dev dependencies
+FROM base as dev
+
+WORKDIR /app
+
+COPY --from=deps /app/node_modules /app/node_modules
+COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
+
+COPY --from=build /app/build /app/build
+COPY --from=build /app/public /app/public
+COPY . .
+
+CMD ["npx", "remix", "dev"]
+
 # Finally, build the production image with minimal footprint
 FROM base as prod
 
