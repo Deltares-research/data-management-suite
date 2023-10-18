@@ -1,15 +1,10 @@
 import { Link } from '@remix-run/react'
-import { H3 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
-import { z } from 'zod'
+import type { z } from 'zod'
 import type { ActionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import { updateGeometry } from '~/services/item.server'
-import {
-  ValidatedForm,
-  useFormContext,
-  validationError,
-} from 'remix-validated-form'
+import { ValidatedForm, validationError } from 'remix-validated-form'
 import { withZod } from '@remix-validated-form/with-zod'
 import { FormSubmit } from '~/components/ui/form'
 import { CollectionSelector } from '~/components/CollectionSelector'
@@ -20,22 +15,16 @@ import { DateRangePicker } from '~/components/DateRangePicker'
 import { requestJsonOrFormData } from '~/utils/requestJsonOrFormdata'
 import { requireAuthentication } from '~/services/auth.server'
 import { prismaToStacItem } from '~/utils/prismaToStac'
-import { zx } from 'zodix'
-import { createItemFormSchema, formTypes } from '.'
-import {
-  Accordion,
-  AccordionTrigger,
-  AccordionItem,
-  AccordionContent,
-} from '~/components/ui/accordion'
-import { SidebarNav } from '~/components/SidebarNav'
+import { formTypes, createItemFormSchema } from '.'
+import { Label } from '~/components/ui/label'
+import React from 'react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { routes } from '~/routes'
+import { Plus, X } from 'lucide-react'
 
 export async function submitItemForm({
   request,
@@ -44,12 +33,13 @@ export async function submitItemForm({
 }: ActionArgs & { id?: string }) {
   await requireAuthentication(request)
 
-  let { type } = zx.parseParams(params, { type: z.string() })
+  let formDataRaw = await requestJsonOrFormData(request)
 
-  let formType = formTypes[type as keyof typeof formTypes]
-  let itemValidator = withZod(createItemFormSchema(formType.propertiesSchema))
+  let itemValidator = withZod(
+    createItemFormSchema(formDataRaw.getAll('properties[__extraFormTypes]')),
+  )
 
-  let form = await itemValidator.validate(await requestJsonOrFormData(request))
+  let form = await itemValidator.validate(formDataRaw)
 
   if (form.error) {
     throw validationError(form.error)
@@ -61,11 +51,11 @@ export async function submitItemForm({
   let dates =
     end_datetime && end_datetime !== start_datetime
       ? {
-          start_datetime,
-          end_datetime,
+          start_datetime: start_datetime || undefined,
+          end_datetime: end_datetime || undefined,
         }
       : {
-          datetime: datetime ?? start_datetime,
+          datetime: (datetime || undefined) ?? (start_datetime || undefined),
         }
 
   let data = {
@@ -95,84 +85,62 @@ export async function submitItemForm({
 export function ItemForm({
   defaultValues,
   collections,
-  formType,
 }: {
   collections: SerializeFrom<
     Collection & { catalog: { title: string | null } }
   >[]
   defaultValues?: unknown
-  formType: keyof typeof formTypes
 }) {
-  let form = formTypes[formType]
-  let itemSchema = createItemFormSchema(form.propertiesSchema)
-  let itemValidator = withZod(itemSchema)
+  let [extraFormTypes, setExtraFormTypes] = React.useState<
+    (keyof typeof formTypes)[]
+  >([])
 
-  let { fieldErrors } = useFormContext('myform')
-  // let [searchParams] = useSearchParams()
+  let itemSchema = React.useMemo(
+    () => createItemFormSchema(extraFormTypes),
+    [extraFormTypes],
+  )
+  let itemValidator = React.useMemo(() => withZod(itemSchema), [itemSchema])
 
-  console.log({ fieldErrors })
+  // TODO: Make global error view
+  // let { fieldErrors } = useFormContext('myform')
 
   return (
     <>
-      <div className="hidden space-y-6 p-10 pb-16 md:block">
+      <div className="max-w-6xl w-full mx-auto py-12">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">
             Register metadata record
           </h2>
-          {/* <p className="text-muted-foreground">
-            Manage your account settings and set e-mail preferences.
-          </p> */}
+          <p className="text-muted-foreground">
+            Findable metadata records are the foundation of the data catalog.
+          </p>
         </div>
         <Separator className="my-6" />
-        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-          <aside className="-mx-4 lg:w-1/5">
-            <SidebarNav
-              items={[
-                {
-                  title: 'General',
-                  href: '#general',
-                },
-                {
-                  title: form.config.title,
-                  href: '#properties',
-                },
-              ]}
-            />
-          </aside>
-          <div className="flex-1 lg:max-w-2xl">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="outline">
-                  {formType ?? 'Select Form Type'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem asChild>
-                  <Link to={routes.createItemType('numerical')}>
-                    Numerical Models
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <ValidatedForm
-              id="myform"
-              method="post"
-              validator={itemValidator}
-              defaultValues={{
-                // collectionId: searchParams.get('collectionId') ?? undefined,
-                ...(defaultValues as z.infer<typeof itemSchema>),
-              }}
-              className="flex flex-col gap-y-16"
-            >
-              <div className="flex flex-col gap-y-8">
-                <div id="general">
-                  <h3 className="text-lg font-medium">General</h3>
-                  <p className="text-sm text-muted-foreground">
-                    This is how others will see you on the site.
-                  </p>
-                </div>
-                <Separator />
-                <div className="flex flex-col space-y-1.5">
+        <div>
+          <ValidatedForm
+            id="myform"
+            method="post"
+            validator={itemValidator}
+            defaultValues={defaultValues as z.infer<typeof itemSchema>}
+            className="flex flex-col gap-y-16"
+          >
+            {extraFormTypes.map(formType => (
+              <input
+                key={formType}
+                type="hidden"
+                name="properties[__extraFormTypes]"
+                value={formType}
+              />
+            ))}
+            <div className="gap-14 grid grid-cols-3">
+              <div id="general">
+                <h3 className="text-lg font-medium">General</h3>
+                <p className="text-sm text-muted-foreground">
+                  Basic information about the data
+                </p>
+              </div>
+              <div className="col-span-2 flex flex-col gap-6">
+                <div className="flex flex-col gap-1.5">
                   {collections ? (
                     <CollectionSelector
                       label="Collection"
@@ -186,41 +154,83 @@ export function ItemForm({
                   )}
                 </div>
 
-                <Separator />
-
                 <div>
-                  <H3>Geometry</H3>
-                  <div className="pt-5">
+                  <Label>Geometry</Label>
+                  <div className="pt-1.5">
                     <BoundsSelector name="geometry" />
                   </div>
                 </div>
 
-                <Separator />
-
                 <div>
-                  <H3>Temporal</H3>
-                  <div className="pt-5">
-                    <DateRangePicker label="Date or date range" />
-                  </div>
+                  <DateRangePicker label="Date or date range" />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-y-8">
-                <div id="properties">
-                  <h3 className="text-lg font-medium">Properties</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Properties specific to {form.config.title}
-                  </p>
-                </div>
-                <Separator />
-                <form.Form />
-              </div>
+              {extraFormTypes?.map(type => {
+                let formType = formTypes[type]
 
-              <div>
-                <FormSubmit>Save</FormSubmit>
-              </div>
-            </ValidatedForm>
-          </div>
+                return (
+                  <>
+                    <Separator className="col-span-3" />
+                    <div id="properties">
+                      <h3 className="text-lg font-medium">
+                        {formType.config.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Properties specific to {formType.config.title}
+                      </p>
+                      <Button
+                        className="mt-3"
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          setExtraFormTypes(c => c.filter(v => v !== type))
+                        }
+                      >
+                        <X className="w-4 h-4 mr-1.5" /> Remove{' '}
+                        {formType.config.title}
+                      </Button>
+                    </div>
+                    <div className="col-span-2">
+                      <formType.Form />
+                    </div>
+                  </>
+                )
+              })}
+
+              {extraFormTypes.length < Object.keys(formTypes).length && (
+                <>
+                  <Separator className="col-span-full" />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full col-span-full"
+                      >
+                        <Plus className="w-4 h-4 mr-1.5" /> Add more data
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      {Object.entries(formTypes)
+                        .filter(([key]) => !extraFormTypes.includes(key))
+                        .map(([key, formType]) => (
+                          <DropdownMenuItem
+                            key={key}
+                            onClick={() => setExtraFormTypes(c => [...c, key])}
+                          >
+                            {formType.config.title}
+                          </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              )}
+            </div>
+
+            <div>
+              <FormSubmit>Save</FormSubmit>
+            </div>
+          </ValidatedForm>
         </div>
       </div>
     </>

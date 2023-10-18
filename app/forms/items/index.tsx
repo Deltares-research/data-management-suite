@@ -4,7 +4,16 @@ import { z } from 'zod'
 import { zfd } from 'zod-form-data'
 import type { Prisma } from '@prisma/client'
 
-export let formTypes = {
+interface FormType {
+  config: {
+    id: string
+    title: string
+  }
+  propertiesSchema: z.AnyZodObject
+  Form: React.ComponentType
+}
+
+export let formTypes: Record<string, FormType> = {
   numerical,
 }
 
@@ -13,9 +22,11 @@ let geometrySchema = z.object({
   type: z.literal('Polygon'),
 }) satisfies z.ZodType<AllowedGeometry>
 
-export function createItemFormSchema<TProperties extends z.ZodTypeAny>(
-  properties?: TProperties,
-) {
+export function createItemFormSchema(extraFormTypes: string[] = []) {
+  let properties = extraFormTypes?.reduce((acc, type) => {
+    return (acc ?? z.object({})).merge(formTypes[type].propertiesSchema)
+  }, null as z.AnyZodObject | null)
+
   return z.object({
     collectionId: z.string().min(1, { message: 'Please select a collection' }),
     geometry: geometrySchema,

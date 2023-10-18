@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { FormInput, FormTextarea } from '~/components/ui/form'
 
 export let config = {
+  id: 'numerical',
   title: 'Numerical Models',
 }
 
@@ -24,7 +25,7 @@ export let propertiesSchema = z.object({
 
 export function Form() {
   return (
-    <div className="grid w-full items-center gap-8">
+    <div className="grid w-full items-center gap-6">
       <FormInput name="properties[title]" label="Title" />
       <FormTextarea name="properties[description]" label="Description" />
       <FormTextarea name="properties[license]" label="License" />
@@ -40,16 +41,18 @@ export function Form() {
       <FormInput name="properties[reportLocation]" label="Report Location" />
       <FormInput name="properties[model]" label="Model" />
 
-      <FormInput
-        type="number"
-        name="properties[timeScale][step]"
-        label="Step"
-      />
-      <FormInput
-        name="properties[timeScale][unit]"
-        label="Unit"
-        helper="E.g. Days or Months"
-      />
+      <div className="grid grid-cols-2 gap-3">
+        <FormInput
+          type="number"
+          name="properties[timeScale][step]"
+          label="Timescale Step"
+        />
+        <FormInput
+          name="properties[timeScale][unit]"
+          label="Timescale Unit"
+          helper="E.g. Days or Months"
+        />
+      </div>
     </div>
   )
 }
