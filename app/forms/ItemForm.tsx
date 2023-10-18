@@ -63,16 +63,15 @@ export async function submitItemForm({
 
   let { geometry, ...formData } = form.data
 
-  let { datetime, start_datetime, end_datetime } = form.data.properties
+  let { datetime, start_datetime, end_datetime, ...properties } =
+    form.data.properties
 
   let data = {
     ...formData,
-    properties: {
-      ...formData.properties,
-      datetime,
-      start_datetime,
-      end_datetime,
-    },
+    properties: properties as Prisma.JsonObject,
+    datetime,
+    start_datetime,
+    end_datetime,
   }
 
   let item = await db.item.upsert({
