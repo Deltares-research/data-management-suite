@@ -1,34 +1,23 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Type, Union
 
-from datetime import datetime
+# avoids conflicts since there are also kwargs and attrs called `datetime`
+from datetime import datetime as Datetime
 from geojson.geometry import Polygon
+from pystac import Asset, Collection, Item
 
 
-class DataManagementSuiteItem:
-
+class DataManagementSuiteItem(Item):
+    # We set the id to be optional because we want to be able to create an item
+    # and let the Datamanagement suite assign the id
     id: Optional[str] = None
-
-    title: str
-
-    projectNumber: str
-
-    description: Optional[str] = ""
-
-    location: str
-
-    license: Optional[str] = None
-
-    keywords: Optional[List[str]] = []
-
     collectionId: str
 
-    geometry: Polygon
-
-    properties: Optional[Dict[str, Any]] = None
-
-    start_datetime: datetime = None
-
-    end_datetime: Optional[datetime] = None
+    # The following attributes we add to the "properties" of the stac item
+    title: str
+    projectNumber: str
+    description: Optional[str] = ""
+    location: str
+    license: Optional[str] = None
 
 
     def __init__(
@@ -36,107 +25,83 @@ class DataManagementSuiteItem:
         title: str,
         projectNumber: str,
         location: str,
+        description: str,
+        license: str,
         collectionId: str,
-        start_datetime: datetime,
+        geometry: Optional[Dict[str, Any]],
+        properties: Dict[str, Any],
         id: Optional[str] = None,
-        geometry: Optional[Polygon] = None,
-        description: Optional[str] = None,
-        license: Optional[str] = None,
-        keywords: Optional[List[str]] = None,
-        properties: Optional[Dict[str, Any]] = None,
-        end_datetime: Optional[datetime] = None,
+        bbox: Optional[List[float]] = None,
+        datetime: Optional[Datetime] = None,
+        start_datetime: Optional[Datetime] = None,
+        end_datetime: Optional[Datetime] = None,
+        stac_extensions: Optional[List[str]] = None,
+        href: Optional[str] = None,
+        extra_fields: Optional[Dict[str, Any]] = None,
+        assets: Optional[Dict[str, Asset]] = None,
+        **kwargs: Any,
     ):
-        if geometry and not geometry.is_valid:
-            raise ValueError("Geometry is not valid")
-        self.id = id
-        self.title = title
-        self.projectNumber = projectNumber
-        self.description = description
-        self.location = location
-        self.license = license
-        self.keywords = keywords
+        super().__init__(
+            id=id,
+            geometry=geometry,
+            bbox=bbox,
+            datetime=datetime,
+            properties=properties,
+            start_datetime=start_datetime,
+            end_datetime=end_datetime,
+            stac_extensions=stac_extensions,
+            href=href,
+            extra_fields=extra_fields,
+            assets=assets
+        )
+
         self.collectionId = collectionId
-        self.geometry = geometry
-        self.properties = properties
-        self.start_datetime = start_datetime
-        self.end_datetime = end_datetime
+        self.properties["title"] = title
+        self.properties["projectNumber"] = projectNumber
+        self.properties["description"] = description
+        self.properties["location"] = location
+        self.properties["license"] = license
+
     
     @classmethod
-    def from_dict(cls, item_dict: dict) -> "DataManagementSuiteClient":
+    def from_dict(
+            cls: Type["DataManagementSuiteItem"],
+            item_dict: dict) -> "DataManagementSuiteItem":
         """
         Create a DMSItem from a dictionary
         :param item_dict: The dictionary to create the DMSItem from
         :return: The DMSItem
         """
-        id = item_dict.get("id")
-        title = item_dict["title"]
-        projectNumber = item_dict["projectNumber"]
-        description = item_dict.get("description")
-        location = item_dict["location"]
-        license = item_dict.get("license")
-        keywords = item_dict.get("keywords")
-        collectionId = item_dict["collectionId"]
-        geometry = Polygon.to_instance(item_dict["geometry"]) if "geometry" in item_dict else None
-        properties = item_dict.get("properties")
-
-        if item_dict["dateTime"] is not None:
-            start_datetime = datetime.fromisoformat(item_dict["dateTime"])
+        stac_item = Item.from_dict(item_dict)
+        collection_link = stac_item.get_single_link("collection")
+        #fetch collection id from collection link if possible
+        if collection_link:
+            collection_id = str(collection_link.target).split('/')[-1]
         else:
-            start_datetime = datetime.fromisoformat(item_dict["startTime"])
-
-        if ("endTime" in item_dict) and (item_dict["endTime"] is not None):
-            end_datetime = datetime.fromisoformat(item_dict["endTime"])
-        else:
-            end_datetime = None
-
-        return cls(
-            id=id,
-            title=title,
-            projectNumber=projectNumber,
-            description=description,
-            location=location,
-            license=license,
-            keywords=keywords,
-            collectionId=collectionId,
-            geometry=geometry,
-            properties=properties,
-            start_datetime=start_datetime,
-            end_datetime=end_datetime
+            collection_id = item_dict["collectionId"]
+        item = cls(
+            title=stac_item.properties["title"],
+            projectNumber=stac_item.properties["projectNumber"],
+            description=stac_item.properties["description"],
+            location=stac_item.properties["location"],
+            license=stac_item.properties["license"],
+            collectionId=collection_id,
+            id=stac_item.id,
+            geometry=stac_item.geometry,
+            bbox=stac_item.bbox,
+            datetime=stac_item.datetime,
+            properties=stac_item.properties,
+            stac_extensions=stac_item.stac_extensions,
+            extra_fields=stac_item.extra_fields,
+            assets=stac_item.assets
         )
+        
+        return item
 
     def to_dict(self) -> dict:
 
-        if self.start_datetime.tzinfo is None:
-            raise ValueError("Start datetime must have a timezone")
-        
-        if self.end_datetime and self.end_datetime.tzinfo is None:
-            raise ValueError("End datetime must have a timezone")
-        
-        item_dict = {
-            "title": self.title,
-            "projectNumber": self.projectNumber,
-            "geometry": self.geometry,
-            "location": self.location,
-            "collectionId": self.collectionId,
-            "dateRange": {
-                "from": self.start_datetime.isoformat()
-            }
-        }
-
-        if self.description:
-            item_dict["description"] = self.description
-        
-        if self.license:
-            item_dict["license"] = self.license
-        
-        if self.keywords:
-            item_dict["keywords"] = self.keywords
-
-        if self.properties:
-            item_dict["properties"] = self.properties
-
-        if self.end_datetime:
-            item_dict["dateRange"]["to"] = self.end_datetime.isoformat()
+        item_dict = super().to_dict()
+        item_dict["collectionId"] = self.collectionId
 
         return item_dict
 

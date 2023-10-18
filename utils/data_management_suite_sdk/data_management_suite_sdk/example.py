@@ -5,7 +5,7 @@ from data_management_suite_sdk.client import DataManagementSuiteClient
 from data_management_suite_sdk.core import DataManagementSuiteItem
 
 # Define the necessary variables
-api_key = "4f2b64c3-6f17-4f36-86b2-3fc92e918d5e"
+api_key = ""
 dms_url = (
     "https://ca-dms-dev-web.greenmushroom-03589694.westeurope.azurecontainerapps.io"
 )
@@ -16,15 +16,18 @@ client = DataManagementSuiteClient(dms_url, api_key)
 item_name = "Python SDK test item"
 item_description = "My first DMS item"
 
+# Find the collection ID of the collection you want to add the item to in the URL when editing the Collection in the DMS
+collectionId = ""
+
 # Create a DMSItem object
 dms_item = DataManagementSuiteItem(
-    id="3bc99da9-5feb-428a-827a-6b26b43830bf",
+    # id="3bc99da9-5feb-428a-827a-6b26b43830bf",
     title=item_name,
     projectNumber="11209789",
     description=item_description,
     location="s3://Minio_on_P_Drive/Python_SDK_test_item",
     license="MIT",
-    collectionId="61c61481-e717-4283-bb9a-4bd10be210f6",
+    collectionId=collectionId,
     geometry=Polygon(
         coordinates=[[
             [5.119014591, 52.378756326],
@@ -38,7 +41,7 @@ dms_item = DataManagementSuiteItem(
         ]],
     ),
     properties={"PROPERTY1": "VALUE1", "PROPERTY2": "VALUE2"},
-    start_datetime=datetime.now(tz=timezone.utc),
+    datetime=datetime.now(tz=timezone.utc),
 
 )
 

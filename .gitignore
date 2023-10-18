@@ -44,3 +44,9 @@ override.tf.json
 terraform-oidc-config/config.tfvars
 terraform-oidc-config/log.txt
 terraform-oidc-config/terraform.tfvars
+
+# Ignore python files
+*.pyc
+*.pyo
+*.pyd
+*.coverage
