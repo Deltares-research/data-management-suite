@@ -22,9 +22,9 @@ test('Create Item', async ({ request, baseURL }) => {
       title: randAnimal(),
       projectNumber: randNumber().toFixed(0),
       description: randParagraph(),
+      datetime: randRecentDate().toISOString(),
     },
     geometry: randomPolygon().features[0].geometry,
-    datetime: randRecentDate().toISOString(),
     collectionId: await db.collection
       .create({
         data: {
@@ -41,10 +41,7 @@ test('Create Item', async ({ request, baseURL }) => {
   }
 
   let exampleResponseBody = {
-    properties: {
-      ...exampleRequestBody.properties,
-      datetime: exampleRequestBody.datetime,
-    },
+    properties: exampleRequestBody.properties,
     links: expect.arrayContaining([
       {
         rel: 'collection',
@@ -101,9 +98,9 @@ test('Edit Item', async ({ request }) => {
       title: randAnimal(),
       projectNumber: randNumber().toFixed(0),
       description: randParagraph(),
+      start_datetime: randRecentDate().toISOString(),
+      end_datetime: randSoonDate().toISOString(),
     },
-    start_datetime: randRecentDate().toISOString(),
-    end_datetime: randSoonDate().toISOString(),
     geometry: randomPolygon().features[0].geometry,
     collectionId: await db.collection
       .create({

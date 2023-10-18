@@ -25,11 +25,14 @@ export function DateRangePicker({
   label: string
   helper?: string
 }) {
-  let { error: errorStart, defaultValue: defaultStart } =
-    useField('start_datetime')
-  let { error: errorEnd, defaultValue: defaultEnd } = useField('end_datetime')
-  let { error: fromError } = useField(`start_datetime`)
-  let { error: toError } = useField(`end_datetime`)
+  let { error: errorStart, defaultValue: defaultStart } = useField(
+    'properties.start_datetime',
+  )
+  let { error: errorEnd, defaultValue: defaultEnd } = useField(
+    'properties.end_datetime',
+  )
+  let { error: fromError } = useField(`properties.start_datetime`)
+  let { error: toError } = useField(`properties.end_datetime`)
   let id = React.useId()
 
   const [dateRange, setDate] = React.useState<DateRange | undefined>({
@@ -41,12 +44,12 @@ export function DateRangePicker({
     <div className={cn('grid gap-2', className)}>
       <input
         type="hidden"
-        name={`start_datetime`}
+        name={`properties.start_datetime`}
         value={dateRange?.from?.toJSON()}
       />
       <input
         type="hidden"
-        name={`end_datetime`}
+        name={`properties.end_datetime`}
         value={dateRange?.to?.toJSON()}
       />
       <Label htmlFor={id}>{label}</Label>

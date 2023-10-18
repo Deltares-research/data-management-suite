@@ -10,9 +10,6 @@ import stacPackageJson from 'stac-spec/package.json'
 
 export function prismaToStacItem({
   id,
-  datetime,
-  start_datetime,
-  end_datetime,
   geometry,
   properties,
   collectionId,
@@ -23,9 +20,6 @@ export function prismaToStacItem({
     coordinates: number[][][]
   }
   properties: Prisma.JsonValue
-  datetime?: Date | null
-  start_datetime?: Date | null
-  end_datetime?: Date | null
   collectionId: string
 }): StacItem {
   return {
@@ -33,12 +27,7 @@ export function prismaToStacItem({
     type: 'Feature',
     geometry,
     stac_version: stacPackageJson.version,
-    properties: {
-      ...(properties as Record<string, unknown>),
-      datetime: datetime?.toISOString(),
-      start_datetime: start_datetime?.toISOString(),
-      end_datetime: end_datetime?.toISOString(),
-    },
+    properties: properties as Record<string, unknown>,
     // TODO: Make links absolute?
     links: [
       {
