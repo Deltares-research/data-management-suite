@@ -12,7 +12,7 @@ FROM base as deps
 
 WORKDIR /app
 
-ADD package.json package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm install --production=false
 
 # Setup production node_modules
@@ -21,7 +21,7 @@ FROM base as production-deps
 WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
-ADD package.json package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm prune --production
 
 # Build the app
@@ -31,7 +31,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
 
-ADD prisma .
+COPY prisma .
 RUN npx prisma generate
 
 ADD . .
@@ -47,6 +47,6 @@ COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
-ADD . .
+COPY . .
 
 CMD ["npm", "start"]
