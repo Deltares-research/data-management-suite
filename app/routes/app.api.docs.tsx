@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table'
-import { createItemFormSchema } from '~/forms/ItemForm'
+import { createItemFormSchema } from '~/forms/items'
 import type { action as createItemAction } from './api.items'
 import { itemRouteParams } from './api.items_.$itemId'
 import { itemRouteParams as stacItemRouteParams } from '~/routes/stac.items.$id'

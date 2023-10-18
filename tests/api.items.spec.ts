@@ -9,7 +9,7 @@ import {
 import { test, expect } from '@playwright/test'
 import type { Prisma } from '@prisma/client'
 import { randomPolygon } from '@turf/turf'
-import type { ItemSchema } from '~/forms/ItemForm'
+import type { ItemSchema } from '~/forms/items/ItemForm'
 import { updateGeometry } from '~/services/item.server'
 import { encodeToken } from '~/utils/apiKey'
 import { db } from '~/utils/db.server'

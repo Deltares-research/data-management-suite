@@ -1,6 +1,10 @@
 import { z } from 'zod'
 import { FormInput, FormTextarea } from '~/components/ui/form'
 
+export let config = {
+  title: 'Numerical Models',
+}
+
 export let propertiesSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
