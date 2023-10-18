@@ -32,13 +32,13 @@ import type { StacItem } from '~/utils/prismaToStac'
 
 let createItemRequestBody: ItemSchema = {
   geometry: randomPolygon(1, { num_vertices: 3 }).features[0].geometry,
-  start_datetime: randRecentDate().toISOString(),
-  end_datetime: randSoonDate().toISOString(),
   collectionId: randUuid(),
   properties: {
     title: randAnimal(),
     projectNumber: randNumber().toFixed(0),
     description: randParagraph(),
+    start_datetime: randRecentDate().toISOString(),
+    end_datetime: randSoonDate().toISOString(),
   },
 }
 

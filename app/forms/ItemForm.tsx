@@ -28,15 +28,22 @@ export let itemSchema = z.object({
   collectionId: z.string().min(1, { message: 'Please select a collection' }),
   geometry: geometrySchema,
   properties: z
-    .record(z.string(), z.any())
-    .optional()
+    .object({
+      datetime: z.string().nullish(),
+      start_datetime: z.string().nullish(),
+      end_datetime: z.string().nullish(),
+    })
+    .passthrough()
     .describe(
       'Properties can be a record of arbitrary JSON objects or primitives for whatever metadata is relevant to your item. E.g. { "timeScale": { "step": 1, "unit": "day" } }',
     ),
-  datetime: z.string().nullish(),
-  start_datetime: z.string().nullish(),
-  end_datetime: z.string().nullish(),
-}) satisfies z.ZodType<Prisma.ItemUncheckedCreateInput>
+  // TODO: Make type stronger?
+}) satisfies z.ZodType<
+  Omit<
+    Prisma.ItemUncheckedCreateInput,
+    'datetime' | 'start_datetime' | 'end_datetime' | 'properties'
+  >
+>
 
 export type ItemSchema = z.infer<typeof itemSchema>
 
@@ -54,22 +61,17 @@ export async function submitItemForm({
     throw validationError(form.error)
   }
 
-  let { geometry, datetime, start_datetime, end_datetime, ...formData } =
-    form.data
+  let { geometry, ...formData } = form.data
 
-  let dates =
-    end_datetime && end_datetime !== start_datetime
-      ? {
-          start_datetime,
-          end_datetime,
-        }
-      : {
-          datetime: datetime ?? start_datetime,
-        }
+  let { datetime, start_datetime, end_datetime, ...properties } =
+    form.data.properties
 
   let data = {
     ...formData,
-    ...dates,
+    properties: properties as Prisma.JsonObject,
+    datetime,
+    start_datetime,
+    end_datetime,
   }
 
   let item = await db.item.upsert({
