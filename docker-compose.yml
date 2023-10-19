@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    # Provide the password for postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=remix
+    # Set health checks to wait until postgres has started
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/app
+    # Set environment variables for the web service
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@postgres:5432/remix'
+      SESSION_SECRET: super-duper-s3cret
+      NODE_VERSION: 18
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    ports:
+      - 80:3000
