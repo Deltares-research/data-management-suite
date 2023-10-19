@@ -122,14 +122,14 @@ export function ItemForm({
         >
           <div className="grid w-full items-center gap-8">
             <FormInput
-              name="projectNumber"
+              name="properties.projectNumber"
               label="Project Number"
               helper="Should be a valid maconomy number"
             />
 
-            <FormInput name="title" label="Title" />
-            <FormTextarea name="description" label="Description" />
-            <FormTextarea name="license" label="License" />
+            <FormInput name="properties.title" label="Title" />
+            <FormTextarea name="properties.description" label="Description" />
+            <FormTextarea name="properties.license" label="License" />
 
             <div className="flex flex-col space-y-1.5">
               {collections ? (
@@ -146,7 +146,7 @@ export function ItemForm({
             </div>
 
             <FormInput
-              name="location"
+              name="properties.location"
               label="Location"
               placeholder="P://12345678-experiment"
               helper="E.g. a path location on the P-drive (starting with P://) or a

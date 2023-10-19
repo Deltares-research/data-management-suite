@@ -82,7 +82,9 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
   },
   {
     id: 'title',
-    accessorKey: 'title',
+    accessorFn(value) {
+      return value.properties?.title
+    },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
