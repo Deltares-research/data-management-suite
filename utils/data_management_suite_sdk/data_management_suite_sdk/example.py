@@ -27,7 +27,7 @@ dms_item = DataManagementSuiteItem(
     description=item_description,
     location="s3://Minio_on_P_Drive/Python_SDK_test_item",
     license="MIT",
-    collectionId=collectionId,
+    collection=collectionId,
     geometry=Polygon(
         coordinates=[[
             [5.119014591, 52.378756326],

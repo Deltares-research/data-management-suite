@@ -10,7 +10,6 @@ class DataManagementSuiteItem(Item):
     # We set the id to be optional because we want to be able to create an item
     # and let the Datamanagement suite assign the id
     id: Optional[str] = None
-    collectionId: str
 
     # The following attributes we add to the "properties" of the stac item
     title: str
@@ -27,7 +26,7 @@ class DataManagementSuiteItem(Item):
         location: str,
         description: str,
         license: str,
-        collectionId: str,
+        collection: str,
         geometry: Optional[Dict[str, Any]],
         properties: Dict[str, Any],
         id: Optional[str] = None,
@@ -46,6 +45,7 @@ class DataManagementSuiteItem(Item):
             geometry=geometry,
             bbox=bbox,
             datetime=datetime,
+            collection=collection,
             properties=properties,
             start_datetime=start_datetime,
             end_datetime=end_datetime,
@@ -55,7 +55,6 @@ class DataManagementSuiteItem(Item):
             assets=assets
         )
 
-        self.collectionId = collectionId
         self.properties["title"] = title
         self.properties["projectNumber"] = projectNumber
         self.properties["description"] = description
@@ -73,19 +72,24 @@ class DataManagementSuiteItem(Item):
         :return: The DMSItem
         """
         stac_item = Item.from_dict(item_dict)
-        collection_link = stac_item.get_single_link("collection")
-        #fetch collection id from collection link if possible
-        if collection_link:
-            collection_id = str(collection_link.target).split('/')[-1]
-        else:
+
+        if "collectionId" in item_dict:
             collection_id = item_dict["collectionId"]
+        else:
+            collection_link = stac_item.get_single_link("collection")
+            #fetch collection id from collection link if possible
+            if collection_link:
+                collection_id = str(collection_link.target).split('/')[-1]
+            else:
+                collection_id = None
+        
         item = cls(
             title=stac_item.properties["title"],
             projectNumber=stac_item.properties["projectNumber"],
             description=stac_item.properties["description"],
             location=stac_item.properties["location"],
             license=stac_item.properties["license"],
-            collectionId=collection_id,
+            collection=collection_id,
             id=stac_item.id,
             geometry=stac_item.geometry,
             bbox=stac_item.bbox,
@@ -101,7 +105,8 @@ class DataManagementSuiteItem(Item):
     def to_dict(self) -> dict:
 
         item_dict = super().to_dict()
-        item_dict["collectionId"] = self.collectionId
+        del item_dict['collection']
+        item_dict["collectionId"] = self.collection_id
 
         return item_dict
 
