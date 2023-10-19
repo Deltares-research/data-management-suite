@@ -31,6 +31,7 @@ export function prismaToStacItem({
   return {
     id,
     type: 'Feature',
+    collectionId,
     geometry,
     stac_version: stacPackageJson.version,
     properties: {

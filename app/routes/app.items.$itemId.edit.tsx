@@ -10,6 +10,7 @@ import { routes } from '~/routes'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import type { AllowedGeometry } from '~/types'
+import { prismaToStacItem } from '~/utils/prismaToStac'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Edit metadata' }]
@@ -45,11 +46,10 @@ export async function loader({ request, params }: LoaderArgs) {
 
   return {
     collections,
-    defaultValues: {
+    defaultValues: prismaToStacItem({
       ...defaultValues,
-      properties: defaultValues.properties as Record<string, unknown>,
       geometry: JSON.parse(geometry) as AllowedGeometry,
-    },
+    }),
   }
 }
 
