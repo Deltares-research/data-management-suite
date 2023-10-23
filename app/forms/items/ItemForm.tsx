@@ -4,7 +4,11 @@ import type { z } from 'zod'
 import type { ActionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import { updateGeometry } from '~/services/item.server'
-import { ValidatedForm, validationError } from 'remix-validated-form'
+import {
+  ValidatedForm,
+  useFormContext,
+  validationError,
+} from 'remix-validated-form'
 import { withZod } from '@remix-validated-form/with-zod'
 import { FormSubmit } from '~/components/ui/form'
 import { CollectionSelector } from '~/components/CollectionSelector'
@@ -49,7 +53,7 @@ export async function submitItemForm({
     datetime,
     start_datetime,
     end_datetime,
-    userId: user.id,
+    ownerId: user.id,
     collectionId: collection,
   }
 
@@ -92,7 +96,8 @@ export function ItemForm({
   let itemValidator = React.useMemo(() => withZod(itemSchema), [itemSchema])
 
   // TODO: Make global error view
-  // let { fieldErrors } = useFormContext('myform')
+  let { fieldErrors } = useFormContext('myform')
+  console.log(fieldErrors)
 
   return (
     <>
@@ -134,7 +139,7 @@ export function ItemForm({
                   {collections ? (
                     <CollectionSelector
                       label="Collection"
-                      name="collectionId"
+                      name="collection"
                       collections={collections}
                     />
                   ) : (
