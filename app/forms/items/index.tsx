@@ -33,13 +33,19 @@ export function createItemFormSchema(extraFormTypes: string[] = []) {
     properties:
       properties ??
       z
-        .record(z.string(), z.any())
-        .optional()
+        .object({
+          datetime: z.string().nullish(),
+          start_datetime: z.string().nullish(),
+          end_datetime: z.string().nullish(),
+        })
+        .passthrough()
         .describe(
           'Properties can be a record of arbitrary JSON objects or primitives for whatever metadata is relevant to your item. E.g. { "timeScale": { "step": 1, "unit": "day" } }',
         ),
-    datetime: z.string().nullish(),
-    start_datetime: z.string().nullish(),
-    end_datetime: z.string().nullish(),
-  }) satisfies z.ZodType<Prisma.ItemUncheckedCreateInput>
+  }) satisfies z.ZodType<
+    Omit<
+      Prisma.ItemUncheckedCreateInput,
+      'datetime' | 'start_datetime' | 'end_datetime' | 'properties'
+    >
+  >
 }

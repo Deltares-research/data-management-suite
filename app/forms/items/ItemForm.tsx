@@ -9,7 +9,7 @@ import { withZod } from '@remix-validated-form/with-zod'
 import { FormSubmit } from '~/components/ui/form'
 import { CollectionSelector } from '~/components/CollectionSelector'
 import { Separator } from '~/components/ui/separator'
-import type { Collection } from '@prisma/client'
+import type { Collection, Prisma } from '@prisma/client'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
 import { DateRangePicker } from '~/components/DateRangePicker'
 import { requestJsonOrFormData } from '~/utils/requestJsonOrFormdata'
@@ -45,22 +45,17 @@ export async function submitItemForm({
     throw validationError(form.error)
   }
 
-  let { geometry, datetime, start_datetime, end_datetime, ...formData } =
-    form.data
+  let { geometry, ...formData } = form.data
 
-  let dates =
-    end_datetime && end_datetime !== start_datetime
-      ? {
-          start_datetime: start_datetime || undefined,
-          end_datetime: end_datetime || undefined,
-        }
-      : {
-          datetime: (datetime || undefined) ?? (start_datetime || undefined),
-        }
+  let { datetime, start_datetime, end_datetime, ...properties } =
+    form.data.properties
 
   let data = {
     ...formData,
-    ...dates,
+    properties: properties as Prisma.JsonObject,
+    datetime,
+    start_datetime,
+    end_datetime,
   }
 
   let item = await db.item.upsert({

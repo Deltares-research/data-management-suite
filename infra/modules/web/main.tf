@@ -61,6 +61,7 @@ resource "azurerm_container_app" "web" {
   }
   template {
     min_replicas = 1
+    max_replicas = 1
     container {
       name   = "web"
       image  = local.container_name
