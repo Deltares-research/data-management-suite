@@ -9,10 +9,14 @@ import {
 import { test, expect } from '@playwright/test'
 import type { Prisma } from '@prisma/client'
 import { randomPolygon } from '@turf/turf'
-import type { ItemSchema } from '~/forms/ItemForm'
+import type { z } from 'zod'
+import { createItemFormSchema } from '~/forms/items'
 import { updateGeometry } from '~/services/item.server'
 import { encodeToken } from '~/utils/apiKey'
 import { db } from '~/utils/db.server'
+
+let itemFormSchema = createItemFormSchema()
+type ItemSchema = z.infer<typeof itemFormSchema>
 
 test('Create Item', async ({ request, baseURL }) => {
   await truncateDatabase()

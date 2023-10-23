@@ -1,12 +1,13 @@
 import { useLoaderData } from '@remix-run/react'
 
+import type { ActionArgs, LoaderArgs, V2_MetaFunction } from '@remix-run/node'
+import { requireAuthentication } from '~/services/auth.server'
+import { routes } from '~/routes'
+
 import { redirect } from '@remix-run/node'
-import type { LoaderArgs, ActionArgs, V2_MetaFunction } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
-import { requireAuthentication } from '~/services/auth.server'
-import { ItemForm, submitItemForm } from '~/forms/ItemForm'
-import { routes } from '~/routes'
+import { ItemForm, submitItemForm } from '~/forms/items/ItemForm'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Register metadata' }]

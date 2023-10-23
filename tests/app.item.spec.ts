@@ -26,17 +26,6 @@ test('can create item', async ({ page }) => {
   await page.goto('/auth/mock')
   await page.goto('/app/items/create')
 
-  let name = randFirstName()
-
-  await page
-    .getByRole('textbox', { name: /project number/i })
-    .fill(`Project ${name}`)
-  await page
-    .getByRole('textbox', { name: /title/i })
-    .fill(`${name} the ${animal}`)
-  await page.getByRole('textbox', { name: /description/i }).fill('Test')
-  await page.getByRole('textbox', { name: /location/i }).fill('P://test')
-
   // Collection
   await page.getByRole('combobox', { name: /Collection/i }).click()
   await page
@@ -84,6 +73,19 @@ test('can create item', async ({ page }) => {
   })
   await grid.getByText(/14/i).click()
   await grid.getByText(/17/i).click()
+
+  await page.getByRole('button', { name: /Numerical Models/i }).click()
+
+  let name = randFirstName()
+
+  await page
+    .getByRole('textbox', { name: /title/i })
+    .fill(`${name} the ${animal}`)
+  await page.getByRole('textbox', { name: /description/i }).fill('Test')
+  await page
+    .getByRole('textbox', { name: /project number/i })
+    .fill(`Project ${name}`)
+  await page.getByRole('textbox', { name: /^location/i }).fill('P://test')
 
   await page.getByRole('button', { name: /Save/i }).click()
 

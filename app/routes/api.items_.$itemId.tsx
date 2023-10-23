@@ -1,7 +1,7 @@
 import type { ActionArgs } from '@remix-run/node'
 import { z } from 'zod'
 import { zx } from 'zodix'
-import { submitItemForm } from '~/forms/ItemForm'
+import { submitItemForm } from '~/forms/items/ItemForm'
 
 export let itemRouteParams = { itemId: z.string() }
 

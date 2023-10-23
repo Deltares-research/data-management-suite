@@ -5,7 +5,7 @@ import type { LoaderArgs, ActionArgs, V2_MetaFunction } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { requireAuthentication } from '~/services/auth.server'
-import { ItemForm, submitItemForm } from '~/forms/ItemForm'
+import { ItemForm, submitItemForm } from '~/forms/items/ItemForm'
 import { routes } from '~/routes'
 import { zx } from 'zodix'
 import { z } from 'zod'
