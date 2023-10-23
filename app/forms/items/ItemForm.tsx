@@ -18,18 +18,11 @@ import { prismaToStacItem } from '~/utils/prismaToStac'
 import { formTypes, createItemFormSchema } from '.'
 import { Label } from '~/components/ui/label'
 import React from 'react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu'
 import { Plus, X } from 'lucide-react'
 
 export async function submitItemForm({
   request,
   id,
-  params,
 }: ActionArgs & { id?: string }) {
   await requireAuthentication(request)
 
@@ -104,7 +97,7 @@ export function ItemForm({
       <div className="max-w-6xl w-full mx-auto py-12">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">
-            Register metadata record
+            {defaultValues ? 'Edit' : 'Register'} metadata record
           </h2>
           <p className="text-muted-foreground">
             Findable metadata records are the foundation of the data catalog.
@@ -195,29 +188,26 @@ export function ItemForm({
 
               {extraFormTypes.length < Object.keys(formTypes).length && (
                 <>
-                  <Separator className="col-span-full" />
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full col-span-full"
-                      >
-                        <Plus className="w-4 h-4 mr-1.5" /> Add more data
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      {Object.entries(formTypes)
-                        .filter(([key]) => !extraFormTypes.includes(key))
-                        .map(([key, formType]) => (
-                          <DropdownMenuItem
-                            key={key}
-                            onClick={() => setExtraFormTypes(c => [...c, key])}
-                          >
-                            {formType.config.title}
-                          </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Separator className="col-span-3" />
+                  <div id="properties">
+                    <h3 className="text-lg font-medium">More Properties</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Add more specific properties for your use-case
+                    </p>
+                  </div>
+                  <div className="col-span-2 flex flex-wrap gap-3">
+                    {Object.entries(formTypes)
+                      .filter(([key]) => !extraFormTypes.includes(key))
+                      .map(([key, formType]) => (
+                        <Button
+                          key={key}
+                          onClick={() => setExtraFormTypes(c => [...c, key])}
+                        >
+                          <Plus className="w-4 h-4 mr-1.5" />{' '}
+                          {formType.config.title}
+                        </Button>
+                      ))}
+                  </div>
                 </>
               )}
             </div>
