@@ -2,7 +2,6 @@ import type { AllowedGeometry } from '~/types'
 import * as numerical from './NumericalModelItemForm'
 import { z } from 'zod'
 import { zfd } from 'zod-form-data'
-import type { Prisma } from '@prisma/client'
 
 interface FormType {
   config: {
@@ -28,7 +27,7 @@ export function createItemFormSchema(extraFormTypes: string[] = []) {
   }, null as z.AnyZodObject | null)
 
   return z.object({
-    collectionId: z.string().min(1, { message: 'Please select a collection' }),
+    collection: z.string().min(1, { message: 'Please select a collection' }),
     geometry: geometrySchema,
     properties:
       properties ??
@@ -42,10 +41,5 @@ export function createItemFormSchema(extraFormTypes: string[] = []) {
         .describe(
           'Properties can be a record of arbitrary JSON objects or primitives for whatever metadata is relevant to your item. E.g. { "timeScale": { "step": 1, "unit": "day" } }',
         ),
-  }) satisfies z.ZodType<
-    Omit<
-      Prisma.ItemUncheckedCreateInput,
-      'datetime' | 'start_datetime' | 'end_datetime' | 'properties'
-    >
-  >
+  })
 }

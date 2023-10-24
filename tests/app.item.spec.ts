@@ -4,6 +4,17 @@ import { randAnimal, randFirstName, randNumber } from '@ngneat/falso'
 import { routes } from '~/routes'
 
 test('can create item', async ({ page }) => {
+  let person = {
+    id: 'admin',
+    name: 'Admin',
+    email: 'admin@admin.com',
+  }
+  await db.person.upsert({
+    where: { id: person.id },
+    create: person,
+    update: person,
+  })
+
   let animal = randAnimal()
   let mockCollection = await db.collection.create({
     data: {
@@ -93,6 +104,17 @@ test('can create item', async ({ page }) => {
 })
 
 test('can edit item', async ({ page }) => {
+  let person = {
+    id: 'admin',
+    name: 'Admin',
+    email: 'admin@admin.com',
+  }
+  await db.person.upsert({
+    where: { id: person.id },
+    create: person,
+    update: person,
+  })
+
   let item = await db.item.create({
     data: {
       properties: {
