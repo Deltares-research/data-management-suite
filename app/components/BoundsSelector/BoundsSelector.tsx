@@ -38,7 +38,7 @@ export function BoundsSelector({ name }: { name: string }) {
   }, [])
 
   return (
-    <div data-testid="geometry-selector">
+    <div data-testid="geometry-selector" className="rounded-xl overflow-hidden">
       <input type="hidden" name={`${name}.type`} value="Polygon" />
       {feature?.geometry?.coordinates.map((polygon, polygonIndex) =>
         (Array.isArray(polygon) ? polygon : [polygon]).map(
