@@ -7,7 +7,7 @@ import {
   randUuid,
 } from '@ngneat/falso'
 import { randomPolygon } from '@turf/turf'
-import { CodeBlock, dracula } from 'react-code-blocks'
+import { CopyBlock, dracula } from 'react-code-blocks'
 import type { ZodRawShape, ZodTypeAny, z } from 'zod'
 import { H4 } from '~/components/typography'
 import {
@@ -180,7 +180,8 @@ export default function ApiDocs() {
         </div>
         <div className="bg-foreground text-background/80 p-6">
           <h3 className="text-lg my-5">Example Request</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="bash"
@@ -202,7 +203,8 @@ curl -X POST "https://${host}/items"
         </div>
         <div className="bg-foreground text-background/80 p-6">
           <h3 className="text-lg my-5">Endpoint</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -212,7 +214,8 @@ curl -X POST "https://${host}/items"
           />
 
           <h3 className="text-lg my-5">Example Response</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -230,7 +233,8 @@ curl -X POST "https://${host}/items"
         </div>
         <div className="bg-foreground text-background/80 p-6">
           <h3 className="text-lg my-5">Example Input</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -240,7 +244,8 @@ curl -X POST "https://${host}/items"
           />
 
           <h3 className="text-lg my-5">Endpoint</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -250,7 +255,8 @@ curl -X POST "https://${host}/items"
           />
 
           <h3 className="text-lg my-5">Example Response</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -273,7 +279,8 @@ curl -X POST "https://${host}/items"
         </div>
         <div className="bg-foreground text-background/80 p-6">
           <h3 className="text-lg my-5">Example Input</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -283,7 +290,8 @@ curl -X POST "https://${host}/items"
           />
 
           <h3 className="text-lg my-5">Endpoint</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -293,7 +301,8 @@ curl -X POST "https://${host}/items"
           />
 
           <h3 className="text-lg my-5">Example Response</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -312,7 +321,8 @@ curl -X POST "https://${host}/items"
         </div>
         <div className="bg-foreground text-background/80 p-6">
           <h3 className="text-lg my-5">Endpoint</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
@@ -322,7 +332,8 @@ curl -X POST "https://${host}/items"
           />
 
           <h3 className="text-lg my-5">Example Response</h3>
-          <CodeBlock
+          <CopyBlock
+            codeBlock
             customStyle={{ fontFamily: 'monospace' }}
             showLineNumbers={false}
             language="ts"
