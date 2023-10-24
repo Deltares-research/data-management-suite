@@ -29,7 +29,7 @@ test('Create Item', async ({ request, baseURL }) => {
       datetime: randRecentDate().toISOString(),
     },
     geometry: randomPolygon().features[0].geometry,
-    collectionId: await db.collection
+    collection: await db.collection
       .create({
         data: {
           title: 'Test Collection',
@@ -49,7 +49,7 @@ test('Create Item', async ({ request, baseURL }) => {
     links: expect.arrayContaining([
       {
         rel: 'collection',
-        href: `/collections/${exampleRequestBody.collectionId}`,
+        href: `/collections/${exampleRequestBody.collection}`,
         type: 'application/json',
       },
     ]),
@@ -106,7 +106,7 @@ test('Edit Item', async ({ request }) => {
       end_datetime: randSoonDate().toISOString(),
     },
     geometry: randomPolygon().features[0].geometry,
-    collectionId: await db.collection
+    collection: await db.collection
       .create({
         data: {
           title: 'Test Collection',
@@ -127,7 +127,7 @@ test('Edit Item', async ({ request }) => {
     links: expect.arrayContaining([
       {
         rel: 'collection',
-        href: `/collections/${exampleRequestBody.collectionId}`,
+        href: `/collections/${exampleRequestBody.collection}`,
         type: 'application/json',
       },
     ]),

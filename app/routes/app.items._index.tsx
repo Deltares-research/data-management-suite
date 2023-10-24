@@ -83,6 +83,7 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
   {
     id: 'title',
     accessorFn(value) {
+      // @ts-expect-error
       return value.properties?.title
     },
     header: ({ column }) => (

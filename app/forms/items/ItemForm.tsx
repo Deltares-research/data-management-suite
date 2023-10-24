@@ -24,7 +24,7 @@ export async function submitItemForm({
   request,
   id,
 }: ActionArgs & { id?: string }) {
-  await requireAuthentication(request)
+  let user = await requireAuthentication(request)
 
   let formDataRaw = await requestJsonOrFormData(request)
 
@@ -38,7 +38,7 @@ export async function submitItemForm({
     throw validationError(form.error)
   }
 
-  let { geometry, ...formData } = form.data
+  let { geometry, collection, ...formData } = form.data
 
   let { datetime, start_datetime, end_datetime, ...properties } =
     form.data.properties
@@ -49,6 +49,8 @@ export async function submitItemForm({
     datetime,
     start_datetime,
     end_datetime,
+    ownerId: user.id,
+    collectionId: collection,
   }
 
   let item = await db.item.upsert({
@@ -132,7 +134,7 @@ export function ItemForm({
                   {collections ? (
                     <CollectionSelector
                       label="Collection"
-                      name="collectionId"
+                      name="collection"
                       collections={collections}
                     />
                   ) : (
