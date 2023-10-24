@@ -4,11 +4,7 @@ import type { z } from 'zod'
 import type { ActionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import { updateGeometry } from '~/services/item.server'
-import {
-  ValidatedForm,
-  useFormContext,
-  validationError,
-} from 'remix-validated-form'
+import { ValidatedForm, validationError } from 'remix-validated-form'
 import { withZod } from '@remix-validated-form/with-zod'
 import { FormSubmit } from '~/components/ui/form'
 import { CollectionSelector } from '~/components/CollectionSelector'
@@ -96,8 +92,7 @@ export function ItemForm({
   let itemValidator = React.useMemo(() => withZod(itemSchema), [itemSchema])
 
   // TODO: Make global error view
-  let { fieldErrors } = useFormContext('myform')
-  console.log(fieldErrors)
+  // let { fieldErrors } = useFormContext('myform')
 
   return (
     <>
