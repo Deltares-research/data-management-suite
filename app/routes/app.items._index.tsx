@@ -1,7 +1,14 @@
-import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
-import { Link, useLoaderData } from '@remix-run/react'
+import {
+  json,
+  type ActionArgs,
+  type LoaderArgs,
+  type SerializeFrom,
+} from '@remix-run/node'
+import { Form, Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Plus } from 'lucide-react'
+import { z } from 'zod'
+import { zx } from 'zodix'
 import { ID } from '~/components/ID'
 import { DataTable } from '~/components/list-table/data-table'
 import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
@@ -15,13 +22,15 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
+import { requireAuthentication } from '~/services/auth.server'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
 export async function loader({ request }: LoaderArgs) {
+  let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 
-  let [count, items] = await db.$transaction([
+  let [count, rawItems] = await db.$transaction([
     db.item.count(),
     db.item.findMany({
       ...filters,
@@ -49,7 +58,26 @@ export async function loader({ request }: LoaderArgs) {
     }),
   ])
 
+  let items = rawItems.map(item => ({
+    ...item,
+    isMine: item.ownerId === user.id,
+  }))
+
   return { count, items }
+}
+
+export async function action({ request }: ActionArgs) {
+  let user = await requireAuthentication(request)
+  let { id } = await zx.parseForm(request, { id: z.string() })
+
+  await db.item.delete({
+    where: {
+      id,
+      ownerId: user.id,
+    },
+  })
+
+  return json({ success: true })
 }
 
 let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
@@ -138,6 +166,30 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
           <DropdownMenuItem asChild>
             <Link to={routes.editItem(row.original.id)}>Edit</Link>
           </DropdownMenuItem>
+          {row.original.isMine && (
+            <Form
+              method="DELETE"
+              onSubmit={e => {
+                if (
+                  !confirm(
+                    `Are you sure you want to delete ${
+                      // @ts-expect-error
+                      row.original.properties?.title ?? row.original.id
+                    }?`,
+                  )
+                ) {
+                  return e.preventDefault()
+                }
+              }}
+            >
+              <input type="hidden" name="id" value={row.original.id} />
+              <DropdownMenuItem asChild>
+                <button type="submit" className="w-full text-left">
+                  Delete
+                </button>
+              </DropdownMenuItem>
+            </Form>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     ),
