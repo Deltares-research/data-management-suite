@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    container_name: dms-web-test
+    image: dms-web
+    build: ../
+    restart: unless-stopped
+    env_file:
+      - ./test.env
+    ports:
+      - 80:80
