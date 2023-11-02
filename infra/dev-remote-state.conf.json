@@ -1,0 +1,6 @@
+{
+  "storage_account_name": "dmscicdsetupsa",
+  "container_name": "terraform-state",
+  "key": "data-management-suite/dev/azdremotestate.tfstate",
+  "resource_group_name": "CICDsetup"
+}
