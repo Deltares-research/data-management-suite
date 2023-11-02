@@ -19,7 +19,7 @@ output "resource_group_name" {
 }
 
 output "container_app_environment_name" {
-  value = module.container_app.container_app_environment_name  
+  value = module.container_app.container_app_environment_name
 }
 
 output "web_container_name" {
