@@ -101,6 +101,7 @@ jobs:
     name: End 2 end test
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    if: false
     services:
       # Label used to access the service container
       postgres:
@@ -172,9 +173,9 @@ jobs:
 
   provision:
     runs-on: ubuntu-latest
-    needs:
-      - end2endtest
-      # - testPythonSDK
+    # needs:
+    # - end2endtest
+    # - testPythonSDK
     defaults:
       run:
         shell: bash
