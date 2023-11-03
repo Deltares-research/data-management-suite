@@ -277,6 +277,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: dflook/terraform-output@v1
         id: outputs
+        with:
+          path: ./infra
 
     outputs:
       azure_container_registry_name: ${{ steps.outputs.outputs.azure_container_registry_name }}
