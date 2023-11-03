@@ -190,10 +190,13 @@ jobs:
       RS_RESOURCE_GROUP: ${{ vars.RS_RESOURCE_GROUP }}
       RS_STORAGE_ACCOUNT: ${{ vars.RS_STORAGE_ACCOUNT }}
       RS_CONTAINER_NAME: ${{ vars.RS_CONTAINER_NAME }}
-      DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-      AZURE_APP_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
-      AZURE_APP_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
+      TF_VAR_location: ${{ vars.AZURE_LOCATION }}
+      TF_VAR_environment_name: dev
+      TF_VAR_database_password: ${{ secrets.DATABASE_PASSWORD }}
+      TF_VAR_session_secret: ${{ secrets.SESSION_SECRET }}
+      TF_VAR_app_client_id: ${{ vars.AZURE_APP_CLIENT_ID }}
+      TF_VAR_app_client_secret: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
+      TF_VAR_web_app_exists: true
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -264,13 +267,7 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
-          TF_VAR_location: ${{ vars.AZURE_LOCATION }}
-          TF_VAR_environment_name: ${{ env.AZURE_ENV_NAME }}
-          TF_VAR_database_password: ${{ env.DATABASE_PASSWORD }}
-          TF_VAR_session_secret: ${{ env.SESSION_SECRET }}
-          TF_VAR_app_client_id: ${{ env.AZURE_APP_CLIENT_ID }}
-          TF_VAR_app_client_secret: ${{ env.AZURE_APP_CLIENT_SECRET }}
-          TF_VAR_web_app_exists: true
+
         run: terraform apply -auto-approve -input=false
 
       - name: Get outputs
