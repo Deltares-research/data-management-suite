@@ -279,6 +279,11 @@ jobs:
         id: outputs
         with:
           path: ./infra
+          backend_config: |
+            storage_account_name="${{ env.RS_STORAGE_ACCOUNT }}"
+            container_name="${{ env.RS_CONTAINER_NAME }}"
+            key="data-management-suite/${{ env.AZURE_ENV_NAME }}/azdremotestate.tfstate"
+            resource_group_name="${{ env.RS_RESOURCE_GROUP }}"
 
     outputs:
       azure_container_registry_name: ${{ steps.outputs.outputs.azure_container_registry_name }}
