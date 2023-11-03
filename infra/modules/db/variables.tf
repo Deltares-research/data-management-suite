@@ -15,7 +15,7 @@ variable "location" {
 
 variable "stack_name" {
   description = "Name of the stack being deployed, consisting of app name, env and location"
-  type = string
+  type        = string
 }
 
 variable "default_tags" {
@@ -58,6 +58,6 @@ variable "allowed_ips" {
     CompanyHQ = "192.168.0.0/24"
   }
   EOT
-  type    = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }

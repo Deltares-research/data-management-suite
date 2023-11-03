@@ -2,20 +2,107 @@ on:
   push:
     branches:
       - main
-      - prod
   pull_request:
 
-# GitHub Actions workflow to deploy to Azure using azd
-# To configure required secrets for connecting to Azure, simply run `azd pipeline config`
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
-# Set up permissions for deploying with secretless Azure federated credentials
-# https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#set-up-azure-login-with-openid-connect-authentication
 permissions:
-  id-token: write
   contents: read
+  issues: read
+  id-token: write
   actions: write
+  checks: write
+  pull-requests: write
+
+# Set up environment variables
+env:
+  IMAGE_NAME: data-management-suite/web-${{ vars.AZURE_ENV_NAME }}
+  IMAGE_TAG: ${{ github.sha }}
+  LATEST_IMAGE_TAG: latest
+  CONTAINER_REGISTRY_ADDRESS: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
+  FULL_IMAGE_NAME: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web-${{ vars.AZURE_ENV_NAME }}:${{ github.sha }}
 
 jobs:
+  testPythonSDK:
+    name: Test Python SDK
+    runs-on: ubuntu-latest
+    if: false
+    env:
+      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/remix'
+      SESSION_SECRET: super-duper-s3cret
+      NODE_VERSION: 18
+      PYTHON_VERSION: 3.9
+      POETRY_VERSION: 1.6.1
+      AZURE_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up python ${{ env.PYTHON_VERSION }}
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      #----------------------------------------#
+      #       Install & configure Poetry       #
+      #----------------------------------------#
+      - name: Load cached Poetry Binary
+        id: cached-poetry-binary
+        uses: actions/cache@v3
+        with:
+          path: ~/.local
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      #----------------------------------------------#
+      #       Load cached venv if cache exists       #
+      #----------------------------------------------#
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          # Restore cache with this prefix if not exact match with key
+          # Note cache-hit returns false in this case, so the below step will run
+          restore-keys: |
+            venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+      #----------------------------------------------------------#
+      #       Install dependencies if cache does not exist       #
+      #----------------------------------------------------------#
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        shell: bash
+        working-directory: utils/data_management_suite_sdk
+        run: poetry install --no-interaction --no-root
+
+      - name: Run webserver and db container
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+
+      - name: Run tests
+        working-directory: utils/data_management_suite_sdk
+        run: |
+          source .venv/bin/activate
+          python -m pytest tests/ --junit-xml=test-results.xml
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            utils/data_management_suite_sdk/test-results.xml
+            utils/data_management_suite_sdk/test-results/**/*.xml
+            utils/data_management_suite_sdk/test-results/**/*.json
+
   end2endtest:
     name: End 2 end test
     timeout-minutes: 10
@@ -89,63 +176,161 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-  deploy:
+  provision:
     runs-on: ubuntu-latest
-    needs: end2endtest
-    if: (github.ref_name == 'main') || (github.ref_name == 'prod')
+    needs:
+      - end2endtest
+    # - testPythonSDK
+    defaults:
+      run:
+        shell: bash
+        # We keep Terraform files in the infra directory.
+        working-directory: ./infra
     env:
-      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-      #deploy to prod for main branch and use the branch name as environment for all other brances
-      AZURE_ENV_NAME: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
-      WEB_APP_EXISTS: true
+      ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      AZURE_ENV_NAME: dev
+      RS_RESOURCE_GROUP: ${{ vars.RS_RESOURCE_GROUP }}
+      RS_STORAGE_ACCOUNT: ${{ vars.RS_STORAGE_ACCOUNT }}
+      RS_CONTAINER_NAME: ${{ vars.RS_CONTAINER_NAME }}
+      TF_VAR_location: ${{ vars.AZURE_LOCATION }}
+      TF_VAR_environment_name: dev
+      TF_VAR_database_password: ${{ secrets.DATABASE_PASSWORD }}
+      TF_VAR_session_secret: ${{ secrets.SESSION_SECRET }}
+      TF_VAR_app_client_id: ${{ vars.AZURE_APP_CLIENT_ID }}
+      TF_VAR_app_client_secret: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
+      TF_VAR_web_app_exists: true
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Install azd
-        uses: Azure/setup-azd@v0.1.0
-
-      - name: Install Nodejs
-        uses: actions/setup-node@v3
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          node-version: 16
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
-      - name: Log in with Azure (Client Credentials)
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: '1.5.7'
+
+      - name: Terraform Init
+        id: init
         run: |
-          $info = $Env:AZURE_CREDENTIALS | ConvertFrom-Json -AsHashtable;
-          Write-Host "::add-mask::$($info.clientSecret)"
+          terraform init \
+          -backend-config="storage_account_name=${{ env.RS_STORAGE_ACCOUNT }}" \
+          -backend-config="container_name=${{ env.RS_CONTAINER_NAME }}" \
+          -backend-config="key=data-management-suite/${{ env.AZURE_ENV_NAME }}/azdremotestate.tfstate" \
+          -backend-config="resource_group_name=${{ env.RS_RESOURCE_GROUP }}"
 
-          azd auth login `
-            --client-id "$($info.clientId)" `
-            --client-secret "$($info.clientSecret)" `
-            --tenant-id "$($info.tenantId)"
-        shell: pwsh
+      - name: Terraform format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform plan
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
+        continue-on-error: true
+
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
         env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
-      - name: Enable terraform alpha feature
-        run: azd config set alpha.terraform on
+            <details><summary>Show Plan</summary>
 
-      - name: Provision Infrastructure
-        run: azd provision --no-prompt
-        env:
-          AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
-          ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          RS_RESOURCE_GROUP: ${{ vars.RS_RESOURCE_GROUP }}
-          RS_STORAGE_ACCOUNT: ${{ vars.RS_STORAGE_ACCOUNT }}
-          RS_CONTAINER_NAME: ${{ vars.RS_CONTAINER_NAME }}
-          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          AZURE_APP_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
-          AZURE_APP_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
 
-      - name: Deploy Application
-        run: azd deploy --no-prompt
-        env:
-          AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
-          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+            </details>
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+
+      - name: Get outputs
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: dflook/terraform-output@v1
+        id: outputs
+
+    outputs:
+      azure_container_registry_name: ${{ steps.outputs.outputs.azure_container_registry_name }}
+      container_app_name: ${{ steps.outputs.outputs.container_app_name }}
+      resource_group_name: ${{ steps.outputs.outputs.resource_group_name }}
+      container_app_environment_name: ${{ steps.outputs.outputs.container_app_environment_name }}
+      web_container_name: ${{ steps.outputs.outputs.web_container_name }}
+
+  build:
+    name: Build and push container image
+    runs-on: ubuntu-latest
+    needs:
+      - end2endtest
+    # - testPythonSDK
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+      - name: Login to ACR
+        run: |
+          az acr login --name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+
+      - name: Build and push container image
+        run: |
+          docker build -t ${{ env.FULL_IMAGE_NAME }} .
+          docker push ${{ env.FULL_IMAGE_NAME }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    env:
+      AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+    needs:
+      - build
+      - provision
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+      - name: Update Container image
+        run: |
+          az containerapp update \
+          --name ${{ needs.provision.outputs.container_app_name }} \
+          --resource-group ${{ needs.provision.outputs.resource_group_name }} \
+          --container-name web \
+          --image ${{ env.FULL_IMAGE_NAME }}

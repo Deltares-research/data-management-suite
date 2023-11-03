@@ -14,7 +14,7 @@ resource "azurerm_container_app_environment" "env" {
   location                   = var.location
   log_analytics_workspace_id = var.log_analytics_workspace_id
   tags                       = var.default_tags
-  infrastructure_subnet_id   = var.subnet.id 
+  infrastructure_subnet_id   = var.subnet.id
 }
 
 resource "azurerm_container_registry" "acr" {

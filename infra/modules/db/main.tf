@@ -37,7 +37,7 @@ resource "azurerm_postgresql_flexible_server_configuration" "ext" {
 }
 
 resource "azurerm_postgresql_flexible_server_firewall_rule" "sql_server_firewall" {
-  for_each = var.allowed_ips
+  for_each         = var.allowed_ips
   server_id        = azurerm_postgresql_flexible_server.db_server.id
   name             = each.key
   start_ip_address = cidrhost(each.value, 0)
