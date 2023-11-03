@@ -327,12 +327,10 @@ jobs:
         with:
           creds: '${{ secrets.AZURE_CREDENTIALS }}'
 
-      - name: Build and deploy Container App
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          appSourcePath: ${{ github.workspace }}
-          acrName: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
-          containerAppName: ${{ needs.provision.outputs.container_app_name }}
-          resourceGroup: ${{ needs.provision.outputs.resource_group_name }}
-          containerAppEnvironment: ${{ needs.provision.outputs.container_app_environment_name }}
-          imageToDeploy: ${{ env.FULL_IMAGE_NAME }}
+      - name: Update Container image
+        run: |
+          az containerapp update \
+          --name ${{ needs.provision.outputs.container_app_name }} \
+          --resource-group ${{ needs.provision.outputs.resource_group_name }} \
+          --container-name web \
+          --image ${{ env.FULL_IMAGE_NAME }}
