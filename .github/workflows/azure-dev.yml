@@ -330,7 +330,7 @@ jobs:
       - name: Update Container image
         run: |
           az containerapp update \
-          --name ${{ needs.provision.outputs.container_app_name }} \
-          --resource-group ${{ needs.provision.outputs.resource_group_name }} \
-          --container-name web \
-          --image ${{ env.FULL_IMAGE_NAME }}
+            --name ${{ needs.provision.outputs.container_app_name }} \
+            --resource-group ${{ needs.provision.outputs.resource_group_name }} \
+            --container-name web \
+            --image ${{ env.FULL_IMAGE_NAME }}
