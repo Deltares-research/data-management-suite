@@ -302,7 +302,7 @@ jobs:
 
       - name: Login to ACR
         run: |
-          az acr login –-name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+          az acr login --name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
 
       - name: Build and push container image
         run: |
