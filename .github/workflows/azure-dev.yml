@@ -18,6 +18,14 @@ permissions:
   checks: write
   pull-requests: write
 
+# Set up environment variables
+env:
+  IMAGE_NAME: data-management-suite/web-${{ vars.AZURE_ENV_NAME }}
+  IMAGE_TAG: ${{ github.sha }}
+  LATEST_IMAGE_TAG: latest
+  CONTAINER_REGISTRY_ADDRESS: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
+  FULL_IMAGE_NAME: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web-${{ vars.AZURE_ENV_NAME }}:${{ github.sha }}
+
 jobs:
   testPythonSDK:
     name: Test Python SDK
@@ -101,7 +109,6 @@ jobs:
     name: End 2 end test
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    if: false
     services:
       # Label used to access the service container
       postgres:
@@ -173,8 +180,8 @@ jobs:
 
   provision:
     runs-on: ubuntu-latest
-    # needs:
-    # - end2endtest
+    needs:
+      - end2endtest
     # - testPythonSDK
     defaults:
       run:
@@ -280,13 +287,39 @@ jobs:
       container_app_environment_name: ${{ steps.outputs.outputs.container_app_environment_name }}
       web_container_name: ${{ steps.outputs.outputs.web_container_name }}
 
+  build:
+    name: Build and push container image
+    runs-on: ubuntu-latest
+    needs:
+      - end2endtest
+    # - testPythonSDK
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+      - name: Login to ACR
+        run: |
+          az acr login –-name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+
+      - name: Build and push container image
+        run: |
+          docker build -t ${{ env.FULL_IMAGE_NAME }} .
+          docker push ${{ env.FULL_IMAGE_NAME }}
+
   deploy:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     env:
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-
+    needs:
+      - build
+      - provision
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -300,8 +333,8 @@ jobs:
         uses: azure/container-apps-deploy-action@v1
         with:
           appSourcePath: ${{ github.workspace }}
-          acrName: ${{ needs.provision.outputs.azure_container_registry_name }}
+          acrName: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
           containerAppName: ${{ needs.provision.outputs.container_app_name }}
           resourceGroup: ${{ needs.provision.outputs.resource_group_name }}
           containerAppEnvironment: ${{ needs.provision.outputs.container_app_environment_name }}
-          imageToBuild: ${{ needs.provision.outputs.azure_container_registry_name }}.azurecr.io/data-management-suite/web-${{ vars.AZURE_ENV_NAME }}:${{ github.sha }}
+          imageToDeploy: ${{ env.FULL_IMAGE_NAME }}
