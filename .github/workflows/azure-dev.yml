@@ -286,7 +286,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: provision
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     env:
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
