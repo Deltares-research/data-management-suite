@@ -3,6 +3,8 @@
 
 import sys
 from importlib import metadata as importlib_metadata
+from deltares_datasuite.core import DataManagementSuiteItem
+from deltares_datasuite.client import DataManagementSuiteClient
 
 
 def get_version() -> str:
@@ -13,3 +15,9 @@ def get_version() -> str:
 
 
 version: str = get_version()
+
+__all__ = [
+    "version",
+    "DataManagementSuiteItem",
+    "DataManagementSuiteClient",
+    ]
