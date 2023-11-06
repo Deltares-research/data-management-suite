@@ -3,7 +3,7 @@ name: Release Drafter
 on:
   push:
     paths:
-      - 'utils/data_management_suite_sdk/**'
+      - 'utils/deltares-datasuite/**'
     # branches to consider in the event; optional, defaults to all
     branches:
       - main

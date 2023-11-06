@@ -1,0 +1,13 @@
+# This file contains values from Cookiecutter
+
+default_context:
+  project_name: 'deltares-datasuite'
+  project_description: 'Python package to easily work with STAC items in the Deltares Data Management Suite'
+  organization: 'Deltares'
+  license: 'MIT'
+  minimal_python_version: 3.9
+  github_name: 'wolkwork'
+  email: 'nathan@wolk.work'
+  version: '0.1.0'
+  line_length: '88'
+  create_example_template: 'none'

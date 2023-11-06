@@ -10,7 +10,7 @@ assignees:
 
 <!-- Mark with an `x` all the checkboxes that apply (like `[x]`) -->
 
-- [ ] I've searched the project's [`issues`](https://github.com/wolkwork/data_management_suite_sdk/issues?q=is%3Aissue).
+- [ ] I've searched the project's [`issues`](https://github.com/wolkwork/data-management-suite/issues?q=is%3Aissue).
 
 ## ❓ Question
 
