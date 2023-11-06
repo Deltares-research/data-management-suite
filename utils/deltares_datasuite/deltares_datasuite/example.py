@@ -10,6 +10,8 @@ dms_url = (
     "https://ca-dms-dev-web.greenmushroom-03589694.westeurope.azurecontainerapps.io"
 )
 
+api_key = ""
+
 client = DataManagementSuiteClient(dms_url, api_key)
 
 
@@ -22,6 +24,7 @@ license = "MIT"
 other_properties = {"Awesomeness": "Very high", "DataSize": "1.5Tb"}
 
 # Find the collection ID of the collection you want to add the item to in the URL when editing the Collection in the DMS
+collectionId = ""
 
 # Create a DMSItem object
 dms_item = DataManagementSuiteItem(
