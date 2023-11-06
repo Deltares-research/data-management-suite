@@ -13,9 +13,9 @@ class DataManagementSuiteClient(object):
 
     def __init__(self, dms_url: str, dms_api_key: str):
         """
-        Initialise the client
-        :param dms_url: The URL of the DMS
-        :param dms_api_key: The API key to use for requests
+        Args:
+            dms_url (str): URL where the Data management suite is hosted
+            dms_api_key (str): The API key to use for requests
         """
         self._dms_url = dms_url
         self._dms_api_key = dms_api_key
@@ -23,10 +23,13 @@ class DataManagementSuiteClient(object):
     def create_or_update_item(
         self, stac_item: DataManagementSuiteItem
     ) -> DataManagementSuiteItem:
-        """
-        Create or update a metadata item in the DMS
-        :param stac_item: The STAC item to create or update
-        :return: The response from the DMS
+        """Create or update a metadata item in the DMS
+
+        Args:
+            stac_item (DataManagementSuiteItem): The STAC item to create or update
+
+        Returns:
+            The response from the DMS
         """
 
         if not stac_item.id:
@@ -39,10 +42,13 @@ class DataManagementSuiteClient(object):
     def create_item(
         self, stac_item: DataManagementSuiteItem
     ) -> DataManagementSuiteItem:
-        """
-        Create a metadata item in the DMS
-        :param stac_item: The STAC item to create
-        :return: The response from the DMS
+        """Create a metadata item in the DMS
+
+        Args:
+            stac_item (DataManagementSuiteItem): The STAC item to create or update
+
+        Returns:
+            The response from the DMS
         """
 
         response = self._make_request("POST", "api/items", json=stac_item.to_dict())
@@ -54,11 +60,14 @@ class DataManagementSuiteClient(object):
     def update_item(
         self, item_id: str, stac_item: DataManagementSuiteItem
     ) -> DataManagementSuiteItem:
-        """
-        Update a metadata item in the DMS
-        :param item_id: The ID of the item to update
-        :param stac_item: The STAC item to update
-        :return: The response from the DMS
+        """Update a metadata item in the DMS
+
+        Args:
+            item_id (str): The ID of the item to update
+            stac_item (DataManagementSuiteItem): The STAC item to create or update
+
+        Returns:
+            The response from the DMS
         """
 
         response = self._make_request(
@@ -70,12 +79,15 @@ class DataManagementSuiteClient(object):
         return DataManagementSuiteItem.from_dict(response.json())
 
     def _make_request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
-        """
-        Make a request to the DMS
-        :param method: The HTTP method to use
-        :param endpoint: The endpoint to request
-        :param kwargs: The arguments to pass to the request
-        :return: The response from the DMS
+        """Make a request to the DMS
+
+        Args:
+            method (str): The HTTP method to use
+            endpoint (str): The endpoint to request
+            kwargs: The arguments to pass to the request
+
+        Returns:
+            The response from the DMS
         """
         url = self._construct_url(endpoint)
         headers = self._get_default_headers()
@@ -85,17 +97,21 @@ class DataManagementSuiteClient(object):
         return response
 
     def _construct_url(self, endpoint: str) -> str:
-        """
-        Construct a URL for the given endpoint
-        :param endpoint: The endpoint to construct the URL for
-        :return: The URL
+        """Construct a URL for the given endpoint
+
+        Args:
+            endpoint (str): The endpoint to construct the URL for
+
+        Returns:
+            The constructed URL
         """
         return f"{self._dms_url}/{endpoint}"
 
     def _get_default_headers(self) -> dict:
-        """
-        Get the default headers for requests
-        :return: The headers
+        """Get the default headers for requests
+
+        Returns:
+            The default headers
         """
         return {
             "Content-Type": "application/json",

@@ -70,10 +70,17 @@ class DataManagementSuiteItem(Item):
         migrate: bool = False,
         preserve_dict: bool = True,
     ) -> "DataManagementSuiteItem":
-        """
-        Create a DMSItem from a dictionary
-        :param item_dict: The dictionary to create the DMSItem from
-        :return: The DMSItem
+        """Instantiate a DataManagementSuiteItem from a dict.
+
+        Args:
+            d (Dict[str, Any]): dict to convert to DataManagementSuiteItem
+            href (Optional[str], optional): Optional href for this item. Defaults to None.
+            root (Optional[Catalog], optional): Optional root Catalog reference. Defaults to None.
+            migrate (bool): If true migrate to latest STAC version. Defaults to False.
+            preserve_dict (bool): If True the dict is not adjusted in place. Defaults to True.
+
+        Returns:
+            DataManagementSuiteItem: instantiated DataManagementSuiteItem
         """
         stac_item: DataManagementSuiteItem = super().from_dict(
             d, href, root, migrate, preserve_dict
