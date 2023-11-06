@@ -1,6 +1,6 @@
 from pystac import Item
 
-from deltares_datasuite.core.models.item import DataManagementSuiteItem
+from deltares_datasuite.core import DataManagementSuiteItem
 
 
 def test_item(item: Item):
