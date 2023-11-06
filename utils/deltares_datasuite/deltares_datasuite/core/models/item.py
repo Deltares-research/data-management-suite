@@ -12,13 +12,6 @@ class DataManagementSuiteItem(Item):
     # and let the Datamanagement suite assign the id
     id: str = ""
 
-    # The following attributes we add to the "properties" of the stac item
-    title: str
-    projectNumber: str
-    description: Optional[str] = ""
-    location: str
-    license: Optional[str] = None
-
     def __init__(
         self,
         title: str,
@@ -61,6 +54,51 @@ class DataManagementSuiteItem(Item):
         self.properties["location"] = location
         self.properties["license"] = license
 
+    @property
+    def title(self) -> str:
+        """Title of the item.
+
+        Returns:
+            str: title of the item
+        """
+        return self.properties["title"]
+
+    @property
+    def projectNumber(self) -> str:
+        """Project number of the item.
+
+        Returns:
+            str: project number of the item
+        """
+        return self.properties["projectNumber"]
+
+    @property
+    def description(self) -> str:
+        """Description of the item.
+
+        Returns:
+            str: description of the item
+        """
+        return self.properties["description"]
+
+    @property
+    def location(self) -> str:
+        """Location of the data
+
+        Returns:
+            str: location of the data
+        """
+        return self.properties["location"]
+
+    @property
+    def license(self) -> str:
+        """License of the item
+
+        Returns:
+            str: license of the item
+        """
+        return self.properties["license"]
+
     @classmethod
     def from_dict(
         cls: Type["DataManagementSuiteItem"],
@@ -82,9 +120,7 @@ class DataManagementSuiteItem(Item):
         Returns:
             DataManagementSuiteItem: instantiated DataManagementSuiteItem
         """
-        stac_item: DataManagementSuiteItem = super().from_dict(
-            d, href, root, migrate, preserve_dict
-        )
+        stac_item: Item = Item.from_dict(d, href, root, migrate, preserve_dict)
 
         if "collectionId" in d:
             collection_id = d["collectionId"]
