@@ -1,6 +1,12 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - 'utils/data_management_suite_sdk/**'
+  pull_request:
+    paths:
+      - 'utils/data_management_suite_sdk/**'
 
 jobs:
   build:
@@ -8,6 +14,9 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.9']
+    defaults:
+      run:
+        working-directory: ./utils/data_management_suite_sdk
 
     steps:
       - uses: actions/checkout@v2
