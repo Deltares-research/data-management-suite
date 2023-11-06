@@ -3,7 +3,7 @@ from pystac import Item
 from deltares_datasuite.core import DataManagementSuiteItem
 
 
-def test_item(item: Item):
+def test_item(item: Item) -> None:
     # test to see if a item is correctly created from a dict
     item_dict = item.to_dict()
     item_dict["properties"]["title"] = "test"

@@ -1,4 +1,4 @@
-# type: ignore[attr-defined]
+# mypy: disable-error-code="attr-defined"
 """Python package to easily work with STAC items in the Deltares Data Management Suite"""
 
 import sys

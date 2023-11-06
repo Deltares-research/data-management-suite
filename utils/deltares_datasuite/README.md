@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![Build status](https://github.com/wolkwork/data-management-suite/workflows/build/badge.svg?branch=master&event=push)](https://github.com/wolkwork/data-management-suite/actions?query=workflow%3Abuild)
+[![Build status](https://github.com/wolkwork/data-management-suite/workflows/build/badge.svg?branch=main&event=push)](https://github.com/wolkwork/data-management-suite/actions?query=workflow%3Abuild)
 [![Python Version](https://img.shields.io/pypi/pyversions/deltares_datasuite.svg)](https://pypi.org/project/deltares_datasuite/)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/wolkwork/data-management-suite/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
 
@@ -10,7 +10,7 @@
 [![Security: bandit](https://img.shields.io/badge/security-bandit-green.svg)](https://github.com/PyCQA/bandit)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/wolkwork/data-management-suite/blob/master/.pre-commit-config.yaml)
 [![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/wolkwork/data-management-suite/releases)
-[![License](https://img.shields.io/github/license/wolkwork/deltares_datasuite)](https://github.com/wolkwork/data-management-suite/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/wolkwork/data-management-suite)](https://github.com/wolkwork/data-management-suite/blob/master/LICENSE)
 ![Coverage Report](assets/images/coverage.svg)
 
 Python package to easily work with STAC items in the Deltares Data Management Suite

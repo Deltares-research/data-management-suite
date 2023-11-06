@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 
 from ..core import DataManagementSuiteItem
@@ -78,7 +80,9 @@ class DataManagementSuiteClient(object):
             response.raise_for_status()
         return DataManagementSuiteItem.from_dict(response.json())
 
-    def _make_request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
+    def _make_request(
+        self, method: str, endpoint: str, **kwargs: Any
+    ) -> requests.Response:
         """Make a request to the DMS
 
         Args:
@@ -89,7 +93,7 @@ class DataManagementSuiteClient(object):
         Returns:
             The response from the DMS
         """
-        url = self._construct_url(endpoint)
+        url: str = self._construct_url(endpoint)
         headers = self._get_default_headers()
 
         response = requests.request(method, url, headers=headers, **kwargs)
@@ -107,7 +111,7 @@ class DataManagementSuiteClient(object):
         """
         return f"{self._dms_url}/{endpoint}"
 
-    def _get_default_headers(self) -> dict:
+    def _get_default_headers(self) -> dict[str, str]:
         """Get the default headers for requests
 
         Returns:

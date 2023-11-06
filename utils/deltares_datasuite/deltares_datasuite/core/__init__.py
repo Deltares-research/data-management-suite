@@ -1,1 +1,3 @@
-from .models import DataManagementSuiteItem
+from .models.item import DataManagementSuiteItem
+
+__all__ = ["DataManagementSuiteItem"]

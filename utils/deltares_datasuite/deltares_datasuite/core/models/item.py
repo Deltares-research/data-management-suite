@@ -61,7 +61,7 @@ class DataManagementSuiteItem(Item):
         Returns:
             str: title of the item
         """
-        return self.properties["title"]
+        return str(self.properties["title"])
 
     @property
     def projectNumber(self) -> str:
@@ -70,7 +70,7 @@ class DataManagementSuiteItem(Item):
         Returns:
             str: project number of the item
         """
-        return self.properties["projectNumber"]
+        return str(self.properties["projectNumber"])
 
     @property
     def description(self) -> str:
@@ -79,7 +79,7 @@ class DataManagementSuiteItem(Item):
         Returns:
             str: description of the item
         """
-        return self.properties["description"]
+        return str(self.properties["description"])
 
     @property
     def location(self) -> str:
@@ -88,7 +88,7 @@ class DataManagementSuiteItem(Item):
         Returns:
             str: location of the data
         """
-        return self.properties["location"]
+        return str(self.properties["location"])
 
     @property
     def license(self) -> str:
@@ -97,7 +97,7 @@ class DataManagementSuiteItem(Item):
         Returns:
             str: license of the item
         """
-        return self.properties["license"]
+        return str(self.properties["license"])
 
     @classmethod
     def from_dict(
