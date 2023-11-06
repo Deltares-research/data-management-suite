@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+
 from geojson.geometry import Polygon
 
 from data_management_suite_sdk.client import DataManagementSuiteClient
@@ -13,8 +14,13 @@ dms_url = (
 client = DataManagementSuiteClient(dms_url, api_key)
 
 
-item_name = "Python SDK test item"
-item_description = "My first DMS item"
+item_name = "Fair data - numerical models item"
+item_description = "This project was a very complex model of the Dutch water system. After running the model the metadata is automatically uploaded to the Data Management Suite."
+project_number = "11209789"
+data_location = "s3://Minio_on_P_Drive/"
+license = "MIT"
+
+other_properties = {"Awesomeness": "Very high", "DataSize": "1.5Tb"}
 
 # Find the collection ID of the collection you want to add the item to in the URL when editing the Collection in the DMS
 collectionId = ""
@@ -23,26 +29,27 @@ collectionId = ""
 dms_item = DataManagementSuiteItem(
     # id="3bc99da9-5feb-428a-827a-6b26b43830bf",
     title=item_name,
-    projectNumber="11209789",
+    projectNumber=project_number,
     description=item_description,
-    location="s3://Minio_on_P_Drive/Python_SDK_test_item",
-    license="MIT",
+    location=data_location,
+    license=license,
     collection=collectionId,
     geometry=Polygon(
-        coordinates=[[
-            [5.119014591, 52.378756326],
-            [5.026268967, 52.340002388],
-            [5.092980732, 52.342487635],
-            [5.12796373, 52.328071261],
-            [5.144234892, 52.332048661],
-            [5.129590846, 52.339008251],
-            [5.128777288, 52.365345348],
-            [5.119014591, 52.378756326],
-        ]],
+        coordinates=[
+            [
+                [5.119014591, 52.378756326],
+                [5.026268967, 52.340002388],
+                [5.092980732, 52.342487635],
+                [5.12796373, 52.328071261],
+                [5.144234892, 52.332048661],
+                [5.129590846, 52.339008251],
+                [5.128777288, 52.365345348],
+                [5.119014591, 52.378756326],
+            ]
+        ],
     ),
-    properties={"PROPERTY1": "VALUE1", "PROPERTY2": "VALUE2"},
+    properties=other_properties,
     datetime=datetime.now(tz=timezone.utc),
-
 )
 
 # Submit the DMSItem object

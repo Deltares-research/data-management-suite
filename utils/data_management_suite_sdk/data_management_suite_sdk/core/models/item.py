@@ -2,14 +2,15 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 # avoids conflicts since there are also kwargs and attrs called `datetime`
 from datetime import datetime as Datetime
-from geojson.geometry import Polygon
-from pystac import Asset, Collection, Item
+
+from geojson import Polygon
+from pystac import Asset, Catalog, Item
 
 
 class DataManagementSuiteItem(Item):
     # We set the id to be optional because we want to be able to create an item
     # and let the Datamanagement suite assign the id
-    id: Optional[str] = None
+    id: str = ""
 
     # The following attributes we add to the "properties" of the stac item
     title: str
@@ -17,7 +18,6 @@ class DataManagementSuiteItem(Item):
     description: Optional[str] = ""
     location: str
     license: Optional[str] = None
-
 
     def __init__(
         self,
@@ -27,9 +27,9 @@ class DataManagementSuiteItem(Item):
         description: str,
         license: str,
         collection: str,
-        geometry: Optional[Dict[str, Any]],
+        geometry: Polygon,
         properties: Dict[str, Any],
-        id: Optional[str] = None,
+        id: str = "",
         bbox: Optional[List[float]] = None,
         datetime: Optional[Datetime] = None,
         start_datetime: Optional[Datetime] = None,
@@ -52,7 +52,7 @@ class DataManagementSuiteItem(Item):
             stac_extensions=stac_extensions,
             href=href,
             extra_fields=extra_fields,
-            assets=assets
+            assets=assets,
         )
 
         self.properties["title"] = title
@@ -61,28 +61,34 @@ class DataManagementSuiteItem(Item):
         self.properties["location"] = location
         self.properties["license"] = license
 
-    
     @classmethod
     def from_dict(
-            cls: Type["DataManagementSuiteItem"],
-            item_dict: dict) -> "DataManagementSuiteItem":
+        cls: Type["DataManagementSuiteItem"],
+        d: Dict[str, Any],
+        href: Optional[str] = None,
+        root: Optional[Catalog] = None,
+        migrate: bool = False,
+        preserve_dict: bool = True,
+    ) -> "DataManagementSuiteItem":
         """
         Create a DMSItem from a dictionary
         :param item_dict: The dictionary to create the DMSItem from
         :return: The DMSItem
         """
-        stac_item = Item.from_dict(item_dict)
+        stac_item: DataManagementSuiteItem = super().from_dict(
+            d, href, root, migrate, preserve_dict
+        )
 
-        if "collectionId" in item_dict:
-            collection_id = item_dict["collectionId"]
+        if "collectionId" in d:
+            collection_id = d["collectionId"]
         else:
             collection_link = stac_item.get_single_link("collection")
-            #fetch collection id from collection link if possible
+            # fetch collection id from collection link if possible
             if collection_link:
-                collection_id = str(collection_link.target).split('/')[-1]
+                collection_id = str(collection_link.target).split("/")[-1]
             else:
                 collection_id = None
-        
+
         item = cls(
             title=stac_item.properties["title"],
             projectNumber=stac_item.properties["projectNumber"],
@@ -97,16 +103,7 @@ class DataManagementSuiteItem(Item):
             properties=stac_item.properties,
             stac_extensions=stac_item.stac_extensions,
             extra_fields=stac_item.extra_fields,
-            assets=stac_item.assets
+            assets=stac_item.assets,
         )
-        
+
         return item
-
-    def to_dict(self) -> dict:
-
-        item_dict = super().to_dict()
-        del item_dict['collection']
-        item_dict["collectionId"] = self.collection_id
-
-        return item_dict
-

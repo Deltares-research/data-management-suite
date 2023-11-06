@@ -1,5 +1,8 @@
 import requests
+
 from ..core import DataManagementSuiteItem
+
+
 class DataManagementSuiteClient(object):
     """
     Client for the Data Management Suite
@@ -17,21 +20,25 @@ class DataManagementSuiteClient(object):
         self._dms_url = dms_url
         self._dms_api_key = dms_api_key
 
-    def create_or_update_item(self, stac_item: DataManagementSuiteItem) -> DataManagementSuiteItem:
+    def create_or_update_item(
+        self, stac_item: DataManagementSuiteItem
+    ) -> DataManagementSuiteItem:
         """
         Create or update a metadata item in the DMS
         :param stac_item: The STAC item to create or update
         :return: The response from the DMS
         """
 
-        if stac_item.id is None:
+        if not stac_item.id:
             # If the STAC item does not have an ID, create a new item
             return self.create_item(stac_item)
         else:
             # If the item exists has an id, update it
             return self.update_item(stac_item.id, stac_item)
-        
-    def create_item(self, stac_item: DataManagementSuiteItem) -> DataManagementSuiteItem:
+
+    def create_item(
+        self, stac_item: DataManagementSuiteItem
+    ) -> DataManagementSuiteItem:
         """
         Create a metadata item in the DMS
         :param stac_item: The STAC item to create
@@ -39,10 +46,14 @@ class DataManagementSuiteClient(object):
         """
 
         response = self._make_request("POST", "api/items", json=stac_item.to_dict())
-        response.raise_for_status()
+        if not response.ok:
+            print(response.text)
+            response.raise_for_status()
         return DataManagementSuiteItem.from_dict(response.json())
 
-    def update_item(self, item_id: str, stac_item: DataManagementSuiteItem) -> DataManagementSuiteItem:
+    def update_item(
+        self, item_id: str, stac_item: DataManagementSuiteItem
+    ) -> DataManagementSuiteItem:
         """
         Update a metadata item in the DMS
         :param item_id: The ID of the item to update
@@ -53,8 +64,10 @@ class DataManagementSuiteClient(object):
         response = self._make_request(
             "PUT", f"api/items/{item_id}", json=stac_item.to_dict()
         )
-
-        return DataManagementSuiteItem.from_dict(response.json())    
+        if not response.ok:
+            print(response.text)
+            response.raise_for_status()
+        return DataManagementSuiteItem.from_dict(response.json())
 
     def _make_request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
         """
@@ -78,7 +91,7 @@ class DataManagementSuiteClient(object):
         :return: The URL
         """
         return f"{self._dms_url}/{endpoint}"
-    
+
     def _get_default_headers(self) -> dict:
         """
         Get the default headers for requests
@@ -88,4 +101,3 @@ class DataManagementSuiteClient(object):
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self._dms_api_key}",
         }
-    
