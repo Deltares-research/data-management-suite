@@ -4,7 +4,7 @@ requires = ["poetry_core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-name = "deltares-datasuite"
+name = "deltares_datasuite"
 version = "0.1.0"
 description = "Python package to easily work with STAC items in the Deltares Data Management Suite"
 readme = "README.md"
@@ -159,7 +159,7 @@ addopts = [
 source = ["tests"]
 
 [coverage.paths]
-source = "deltares-datasuite"
+source = "deltares_datasuite"
 
 [coverage.run]
 branch = true

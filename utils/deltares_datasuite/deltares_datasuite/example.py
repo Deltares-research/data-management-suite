@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 
 from geojson.geometry import Polygon
 
-from deltares-datasuite.client import DataManagementSuiteClient
-from deltares-datasuite.core import DataManagementSuiteItem
+from deltares_datasuite.client import DataManagementSuiteClient
+from deltares_datasuite.core import DataManagementSuiteItem
 
 # Define the necessary variables
 dms_url = (

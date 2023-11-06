@@ -1,7 +1,7 @@
 # This file contains values from Cookiecutter
 
 default_context:
-  project_name: 'deltares-datasuite'
+  project_name: 'deltares_datasuite'
   project_description: 'Python package to easily work with STAC items in the Deltares Data Management Suite'
   organization: 'Deltares'
   license: 'MIT'

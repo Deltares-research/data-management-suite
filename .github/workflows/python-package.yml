@@ -3,10 +3,10 @@ name: build
 on:
   push:
     paths:
-      - 'utils/deltares-datasuite/**'
+      - 'utils/deltares_datasuite/**'
   pull_request:
     paths:
-      - 'utils/deltares-datasuite/**'
+      - 'utils/deltares_datasuite/**'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
         python-version: ['3.9']
     defaults:
       run:
-        working-directory: ./utils/deltares-datasuite
+        working-directory: ./utils/deltares_datasuite
 
     steps:
       - uses: actions/checkout@v2

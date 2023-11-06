@@ -1,4 +1,4 @@
-# Docker for deltares-datasuite
+# Docker for deltares_datasuite
 
 ## Installation
 
@@ -15,7 +15,7 @@ make docker-build VERSION=latest
 ```
 
 You may provide name and version for the image.
-Default name is `IMAGE := deltares-datasuite`.
+Default name is `IMAGE := deltares_datasuite`.
 Default version is `VERSION := latest`.
 
 ```bash
@@ -27,7 +27,7 @@ make docker-build IMAGE=some_name VERSION=0.1.0
 ```bash
 docker run -it --rm \
    -v $(pwd):/workspace \
-   deltares-datasuite bash
+   deltares_datasuite bash
 ```
 
 ## How to clean up
