@@ -1,5 +1,7 @@
 on:
   push:
+    paths:
+      - utils/deltares_datasuite/**
     branches:
       - main
 
