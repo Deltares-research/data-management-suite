@@ -82,14 +82,14 @@ jobs:
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         shell: bash
-        working-directory: utils/data_management_suite_sdk
+        working-directory: utils/deltares_datasuite
         run: poetry install --no-interaction --no-root
 
       - name: Run webserver and db container
         run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
 
       - name: Run tests
-        working-directory: utils/data_management_suite_sdk
+        working-directory: utils/deltares_datasuite
         run: |
           source .venv/bin/activate
           python -m pytest tests/ --junit-xml=test-results.xml
@@ -99,9 +99,9 @@ jobs:
         if: always()
         with:
           files: |
-            utils/data_management_suite_sdk/test-results.xml
-            utils/data_management_suite_sdk/test-results/**/*.xml
-            utils/data_management_suite_sdk/test-results/**/*.json
+            utils/deltares_datasuite/test-results.xml
+            utils/deltares_datasuite/test-results/**/*.xml
+            utils/deltares_datasuite/test-results/**/*.json
 
   end2endtest:
     name: End 2 end test
