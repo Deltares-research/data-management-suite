@@ -16,6 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v3
+        id: release-please
         with:
           release-type: python
           path: utils/deltares_datasuite
+          package-name: deltares-datasuite
+      - name: Release python package to PyPi with poetry
+        if: steps.release-please.outputs.release-created == 'true'
+        run: |
+          make poetry-download
+          poetry publish --build
