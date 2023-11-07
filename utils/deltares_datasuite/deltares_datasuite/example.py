@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from geojson.geometry import Polygon
+from geojson import Polygon
 
 from deltares_datasuite.client import DataManagementSuiteClient
 from deltares_datasuite.core import DataManagementSuiteItem
