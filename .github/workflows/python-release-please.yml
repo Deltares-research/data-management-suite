@@ -22,6 +22,7 @@ jobs:
           release-type: python
           path: utils/deltares_datasuite
           package-name: deltares-datasuite
+          monorepo-tags: true
       - name: Release python package to PyPi with poetry
         if: steps.release-please.outputs.release-created == 'true'
         run: |
