@@ -9,7 +9,7 @@ permissions:
   contents: write
   pull-requests: write
 
-name: release-please
+name: Release Python package
 
 jobs:
   release-please:
