@@ -2,6 +2,7 @@ on:
   push:
     paths:
       - utils/deltares_datasuite/**
+      - '.github/workflows/**'
     branches:
       - main
 

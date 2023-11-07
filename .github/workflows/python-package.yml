@@ -4,9 +4,7 @@ on:
   push:
     paths:
       - 'utils/deltares_datasuite/**'
-  pull_request:
-    paths:
-      - 'utils/deltares_datasuite/**'
+      - '.github/workflows/**'
 
 jobs:
   build:
