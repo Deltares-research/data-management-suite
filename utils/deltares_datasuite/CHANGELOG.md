@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.2.0](https://github.com/wolkwork/data-management-suite/compare/deltares-datasuite-v0.1.0...deltares-datasuite-v0.2.0) (2023-11-08)
+
+
+### Features
+
+* add end2end pytest in github actions pipeline ([aed6579](https://github.com/wolkwork/data-management-suite/commit/aed657943cf66dbc483e2a7c26428f1bd0655d74))
+* Add testing and releasing of python package to Github Action workflow ([#64](https://github.com/wolkwork/data-management-suite/issues/64)) ([aed6579](https://github.com/wolkwork/data-management-suite/commit/aed657943cf66dbc483e2a7c26428f1bd0655d74))
+
+
+### Bug Fixes
+
+* add wait and healthcheck so pytests wait until webcontainer has started ([aed6579](https://github.com/wolkwork/data-management-suite/commit/aed657943cf66dbc483e2a7c26428f1bd0655d74))
+* change timeouts and pass correct database url for python end2end test ([aed6579](https://github.com/wolkwork/data-management-suite/commit/aed657943cf66dbc483e2a7c26428f1bd0655d74))
+* run pytest only in 1 workflow and spin up docker image with webserver when testing ([aed6579](https://github.com/wolkwork/data-management-suite/commit/aed657943cf66dbc483e2a7c26428f1bd0655d74))
+
 ## 0.1.0 (2023-11-07)
 
 
