@@ -6,23 +6,16 @@ import { Access } from '@prisma/client'
 import {
   createPrivateCollection,
   createPublicCollection,
+  loginAsAdmin,
   truncateDatabase,
 } from './utils'
 
-test.beforeEach(async () => await truncateDatabase())
+test.beforeEach(async ({ page }) => {
+  await truncateDatabase()
+  await loginAsAdmin(page)
+})
 
 test('can create item', async ({ page }) => {
-  let person = {
-    id: 'admin',
-    name: 'Admin',
-    email: 'admin@admin.com',
-  }
-  await db.person.upsert({
-    where: { id: person.id },
-    create: person,
-    update: person,
-  })
-
   let animal = randAnimal()
   let mockCollection = await createPrivateCollection()
 
@@ -32,7 +25,6 @@ test('can create item', async ({ page }) => {
     },
   })
 
-  await page.goto('/auth/mock')
   await page.goto('/app/items/create')
 
   // Collection
@@ -102,14 +94,6 @@ test('can create item', async ({ page }) => {
 })
 
 test('can edit item', async ({ page }) => {
-  await db.person.create({
-    data: {
-      id: 'admin',
-      name: 'Admin',
-      email: 'admin@admin.com',
-    },
-  })
-
   let item = await db.item.create({
     data: {
       properties: {
@@ -120,22 +104,13 @@ test('can edit item', async ({ page }) => {
     },
   })
 
-  await page.goto('/auth/mock')
-  await page.goto(routes.editItem(item.id))
+  await page.goto(routes.editItem(item.id), { waitUntil: 'networkidle' })
 
   let title = await page.getByText(/Edit metadata record/i)
   expect(title).toBeInViewport()
 })
 
 test("can't edit item without permissions", async ({ page }) => {
-  await db.person.create({
-    data: {
-      id: 'admin',
-      name: 'Admin',
-      email: 'admin@admin.com',
-    },
-  })
-
   let item = await db.item.create({
     data: {
       properties: {
@@ -157,8 +132,7 @@ test("can't edit item without permissions", async ({ page }) => {
     },
   })
 
-  await page.goto('/auth/mock')
-  await page.goto(routes.editItem(item.id))
+  await page.goto(routes.editItem(item.id), { waitUntil: 'networkidle' })
 
   // Should redirect back to list when no permissions
   let title = await page.getByRole('heading', { name: /Items/i })
@@ -166,14 +140,6 @@ test("can't edit item without permissions", async ({ page }) => {
 })
 
 test('can list items', async ({ page }) => {
-  await db.person.create({
-    data: {
-      id: 'admin',
-      name: 'Admin',
-      email: 'admin@admin.com',
-    },
-  })
-
   let privateCollection = await createPrivateCollection()
   let publicCollection = await createPublicCollection()
 
@@ -209,7 +175,6 @@ test('can list items', async ({ page }) => {
     })
   }
 
-  await page.goto('/auth/mock')
   await page.goto(routes.items())
 
   let title = await page.getByRole('heading', { name: /Items/i })

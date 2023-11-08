@@ -25,6 +25,7 @@ env:
   LATEST_IMAGE_TAG: latest
   CONTAINER_REGISTRY_ADDRESS: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
   FULL_IMAGE_NAME: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web-${{ vars.AZURE_ENV_NAME }}:${{ github.sha }}
+  PLAYWRIGHT_USER_PASSWORD: ${{ secrets.PLAYWRIGHT_USER_PASSWORD }}
 
 jobs:
   end2endtest:
