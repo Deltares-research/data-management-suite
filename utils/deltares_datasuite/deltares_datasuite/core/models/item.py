@@ -8,6 +8,14 @@ from pystac import Asset, Catalog, Item
 
 
 class DataManagementSuiteItem(Item):
+    """_summary_
+
+    Args:
+        Item (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # We set the id to be optional because we want to be able to create an item
     # and let the Datamanagement suite assign the id
     id: str = ""

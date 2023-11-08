@@ -65,6 +65,7 @@ export default function AppLayout() {
           <MenuItem to={routes.groups()}>Groups</MenuItem>
           <Separator className="h-4" orientation="vertical" />
           <MenuItem to={routes.docs()}>API</MenuItem>
+          <MenuItem to={routes.pythonDocs()}>Python Docs</MenuItem>
         </div>
 
         <div>

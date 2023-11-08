@@ -16,6 +16,9 @@ export let routes = {
     return `${appPrefix}/api/docs`
   },
 
+  pythonDocs() {
+    return `/docs`
+  },
   items() {
     return `${appPrefix}/items`
   },
