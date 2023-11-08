@@ -2,6 +2,14 @@ import { test, expect } from '@playwright/test'
 import { db } from '~/utils/db.server'
 import { randAnimal, randFirstName, randNumber } from '@ngneat/falso'
 import { routes } from '~/routes'
+import { Access } from '@prisma/client'
+import {
+  createPrivateCollection,
+  createPublicCollection,
+  truncateDatabase,
+} from './utils'
+
+test.beforeEach(async () => await truncateDatabase())
 
 test('can create item', async ({ page }) => {
   let person = {
@@ -16,17 +24,7 @@ test('can create item', async ({ page }) => {
   })
 
   let animal = randAnimal()
-  let mockCollection = await db.collection.create({
-    data: {
-      title: `${animal} Collection`,
-      catalog: {
-        create: {
-          title: 'Animals',
-          description: 'Catalog of animals',
-        },
-      },
-    },
-  })
+  let mockCollection = await createPrivateCollection()
 
   await db.keyword.create({
     data: {
@@ -104,15 +102,38 @@ test('can create item', async ({ page }) => {
 })
 
 test('can edit item', async ({ page }) => {
-  let person = {
-    id: 'admin',
-    name: 'Admin',
-    email: 'admin@admin.com',
-  }
-  await db.person.upsert({
-    where: { id: person.id },
-    create: person,
-    update: person,
+  await db.person.create({
+    data: {
+      id: 'admin',
+      name: 'Admin',
+      email: 'admin@admin.com',
+    },
+  })
+
+  let item = await db.item.create({
+    data: {
+      properties: {
+        title: randAnimal(),
+        projectNumber: randNumber().toFixed(),
+      },
+      collectionId: await createPrivateCollection().then(c => c.id),
+    },
+  })
+
+  await page.goto('/auth/mock')
+  await page.goto(routes.editItem(item.id))
+
+  let title = await page.getByText(/Edit metadata record/i)
+  expect(title).toBeInViewport()
+})
+
+test("can't edit item without permissions", async ({ page }) => {
+  await db.person.create({
+    data: {
+      id: 'admin',
+      name: 'Admin',
+      email: 'admin@admin.com',
+    },
   })
 
   let item = await db.item.create({
@@ -126,6 +147,7 @@ test('can edit item', async ({ page }) => {
           title: `Test Collection`,
           catalog: {
             create: {
+              access: Access.PRIVATE,
               title: 'Animals',
               description: 'Catalog of animals',
             },
@@ -138,11 +160,55 @@ test('can edit item', async ({ page }) => {
   await page.goto('/auth/mock')
   await page.goto(routes.editItem(item.id))
 
-  let title = await page.getByText(/Edit metadata record/i)
+  // Should redirect back to list when no permissions
+  let title = await page.getByRole('heading', { name: /Items/i })
   expect(title).toBeInViewport()
 })
 
 test('can list items', async ({ page }) => {
+  await db.person.create({
+    data: {
+      id: 'admin',
+      name: 'Admin',
+      email: 'admin@admin.com',
+    },
+  })
+
+  let privateCollection = await createPrivateCollection()
+  let publicCollection = await createPublicCollection()
+
+  for (let i = 0; i < 3; i++) {
+    await db.item.create({
+      data: {
+        properties: {
+          title: randAnimal(),
+          projectNumber: randNumber().toFixed(),
+        },
+        collection: {
+          connect: {
+            id: publicCollection.id,
+          },
+        },
+      },
+    })
+  }
+
+  for (let i = 0; i < 5; i++) {
+    await db.item.create({
+      data: {
+        properties: {
+          title: randAnimal(),
+          projectNumber: randNumber().toFixed(),
+        },
+        collection: {
+          connect: {
+            id: privateCollection.id,
+          },
+        },
+      },
+    })
+  }
+
   await page.goto('/auth/mock')
   await page.goto(routes.items())
 

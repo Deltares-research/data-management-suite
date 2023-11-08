@@ -1,3 +1,4 @@
+import { Role } from '@prisma/client'
 import {
   json,
   type ActionArgs,
@@ -23,6 +24,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
+import { getCollectionAuthWhere } from '~/utils/authQueries'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
@@ -30,10 +32,19 @@ export async function loader({ request }: LoaderArgs) {
   let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 
+  let whereCollection = getCollectionAuthWhere(user.id)
+
   let [count, rawItems] = await db.$transaction([
-    db.item.count(),
+    db.item.count({
+      where: {
+        collection: whereCollection,
+      },
+    }),
     db.item.findMany({
       ...filters,
+      where: {
+        collection: whereCollection,
+      },
       orderBy: {
         updatedAt: 'desc',
       },
@@ -44,6 +55,20 @@ export async function loader({ request }: LoaderArgs) {
             catalog: {
               select: {
                 title: true,
+                permissions: {
+                  select: {
+                    role: true,
+                    group: {
+                      select: {
+                        members: {
+                          where: {
+                            personId: user.id,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
               },
             },
           },
@@ -60,7 +85,12 @@ export async function loader({ request }: LoaderArgs) {
 
   let items = rawItems.map(item => ({
     ...item,
-    isMine: item.ownerId === user.id,
+    canEdit: item.collection.catalog.permissions.some(permission => {
+      return (
+        permission.group.members.some(member => member.personId === user.id) &&
+        (permission.role === Role.CONTRIBUTOR || permission.role === Role.ADMIN)
+      )
+    }),
   }))
 
   return { count, items }
@@ -150,23 +180,23 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-          >
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem asChild>
-            <Link to={routes.editItem(row.original.id)}>Edit</Link>
-          </DropdownMenuItem>
-          {row.original.isMine && (
+    cell: ({ row }) =>
+      row.original.canEdit ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem asChild>
+              <Link to={routes.editItem(row.original.id)}>Edit</Link>
+            </DropdownMenuItem>
             <Form
               method="DELETE"
               onSubmit={e => {
@@ -189,10 +219,9 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['items'][number]>[] = [
                 </button>
               </DropdownMenuItem>
             </Form>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : null,
   },
 ]
 

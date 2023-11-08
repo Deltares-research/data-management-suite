@@ -30,16 +30,12 @@ export async function loader({ request, params }: LoaderArgs) {
       id: catalogId,
     },
     include: {
-      groups: true,
+      permissions: true,
     },
   })
 
   return {
-    catalog: {
-      ...catalog,
-      groupIds: catalog.groups.map(c => c.id),
-    },
-    initialGroupCache: catalog.groups,
+    catalog,
   }
 }
 

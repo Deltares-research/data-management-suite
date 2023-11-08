@@ -1,4 +1,3 @@
-import type { Prisma } from '@prisma/client'
 import { Role } from '@prisma/client'
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
@@ -17,6 +16,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
+import { getCollectionAuthWhere } from '~/utils/authQueries'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
@@ -24,32 +24,9 @@ export async function loader({ request }: LoaderArgs) {
   let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 
-  let where: Prisma.CollectionWhereInput = {
-    catalog: {
-      OR: [
-        {
-          groups: {
-            some: {
-              members: {
-                some: {
-                  personId: user.id,
-                },
-              },
-            },
-          },
-        },
-        {
-          groups: {
-            every: {
-              id: undefined,
-            },
-          },
-        },
-      ],
-    },
-  }
+  let where = getCollectionAuthWhere(user.id)
 
-  let [count, collections] = await db.$transaction([
+  let [count, rawCollections] = await db.$transaction([
     db.collection.count({
       where,
     }),
@@ -60,9 +37,38 @@ export async function loader({ request }: LoaderArgs) {
         _count: {
           select: { items: true },
         },
+        catalog: {
+          select: {
+            title: true,
+            permissions: {
+              select: {
+                role: true,
+                group: {
+                  select: {
+                    members: {
+                      where: {
+                        personId: user.id,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     }),
   ])
+
+  let collections = rawCollections.map(collection => ({
+    ...collection,
+    canEdit: collection.catalog.permissions.some(permission => {
+      return (
+        permission.group.members.some(member => member.personId === user.id) &&
+        (permission.role === Role.CONTRIBUTOR || permission.role === Role.ADMIN)
+      )
+    }),
+  }))
 
   return { count, collections }
 }
@@ -105,25 +111,26 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['collections'][number]>[] =
     },
     {
       id: 'actions',
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[160px]">
-            <DropdownMenuItem asChild>
-              <Link to={routes.editCollection(row.original.id)}>Edit</Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: ({ row }) =>
+        row.original.canEdit ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[160px]">
+              <DropdownMenuItem asChild>
+                <Link to={routes.editCollection(row.original.id)}>Edit</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null,
     },
   ]
 

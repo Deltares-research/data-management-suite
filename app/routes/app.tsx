@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client'
 import type { ActionArgs, LoaderArgs } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
 import { Form, Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
@@ -23,11 +22,7 @@ export async function loader({ request }: LoaderArgs) {
       id: user?.id ?? '',
     },
     include: {
-      memberOf: {
-        include: {
-          group: true,
-        },
-      },
+      memberOf: true,
     },
   })
 }

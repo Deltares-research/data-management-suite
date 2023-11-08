@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client'
 import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import type { ColumnDef } from '@tanstack/react-table'

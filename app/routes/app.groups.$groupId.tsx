@@ -1,21 +1,15 @@
-import type { Person } from '@prisma/client'
-import { Role } from '@prisma/client'
+import { MemberRole, type Person } from '@prisma/client'
 import type { ActionArgs, LoaderArgs, SerializeFrom } from '@remix-run/node'
-import { useLoaderData, useNavigation } from '@remix-run/react'
+import { Form, useLoaderData, useNavigation } from '@remix-run/react'
 import { withZod } from '@remix-validated-form/with-zod'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Plus } from 'lucide-react'
+import { Crown, MoreHorizontal, Plus, Trash } from 'lucide-react'
 import React from 'react'
-import {
-  ValidatedForm,
-  useFormContext,
-  validationError,
-} from 'remix-validated-form'
+import { ValidatedForm, validationError } from 'remix-validated-form'
 import { z } from 'zod'
 import { zx } from 'zodix'
 import { PersonSelector } from '~/components/PersonSelector'
 import { DataTable } from '~/components/list-table/data-table'
-import { DataTableColumnHeader } from '~/components/list-table/data-table-column-header'
 import { H3 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import {
@@ -26,8 +20,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '~/components/ui/dialog'
-import { FormSelect, FormSubmit } from '~/components/ui/form'
-import { SelectItem } from '~/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu'
+import { FormSubmit } from '~/components/ui/form'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
@@ -35,14 +34,12 @@ let addPeopleSchema = z.object({
   peopleIds: z.string().array(),
 })
 
-let addPeopleValidator = withZod(addPeopleSchema)
-
-let updateRoleSchema = z.object({
-  role: z.nativeEnum(Role),
-  personId: z.string(),
+let personSchema = z.object({
+  id: z.string(),
 })
 
-let updateRoleValidator = withZod(updateRoleSchema)
+let addPeopleValidator = withZod(addPeopleSchema)
+let personValidator = withZod(personSchema)
 
 export async function loader({ request, params }: LoaderArgs) {
   let user = await requireAuthentication(request)
@@ -68,49 +65,135 @@ export async function loader({ request, params }: LoaderArgs) {
   })
 }
 
-export async function action({
+enum Action {
+  TOGGLE_ADMIN = 'toggle-admin',
+  DELETE_MEMBER = 'delete-member',
+  ADD_MEMBERS = 'add-members',
+}
+
+async function toggleAdmin({
   request,
   params,
-}: ActionArgs & { id?: string }) {
+  formData,
+}: ActionArgs & { formData: FormData }) {
   let user = await requireAuthentication(request)
   let { groupId } = zx.parseParams(params, { groupId: z.string() })
 
-  let formData = await request.formData()
-  let subaction = formData.get('subaction')
+  let form = await personValidator.validate(formData)
 
-  if (subaction === 'updateRole') {
-    let form = await updateRoleValidator.validate(formData)
+  if (form.error) {
+    return validationError(form.error)
+  }
 
-    if (form.error) {
-      console.log(form.error)
-      return validationError(form.error)
-    }
+  let member = await db.member.findUniqueOrThrow({
+    where: {
+      personId_groupId: {
+        groupId,
+        personId: form.data.id,
+      },
+    },
+  })
 
-    return db.member.update({
-      where: {
-        personId_groupId: {
-          personId: form.data.personId,
-          groupId,
+  return db.member.update({
+    where: {
+      personId_groupId: {
+        groupId,
+        personId: form.data.id,
+      },
+      group: {
+        members: {
+          some: {
+            personId: user.id,
+            role: MemberRole.ADMIN,
+          },
         },
       },
-      data: {
-        role: form.data.role,
-      },
-    })
-  } else {
-    let form = await addPeopleValidator.validate(formData)
+    },
+    data: {
+      role:
+        member.role === MemberRole.ADMIN ? MemberRole.MEMBER : MemberRole.ADMIN,
+    },
+  })
+}
 
-    if (form.error) {
-      return validationError(form.error)
-    }
+async function deleteMember({
+  request,
+  params,
+  formData,
+}: ActionArgs & { formData: FormData }) {
+  let user = await requireAuthentication(request)
+  let { groupId } = zx.parseParams(params, { groupId: z.string() })
 
-    return db.member.createMany({
-      data: form.data.peopleIds.map(id => ({
-        personId: id,
-        role: Role.READER,
+  let form = await personValidator.validate(formData)
+
+  if (form.error) {
+    return validationError(form.error)
+  }
+
+  return db.member.delete({
+    where: {
+      personId_groupId: {
         groupId,
-      })),
-    })
+        personId: form.data.id,
+      },
+      group: {
+        members: {
+          some: {
+            personId: user.id,
+            role: MemberRole.ADMIN,
+          },
+        },
+      },
+    },
+  })
+}
+
+async function addMembers({
+  request,
+  params,
+  formData,
+}: ActionArgs & { formData: FormData }) {
+  let user = await requireAuthentication(request)
+  let { groupId } = zx.parseParams(params, { groupId: z.string() })
+
+  let form = await addPeopleValidator.validate(formData)
+
+  if (form.error) {
+    return validationError(form.error)
+  }
+
+  return db.group.update({
+    where: {
+      id: groupId,
+      members: {
+        some: {
+          personId: user.id,
+        },
+      },
+    },
+    data: {
+      members: {
+        create: form.data.peopleIds.map(id => ({
+          personId: id,
+          role: MemberRole.MEMBER,
+        })),
+      },
+    },
+  })
+}
+
+export async function action(args: ActionArgs) {
+  let formData = await args.request.formData()
+
+  switch (formData.get('subaction') as Action) {
+    case Action.TOGGLE_ADMIN:
+      return toggleAdmin({ ...args, formData })
+    case Action.DELETE_MEMBER:
+      return deleteMember({ ...args, formData })
+    case Action.ADD_MEMBERS:
+      return addMembers({ ...args, formData })
+    default:
+      throw new Error('Invalid action')
   }
 }
 
@@ -121,6 +204,16 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['members'][number]>[] = [
       return row.person.name
     },
     header: 'Name',
+    cell({ row }) {
+      return (
+        <span className="flex items-center gap-1.5">
+          {row.original.role === MemberRole.ADMIN && (
+            <Crown className="w-4 h-4" />
+          )}
+          {row.original.person.name}
+        </span>
+      )
+    },
   },
   {
     id: 'email',
@@ -131,32 +224,75 @@ let columns: ColumnDef<SerializeFrom<typeof loader>['members'][number]>[] = [
   },
   {
     id: 'role',
-    accessorFn(row) {
-      return row.role
-    },
-    header: 'Role',
-    cell: function Cell({ row }) {
-      let id = React.useId()
-      let { submit } = useFormContext(id)
+    accessorKey: 'role',
+    header: 'Actions',
+    cell({ row }) {
+      if (row.original.role === MemberRole.ADMIN) {
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[160px]">
+              <Form
+                method="POST"
+                onSubmit={e => {
+                  if (!confirm(`Make ${row.original.person.name} Admin?`)) {
+                    return e.preventDefault()
+                  }
+                }}
+              >
+                <input
+                  type="hidden"
+                  name="subaction"
+                  value={Action.TOGGLE_ADMIN}
+                />
+                <input type="hidden" name="id" value={row.original.personId} />
+                <DropdownMenuItem asChild>
+                  <button type="submit" className="w-full text-left">
+                    <Crown className="w-4 h-4 mr-1.5" /> Make{' '}
+                    {row.original.role === MemberRole.ADMIN
+                      ? 'Member'
+                      : 'Admin'}
+                  </button>
+                </DropdownMenuItem>
+              </Form>
 
-      return (
-        <ValidatedForm
-          id={id}
-          defaultValues={{ role: row.original.role }}
-          validator={updateRoleValidator}
-          subaction="updateRole"
-          method="post"
-        >
-          <input type="hidden" name="personId" value={row.original.personId} />
-          <FormSelect name="role" onValueChange={submit}>
-            {Object.values(Role).map(value => (
-              <SelectItem key={value} value={value}>
-                {value}
-              </SelectItem>
-            ))}
-          </FormSelect>
-        </ValidatedForm>
-      )
+              <Form
+                method="DELETE"
+                onSubmit={e => {
+                  if (
+                    !confirm(
+                      `Are you sure you want to remove ${row.original.person.name} from the group?`,
+                    )
+                  ) {
+                    return e.preventDefault()
+                  }
+                }}
+              >
+                <input
+                  type="hidden"
+                  name="subaction"
+                  value={Action.DELETE_MEMBER}
+                />
+                <input type="hidden" name="id" value={row.original.personId} />
+                <DropdownMenuItem asChild>
+                  <button type="submit" className="w-full text-left">
+                    <Trash className="w-4 h-4 mr-1.5" /> Delete
+                  </button>
+                </DropdownMenuItem>
+              </Form>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      }
     },
   },
 ]
@@ -184,7 +320,11 @@ export default function GroupPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
-            <ValidatedForm method="post" validator={addPeopleValidator}>
+            <ValidatedForm
+              method="post"
+              validator={addPeopleValidator}
+              subaction={Action.ADD_MEMBERS}
+            >
               <DialogHeader>
                 <DialogTitle>Add people to `{group.name}`</DialogTitle>
               </DialogHeader>

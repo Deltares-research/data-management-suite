@@ -8,13 +8,14 @@ import { redirect } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { ItemForm, submitItemForm } from '~/forms/items/ItemForm'
+import { getCollectionAuthWhere } from '~/utils/authQueries'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Register metadata' }]
 }
 
 export async function loader({ request }: LoaderArgs) {
-  await requireAuthentication(request)
+  let user = await requireAuthentication(request)
 
   let collections = await db.collection.findMany({
     include: {
@@ -24,6 +25,7 @@ export async function loader({ request }: LoaderArgs) {
         },
       },
     },
+    where: getCollectionAuthWhere(user.id),
   })
 
   return { collections }

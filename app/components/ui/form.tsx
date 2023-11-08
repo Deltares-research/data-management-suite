@@ -16,6 +16,11 @@ import { Loader2 } from 'lucide-react'
 import type { TextareaProps } from './textarea'
 import { Textarea } from './textarea'
 import { Select, SelectContent, SelectTrigger, SelectValue } from './select'
+import { RadioGroup, RadioGroupItem } from './radio-group'
+import type {
+  RadioGroupItemProps,
+  RadioGroupProps,
+} from '@radix-ui/react-radio-group'
 
 const Form = FormProvider
 
@@ -82,6 +87,7 @@ export function FormSelect({
   helper,
   placeholder,
   children,
+  defaultValue,
   ...props
 }: {
   name: string
@@ -94,9 +100,14 @@ export function FormSelect({
   let id = React.useId()
 
   return (
-    <div className="flex flex-col space-y-1.5">
+    <div className="w-full">
       {label && <Label htmlFor={id}>{label}</Label>}
-      <Select name={name} {...getInputProps()} {...props}>
+      <Select
+        name={name}
+        defaultValue={defaultValue}
+        {...getInputProps()}
+        {...props}
+      >
         <SelectTrigger id={id}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
@@ -104,6 +115,51 @@ export function FormSelect({
       </Select>
       {helper && <Muted>{helper}</Muted>}
       {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  )
+}
+
+export function FormRadioGroup({
+  name,
+  helper,
+  placeholder,
+  children,
+  defaultValue,
+  ...props
+}: {
+  name: string
+  helper?: React.ReactNode
+  children: React.ReactNode
+  placeholder?: string
+} & RadioGroupProps) {
+  let { error, getInputProps } = useField(name)
+
+  return (
+    <div className="w-full">
+      <RadioGroup
+        name={name}
+        defaultValue={defaultValue}
+        {...getInputProps()}
+        {...props}
+      >
+        {children}
+      </RadioGroup>
+      {helper && <Muted>{helper}</Muted>}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+    </div>
+  )
+}
+
+export function FormRadioGroupItem({
+  label,
+  ...props
+}: RadioGroupItemProps & { label: React.ReactNode }) {
+  let id = React.useId()
+
+  return (
+    <div className="flex items-center gap-x-2 border-border border rounded-md p-5">
+      <RadioGroupItem id={id} {...props} />
+      <Label htmlFor={id}>{label}</Label>
     </div>
   )
 }

@@ -11,13 +11,14 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import type { AllowedGeometry } from '~/types'
 import { prismaToStacItem } from '~/utils/prismaToStac'
+import { getCollectionAuthWhere } from '~/utils/authQueries'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Edit metadata' }]
 }
 
 export async function loader({ request, params }: LoaderArgs) {
-  await requireAuthentication(request)
+  let user = await requireAuthentication(request)
 
   let { itemId } = await zx.parseParams(params, { itemId: z.string() })
 
@@ -29,13 +30,17 @@ export async function loader({ request, params }: LoaderArgs) {
         },
       },
     },
+    where: getCollectionAuthWhere(user.id),
   })
 
-  let defaultValues = await db.item.findUniqueOrThrow({
+  let defaultValues = await db.item.findUnique({
     where: {
       id: itemId,
+      collection: getCollectionAuthWhere(user.id),
     },
   })
+
+  if (!defaultValues) throw redirect(routes.items())
 
   // Not optimal, but for now cleaner than a full raw query
   let [{ geometry }] = await db.$queryRaw<{ geometry: string }[]>`

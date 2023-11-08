@@ -9,7 +9,7 @@ import { withZod } from '@remix-validated-form/with-zod'
 import { FormSubmit } from '~/components/ui/form'
 import { CollectionSelector } from '~/components/CollectionSelector'
 import { Separator } from '~/components/ui/separator'
-import type { Collection, Prisma } from '@prisma/client'
+import { Role, type Collection, type Prisma } from '@prisma/client'
 import { BoundsSelector } from '~/components/BoundsSelector/BoundsSelector'
 import { DateRangePicker } from '~/components/DateRangePicker'
 import { requestJsonOrFormData } from '~/utils/requestJsonOrFormdata'
@@ -40,15 +40,41 @@ export async function submitItemForm({
 
   let { geometry, collection, ...formData } = form.data
 
+  let selectedCatalog = await db.catalog.findFirst({
+    where: {
+      collections: {
+        some: {
+          id: collection,
+        },
+      },
+      permissions: {
+        some: {
+          role: {
+            in: [Role.ADMIN, Role.CONTRIBUTOR],
+          },
+          group: {
+            members: {
+              some: {
+                personId: user.id,
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!selectedCatalog) throw new Response('Forbidden', { status: 403 })
+
   let { datetime, start_datetime, end_datetime, ...properties } =
     form.data.properties
 
   let data = {
     ...formData,
     properties: properties as Prisma.JsonObject,
-    datetime,
-    start_datetime,
-    end_datetime,
+    datetime: datetime || undefined,
+    start_datetime: start_datetime || undefined,
+    end_datetime: end_datetime || undefined,
     ownerId: user.id,
     collectionId: collection,
   }
@@ -83,7 +109,19 @@ export function ItemForm({
 }) {
   let [extraFormTypes, setExtraFormTypes] = React.useState<
     (keyof typeof formTypes)[]
-  >([])
+  >(
+    Object.entries(formTypes)
+      .map(([key, formType]) => {
+        if (
+          Object.keys(formType.propertiesSchema.shape).some(key => {
+            return defaultValues?.properties?.[key]
+          })
+        ) {
+          return key
+        }
+      })
+      .filter(Boolean) as (keyof typeof formTypes)[],
+  )
 
   let itemSchema = React.useMemo(
     () => createItemFormSchema(extraFormTypes),

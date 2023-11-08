@@ -7,19 +7,26 @@ import {
   randSoonDate,
 } from '@ngneat/falso'
 import { test, expect } from '@playwright/test'
-import type { Prisma } from '@prisma/client'
+import { type Prisma } from '@prisma/client'
 import { randomPolygon } from '@turf/turf'
 import type { z } from 'zod'
 import { createItemFormSchema } from '~/forms/items'
 import { updateGeometry } from '~/services/item.server'
-import { encodeToken } from '~/utils/apiKey'
 import { db } from '~/utils/db.server'
+import {
+  createPrivateCollection,
+  createPublicCollection,
+  createToken,
+  truncateDatabase,
+} from './utils'
 
 let itemFormSchema = createItemFormSchema()
 type ItemSchema = z.infer<typeof itemFormSchema>
 
+test.beforeEach(async () => await truncateDatabase())
+
 test('Create Item', async ({ request, baseURL }) => {
-  await truncateDatabase()
+  let token = await createToken()
 
   let exampleRequestBody: ItemSchema = {
     properties: {
@@ -29,19 +36,7 @@ test('Create Item', async ({ request, baseURL }) => {
       datetime: randRecentDate().toISOString(),
     },
     geometry: randomPolygon().features[0].geometry,
-    collection: await db.collection
-      .create({
-        data: {
-          title: 'Test Collection',
-          catalog: {
-            create: {
-              title: 'Test Catalog',
-              description: 'Catalog created during automated test',
-            },
-          },
-        },
-      })
-      .then(c => c.id),
+    collection: await createPrivateCollection().then(c => c.id),
   }
 
   let exampleResponseBody = {
@@ -54,8 +49,6 @@ test('Create Item', async ({ request, baseURL }) => {
       },
     ]),
   }
-
-  let token = await createToken()
 
   let result = await request
     .post(`/api/items`, {
@@ -72,7 +65,7 @@ test('Create Item', async ({ request, baseURL }) => {
 })
 
 test('Edit Item', async ({ request }) => {
-  await truncateDatabase()
+  let token = await createToken()
 
   let testItem = await db.item.create({
     data: {
@@ -83,17 +76,7 @@ test('Edit Item', async ({ request }) => {
         start_datetime: randRecentDate().toISOString(),
         end_datetime: randSoonDate().toISOString(),
       },
-      collection: {
-        create: {
-          title: 'Test Collection',
-          catalog: {
-            create: {
-              title: 'Test Catalog',
-              description: 'Catalog created during automated test',
-            },
-          },
-        },
-      },
+      collectionId: await createPrivateCollection().then(c => c.id),
     },
   })
 
@@ -106,19 +89,7 @@ test('Edit Item', async ({ request }) => {
       end_datetime: randSoonDate().toISOString(),
     },
     geometry: randomPolygon().features[0].geometry,
-    collection: await db.collection
-      .create({
-        data: {
-          title: 'Test Collection',
-          catalog: {
-            create: {
-              title: 'Test Catalog',
-              description: 'Catalog created during automated test',
-            },
-          },
-        },
-      })
-      .then(c => c.id),
+    collection: testItem.collectionId,
   }
 
   let exampleResponseBody = {
@@ -132,8 +103,6 @@ test('Edit Item', async ({ request }) => {
       },
     ]),
   }
-
-  let token = await createToken()
 
   let result = await request
     .patch(`/api/items/${testItem.id}`, {
@@ -151,8 +120,6 @@ test('Edit Item', async ({ request }) => {
 })
 
 test('Get Item', async ({ request }) => {
-  await truncateDatabase()
-
   // Arrange
   let exampleItem: Prisma.ItemCreateWithoutCollectionInput = {
     properties: {
@@ -210,20 +177,7 @@ test('Get Item', async ({ request }) => {
 })
 
 test('Item Search', async ({ request }) => {
-  await truncateDatabase()
-
-  let collection = await db.collection.create({
-    data: {
-      title: `Animals`,
-      startTime: new Date(),
-      catalog: {
-        create: {
-          title: 'Organisms',
-          description: 'Catalog of organisms',
-        },
-      },
-    },
-  })
+  let collection = await createPublicCollection()
 
   await Promise.all(
     Array(10)
@@ -268,39 +222,3 @@ test('Item Search', async ({ request }) => {
 
   expect(searchResult.features.length).toBe(10)
 })
-
-async function truncateDatabase() {
-  const tablenames = await db.$queryRaw<
-    Array<{ tablename: string }>
-  >`SELECT tablename FROM pg_tables WHERE schemaname='public'`
-
-  const tables = tablenames
-    .map(({ tablename }) => tablename)
-    .filter(name => name !== '_prisma_migrations')
-    .map(name => `"public"."${name}"`)
-    .join(', ')
-
-  try {
-    await db.$executeRawUnsafe(`TRUNCATE TABLE ${tables} CASCADE;`)
-  } catch (error) {
-    console.log({ error })
-  }
-}
-
-async function createToken() {
-  let token = 'TestKey'
-  await db.apiKey.create({
-    data: {
-      key: encodeToken(token),
-      name: 'Test Token',
-      person: {
-        create: {
-          name: 'Test Person',
-          email: 'test@test.test',
-        },
-      },
-    },
-  })
-
-  return token
-}

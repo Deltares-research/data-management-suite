@@ -34,10 +34,27 @@ model Group {
 
   name String @unique
 
-  members Member[]
-
-  catalogs    Catalog[]
   collections Collection[]
+
+  members     Member[]
+  permissions Permission[]
+}
+
+enum MemberRole {
+  ADMIN
+  MEMBER
+}
+
+model Member {
+  person   Person @relation(fields: [personId], references: [id])
+  personId String
+
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String
+
+  role MemberRole
+
+  @@id([personId, groupId])
 }
 
 enum Role {
@@ -51,15 +68,16 @@ enum Access {
   PRIVATE
 }
 
-model Member {
-  person   Person @relation(fields: [personId], references: [id])
-  personId String
-  group    Group  @relation(fields: [groupId], references: [id])
-  groupId  String
+model Permission {
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String
+
+  catalog   Catalog @relation(fields: [catalogId], references: [id])
+  catalogId String
 
   role Role
 
-  @@id([personId, groupId])
+  @@id([catalogId, groupId])
 }
 
 // STAC Item
@@ -128,8 +146,8 @@ model Catalog {
 
   collections Collection[]
 
-  access Access  @default(PRIVATE)
-  groups Group[]
+  access      Access       @default(PRIVATE)
+  permissions Permission[]
 }
 
 model ExternalCatalog {

@@ -1,4 +1,4 @@
-import { Role, type Prisma } from '@prisma/client'
+import { MemberRole, type Prisma } from '@prisma/client'
 import type { ActionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
@@ -42,7 +42,12 @@ export async function submitGroupForm({
       },
     })
 
-    if (foundGroup.members.some(member => member.personId === user.id)) {
+    if (
+      foundGroup.members.some(
+        member =>
+          member.personId === user.id && member.role === MemberRole.ADMIN,
+      )
+    ) {
       await db.group.update({
         where: {
           id,
@@ -56,8 +61,8 @@ export async function submitGroupForm({
         ...form.data,
         members: {
           create: {
+            role: MemberRole.ADMIN,
             personId: user.id,
-            role: Role.ADMIN,
           },
         },
       },
