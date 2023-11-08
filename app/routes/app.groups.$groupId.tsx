@@ -1,6 +1,11 @@
 import { MemberRole, type Person } from '@prisma/client'
 import type { ActionArgs, LoaderArgs, SerializeFrom } from '@remix-run/node'
-import { Form, useLoaderData, useNavigation } from '@remix-run/react'
+import {
+  Form,
+  useLoaderData,
+  useNavigation,
+  useRouteLoaderData,
+} from '@remix-run/react'
 import { withZod } from '@remix-validated-form/with-zod'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Crown, MoreHorizontal, Plus, Trash } from 'lucide-react'
@@ -29,6 +34,7 @@ import {
 import { FormSubmit } from '~/components/ui/form'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
+import type { appLoader } from './app'
 
 let addPeopleSchema = z.object({
   peopleIds: z.string().array(),
@@ -59,6 +65,9 @@ export async function loader({ request, params }: LoaderArgs) {
       members: {
         include: {
           person: true,
+        },
+        orderBy: {
+          role: 'asc',
         },
       },
     },
@@ -197,108 +206,129 @@ export async function action(args: ActionArgs) {
   }
 }
 
-let columns: ColumnDef<SerializeFrom<typeof loader>['members'][number]>[] = [
-  {
-    id: 'name',
-    accessorFn(row) {
-      return row.person.name
-    },
-    header: 'Name',
-    cell({ row }) {
-      return (
-        <span className="flex items-center gap-1.5">
-          {row.original.role === MemberRole.ADMIN && (
-            <Crown className="w-4 h-4" />
-          )}
-          {row.original.person.name}
-        </span>
-      )
-    },
-  },
-  {
-    id: 'email',
-    accessorFn(row) {
-      return row.person.email
-    },
-    header: 'Email',
-  },
-  {
-    id: 'role',
-    accessorKey: 'role',
-    header: 'Actions',
-    cell({ row }) {
-      if (row.original.role === MemberRole.ADMIN) {
+function createColumns(
+  userRole: MemberRole,
+): ColumnDef<SerializeFrom<typeof loader>['members'][number]>[] {
+  return [
+    {
+      id: 'name',
+      accessorFn(row) {
+        return row.person.name
+      },
+      header: 'Name',
+      cell({ row }) {
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[160px]">
-              <Form
-                method="POST"
-                onSubmit={e => {
-                  if (!confirm(`Make ${row.original.person.name} Admin?`)) {
-                    return e.preventDefault()
-                  }
-                }}
-              >
-                <input
-                  type="hidden"
-                  name="subaction"
-                  value={Action.TOGGLE_ADMIN}
-                />
-                <input type="hidden" name="id" value={row.original.personId} />
-                <DropdownMenuItem asChild>
-                  <button type="submit" className="w-full text-left">
-                    <Crown className="w-4 h-4 mr-1.5" /> Make{' '}
-                    {row.original.role === MemberRole.ADMIN
-                      ? 'Member'
-                      : 'Admin'}
-                  </button>
-                </DropdownMenuItem>
-              </Form>
-
-              <Form
-                method="DELETE"
-                onSubmit={e => {
-                  if (
-                    !confirm(
-                      `Are you sure you want to remove ${row.original.person.name} from the group?`,
-                    )
-                  ) {
-                    return e.preventDefault()
-                  }
-                }}
-              >
-                <input
-                  type="hidden"
-                  name="subaction"
-                  value={Action.DELETE_MEMBER}
-                />
-                <input type="hidden" name="id" value={row.original.personId} />
-                <DropdownMenuItem asChild>
-                  <button type="submit" className="w-full text-left">
-                    <Trash className="w-4 h-4 mr-1.5" /> Delete
-                  </button>
-                </DropdownMenuItem>
-              </Form>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <span className="flex items-center gap-1.5">
+            {row.original.role === MemberRole.ADMIN && (
+              <Crown className="w-4 h-4" />
+            )}
+            {row.original.person.name}
+          </span>
         )
-      }
+      },
     },
-  },
-]
+    {
+      id: 'email',
+      accessorFn(row) {
+        return row.person.email
+      },
+      header: 'Email',
+    },
+    {
+      id: 'role',
+      accessorKey: 'role',
+      header: 'Actions',
+      cell({ row }) {
+        if (userRole === MemberRole.ADMIN) {
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  <span className="sr-only">Open menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[160px]">
+                <Form
+                  method="POST"
+                  onSubmit={e => {
+                    if (
+                      !confirm(
+                        `Make ${row.original.person.name} ${
+                          row.original.role === MemberRole.ADMIN
+                            ? 'Member'
+                            : 'Admin'
+                        }?`,
+                      )
+                    ) {
+                      return e.preventDefault()
+                    }
+                  }}
+                >
+                  <input
+                    type="hidden"
+                    name="subaction"
+                    value={Action.TOGGLE_ADMIN}
+                  />
+                  <input
+                    type="hidden"
+                    name="id"
+                    value={row.original.personId}
+                  />
+                  <DropdownMenuItem asChild>
+                    <button type="submit" className="w-full text-left">
+                      <Crown className="w-4 h-4 mr-1.5" /> Make{' '}
+                      {row.original.role === MemberRole.ADMIN
+                        ? 'Member'
+                        : 'Admin'}
+                    </button>
+                  </DropdownMenuItem>
+                </Form>
+
+                <Form
+                  method="DELETE"
+                  onSubmit={e => {
+                    if (
+                      !confirm(
+                        `Are you sure you want to remove ${row.original.person.name} from the group?`,
+                      )
+                    ) {
+                      return e.preventDefault()
+                    }
+                  }}
+                >
+                  <input
+                    type="hidden"
+                    name="subaction"
+                    value={Action.DELETE_MEMBER}
+                  />
+                  <input
+                    type="hidden"
+                    name="id"
+                    value={row.original.personId}
+                  />
+                  <DropdownMenuItem asChild>
+                    <button type="submit" className="w-full text-left">
+                      <Trash className="w-4 h-4 mr-1.5" /> Delete
+                    </button>
+                  </DropdownMenuItem>
+                </Form>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )
+        }
+      },
+    },
+  ]
+}
 
 export default function GroupPage() {
   let group = useLoaderData<typeof loader>()
+  let user = useRouteLoaderData<typeof appLoader>('routes/app')
   let [open, setOpen] = React.useState(false)
   let navigation = useNavigation()
 
@@ -307,6 +337,14 @@ export default function GroupPage() {
       setOpen(false)
     }
   }, [navigation.state])
+
+  let columns = React.useMemo(() => {
+    let member = user?.memberOf.find(member => member.groupId === group.id)
+
+    if (!member?.role) return []
+
+    return createColumns(member?.role)
+  }, [group.id, user?.memberOf])
 
   return (
     <div className="p-8 flex flex-col">

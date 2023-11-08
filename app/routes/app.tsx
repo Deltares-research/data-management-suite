@@ -13,7 +13,7 @@ import { routes } from '~/routes'
 import { createAuthenticator } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function appLoader({ request }: LoaderArgs) {
   let authenticator = createAuthenticator(request)
   let user = await authenticator.isAuthenticated(request)
 
@@ -26,6 +26,8 @@ export async function loader({ request }: LoaderArgs) {
     },
   })
 }
+
+export let loader = appLoader
 
 export async function action({ request }: ActionArgs) {
   let authenticator = createAuthenticator(request)
