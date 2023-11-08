@@ -23,6 +23,9 @@ jobs:
       - run: echo "A release was created."
         if: ${{ steps.release.outputs.releases_created }}
 
+      - uses: actions/checkout@v2
+        if: ${{ steps.release.outputs.releases_created }}
+
       - name: Mint token
         if: ${{ steps.release.outputs['utils/deltares_datasuite--release_created'] }}
         id: mint

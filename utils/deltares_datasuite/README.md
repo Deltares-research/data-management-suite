@@ -45,7 +45,7 @@ poetry add deltares_datasuite
 - Ready-to-use [Pull Requests templates](https://github.com/wolkwork/data-management-suite/blob/master/.github/PULL_REQUEST_TEMPLATE.md) and several [Issue templates](https://github.com/wolkwork/data-management-suite/tree/master/.github/ISSUE_TEMPLATE).
 - Files such as: `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` are generated automatically.
 - [`Stale bot`](https://github.com/apps/stale) that closes abandoned issues after a period of inactivity. (You will only [need to setup free plan](https://github.com/marketplace/stale)). Configuration is [here](https://github.com/wolkwork/data-management-suite/blob/master/.github/.stale.yml).
-- [Semantic Versions](https://semver.org/) specification with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter).
+- [Semantic Versions](https://semver.org/) specification with [`Release Please`](https://github.com/google-github-actions/release-please-action).
 
 ### Makefile usage
 
