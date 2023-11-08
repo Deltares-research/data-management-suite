@@ -102,10 +102,14 @@ export async function loader({ request }: LoaderArgs) {
       let geometry = JSON.parse(item.geometry)
 
       // TODO: Generate STAC Item
-      return prismaToStacItem({
-        ...item,
-        geometry,
-      })
+      return {
+        ...prismaToStacItem({
+          ...item,
+          geometry,
+        }),
+        collectionTitle: item.collectionTitle,
+        catalogTitle: item.catalogTitle,
+      }
     }),
     // ...externalResults.features?.map(feature => ({
     //   ...feature,

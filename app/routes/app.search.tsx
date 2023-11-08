@@ -181,7 +181,7 @@ export default function SearchPage() {
                     <CardTitle>{properties.title}</CardTitle>
                     <Muted className="flex items-center mt-0.5">
                       <BookOpen className="w-4 h-4 mr-1.5" />{' '}
-                      {properties.catalogTitle}
+                      {item.catalogTitle}
                     </Muted>
                     <CardDescription>{properties.description}</CardDescription>
                   </CardHeader>
@@ -218,7 +218,7 @@ export default function SearchPage() {
 
                       <div className="ml-auto">
                         <Badge variant="secondary">
-                          {properties.collectionTitle}
+                          {item.collectionTitle}
                         </Badge>
                       </div>
                     </div>
