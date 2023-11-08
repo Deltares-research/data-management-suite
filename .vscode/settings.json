@@ -19,5 +19,8 @@
     "titleBar.inactiveForeground": "#15202b99"
   },
   "peacock.color": "#f4fd9e",
-  "prisma.fileWatcher": true
+  "prisma.fileWatcher": true,
+  "python.testing.pytestArgs": ["utils"],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

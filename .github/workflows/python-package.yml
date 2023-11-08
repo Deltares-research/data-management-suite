@@ -6,6 +6,12 @@ on:
       - 'utils/deltares_datasuite/**'
       - '.github/workflows/**'
 
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,6 +21,15 @@ jobs:
     defaults:
       run:
         working-directory: ./utils/deltares_datasuite
+    env:
+      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/remix'
+      SESSION_SECRET: super-duper-s3cret
+      NODE_VERSION: 18
+      PYTHON_VERSION: 3.9
+      POETRY_VERSION: 1.6.1
+      AZURE_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
 
     steps:
       - uses: actions/checkout@v2
@@ -40,9 +55,22 @@ jobs:
         run: |
           make check-codestyle
 
+      # - name: Run webserver and db container
+      #   working-directory: .
+      #   run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build --wait --quiet-pull
+
       - name: Run tests
         run: |
           make test
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            **/test-results.xml
+            **/test-results/**/*.xml
+            **/test-results/**/*.json
 
       - name: Run safety checks
         run: |

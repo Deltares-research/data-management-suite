@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      target: prod
+    # Set environment variables for the web service
+    environment:
+      - SESSION_SECRET
+      - NODE_VERSION
+      - AZURE_TENANT_ID
+      - AZURE_CLIENT_ID
+      - AZURE_CLIENT_SECRET
+      - DATABASE_URL='postgresql://postgres:postgres@postgres:5432/remix'

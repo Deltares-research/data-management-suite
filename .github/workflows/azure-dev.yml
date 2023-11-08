@@ -27,84 +27,6 @@ env:
   FULL_IMAGE_NAME: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web-${{ vars.AZURE_ENV_NAME }}:${{ github.sha }}
 
 jobs:
-  testPythonSDK:
-    name: Test Python SDK
-    runs-on: ubuntu-latest
-    if: false
-    env:
-      DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/remix'
-      SESSION_SECRET: super-duper-s3cret
-      NODE_VERSION: 18
-      PYTHON_VERSION: 3.9
-      POETRY_VERSION: 1.6.1
-      AZURE_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
-      AZURE_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_APP_CLIENT_SECRET }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Set up python ${{ env.PYTHON_VERSION }}
-        id: setup-python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      #----------------------------------------#
-      #       Install & configure Poetry       #
-      #----------------------------------------#
-      - name: Load cached Poetry Binary
-        id: cached-poetry-binary
-        uses: actions/cache@v3
-        with:
-          path: ~/.local
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ env.POETRY_VERSION }}
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: ${{ env.POETRY_VERSION }}
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-      #----------------------------------------------#
-      #       Load cached venv if cache exists       #
-      #----------------------------------------------#
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-          # Restore cache with this prefix if not exact match with key
-          # Note cache-hit returns false in this case, so the below step will run
-          restore-keys: |
-            venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
-      #----------------------------------------------------------#
-      #       Install dependencies if cache does not exist       #
-      #----------------------------------------------------------#
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        shell: bash
-        working-directory: utils/deltares_datasuite
-        run: poetry install --no-interaction --no-root
-
-      - name: Run webserver and db container
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
-
-      - name: Run tests
-        working-directory: utils/deltares_datasuite
-        run: |
-          source .venv/bin/activate
-          python -m pytest tests/ --junit-xml=test-results.xml
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            utils/deltares_datasuite/test-results.xml
-            utils/deltares_datasuite/test-results/**/*.xml
-            utils/deltares_datasuite/test-results/**/*.json
-
   end2endtest:
     name: End 2 end test
     timeout-minutes: 10
@@ -182,7 +104,6 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - end2endtest
-    # - testPythonSDK
     defaults:
       run:
         shell: bash
@@ -299,7 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - end2endtest
-    # - testPythonSDK
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
