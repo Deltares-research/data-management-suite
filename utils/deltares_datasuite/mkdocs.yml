@@ -25,10 +25,10 @@ plugins:
   - tags
 
 nav:
-  - Home: '../'
   - Introduction: 'index.md'
   - User Guide: 'guide.md'
   - Classes:
-      - Datasuite Client: 'classes/client.md'
-      - Metadata Item: 'classes/item.md'
+      - DataManagementSuiteClient: 'classes/client.md'
+      - DataManagementSuiteItem: 'classes/item.md'
+  - Back to the App: '/'
   - Issue Tracker: 'https://github.com/wolkwork/data-management-suite/issues'
