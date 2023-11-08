@@ -100,6 +100,10 @@ resource "azurerm_container_app" "web" {
         name        = "AZURE_CLIENT_SECRET"
         secret_name = "client-secret"
       }
+      env {
+        name        = "PLAYWRIGHT_USER_PASSWORD"
+        secret_name = "playwright-user-password"
+      }
     }
   }
 
@@ -117,4 +121,15 @@ resource "azurerm_container_app" "web" {
     name  = "client-secret"
     value = var.app_client_secret
   }
+
+  secret {
+    name  = "playwright-user-password"
+    value = base64sha512(random_password.playwright_password.result)
+  }
 }
+
+resource "random_password" "playwright_password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-=+[]{}<>:?"
+} 

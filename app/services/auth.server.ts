@@ -1,10 +1,10 @@
 // app/services/auth.server.ts
 import { MicrosoftStrategy } from 'remix-auth-microsoft'
-import type { AuthenticateOptions } from 'remix-auth'
-import { Authenticator, Strategy } from 'remix-auth'
+import { FormStrategy } from 'remix-auth-form'
+import { Authenticator } from 'remix-auth'
 import { sessionStorage } from '~/services/session.server'
 import { db } from '~/utils/db.server'
-import type { SessionStorage, SessionData, LoaderArgs } from '@remix-run/node'
+import type { LoaderArgs } from '@remix-run/node'
 import { assert } from '~/utils/assert'
 import { routes } from '~/routes'
 import { encodeToken } from '~/utils/apiKey'
@@ -25,6 +25,10 @@ let clientSecret = assert(
 let tenantId = assert(
   process.env.AZURE_TENANT_ID,
   'AZURE_TENANT_ID should be set',
+)
+let playwrightAdminPassword = assert(
+  process.env.PLAYWRIGHT_USER_PASSWORD,
+  'PLAYWRIGHT_USER_PASSWORD should be set',
 )
 
 function createMicrosoftStrategy(request: LoaderArgs['request']) {
@@ -104,32 +108,23 @@ async function checkApiKey(request: Request) {
 }
 
 // For tests
-class MockStrategy extends Strategy<
-  {
-    id: string
-    name: string | null
-  },
-  null
-> {
-  name = 'mock'
+authenticator.use(
+  new FormStrategy(async ({ form }) => {
+    let username = form.get('username')
+    let password = form.get('password')
 
-  async authenticate(
-    request: Request,
-    sessionStorage: SessionStorage<SessionData, SessionData>,
-    options: AuthenticateOptions,
-  ): Promise<{ id: string; name: string | null }> {
-    return this.success(
-      await this.verify(null),
-      request,
-      sessionStorage,
-      options,
-    )
-  }
-}
+    if (typeof username !== 'string' || typeof password !== 'string') {
+      throw new Error('Invalid username or password')
+    }
 
-let mockStrategy = new MockStrategy(async () => ({
-  id: 'admin',
-  name: 'Admin',
-}))
+    if (username !== 'admin' || password !== playwrightAdminPassword) {
+      throw new Error('Invalid username or password')
+    }
 
-authenticator.use(mockStrategy)
+    return {
+      id: 'admin',
+      name: 'Admin',
+      email: 'admin@admin.com',
+    }
+  }),
+)

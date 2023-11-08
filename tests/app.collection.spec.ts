@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { routes } from '~/routes'
 import { db } from '~/utils/db.server'
+import { loginAsAdmin } from './utils'
 
 test.beforeEach(async ({ page }) => {
-  await page.goto('/auth/mock')
+  await loginAsAdmin(page)
 })
 
 test('can list collections', async ({ page }) => {

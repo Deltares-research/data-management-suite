@@ -7,6 +7,7 @@ import { submitCatalogForm } from '~/forms/CatalogForm'
 import { CollectionForm } from '~/forms/CollectionForm'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
+import { getCollectionAuthWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
 
 export async function action(args: ActionArgs) {
@@ -21,7 +22,9 @@ export async function action(args: ActionArgs) {
   return redirect(routes.collections())
 }
 
-export async function loader({ params }: LoaderArgs) {
+export async function loader({ params, request }: LoaderArgs) {
+  let user = await requireAuthentication(request)
+
   let { collectionId } = zx.parseParams(params, {
     collectionId: z.string(),
   })
@@ -31,7 +34,9 @@ export async function loader({ params }: LoaderArgs) {
         id: collectionId,
       },
     }),
-    db.catalog.findMany(),
+    db.catalog.findMany({
+      where: getCollectionAuthWhere(user.id).catalog,
+    }),
   ])
 
   return { defaultValues, catalogs }

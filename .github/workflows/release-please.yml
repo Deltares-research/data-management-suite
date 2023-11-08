@@ -1,0 +1,45 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  # This permission is required for trusted publishing.
+  id-token: write
+  contents: write
+  pull-requests: write
+
+name: Release packages
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          command: manifest
+          monorepo-tags: true
+      - run: echo "A release was created."
+        if: ${{ steps.release.outputs.releases_created }}
+
+      - uses: actions/checkout@v2
+        if: ${{ steps.release.outputs.releases_created }}
+
+      - name: Mint token
+        if: ${{ steps.release.outputs['utils/deltares_datasuite--release_created'] }}
+        id: mint
+        uses: tschm/token-mint-action@v1.0.2
+
+      - name: Release python package to PyPi with poetry
+        if: ${{ steps.release.outputs['utils/deltares_datasuite--release_created'] }}
+        working-directory: ./utils/deltares_datasuite
+        run: |
+          make poetry-download
+          poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
+
+      - name: Add python files to release
+        if: ${{ steps.release.outputs['utils/deltares_datasuite--release_created'] }}
+        working-directory: ./utils/deltares_datasuite
+        run: |
+          gh release upload ${{ steps.release.outputs['utils/deltares_datasuite--tag_name'] }} .dist/*

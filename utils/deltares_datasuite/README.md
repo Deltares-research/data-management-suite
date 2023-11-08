@@ -2,7 +2,8 @@
 
 <div align="center">
 
-[![Build status](https://github.com/wolkwork/data-management-suite/workflows/build/badge.svg?branch=main&event=push)](https://github.com/wolkwork/data-management-suite/actions?query=workflow%3Abuild)
+[![Build status](https://github.com/wolkwork/data-management-suite/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/wolkwork/data-management-suite/actions/workflows/python-package.yml)
+
 [![Python Version](https://img.shields.io/pypi/pyversions/deltares_datasuite.svg)](https://pypi.org/project/deltares_datasuite/)
 [![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/wolkwork/data-management-suite/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
 
@@ -10,84 +11,25 @@
 [![Security: bandit](https://img.shields.io/badge/security-bandit-green.svg)](https://github.com/PyCQA/bandit)
 [![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/wolkwork/data-management-suite/blob/master/.pre-commit-config.yaml)
 [![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/wolkwork/data-management-suite/releases)
-[![License](https://img.shields.io/github/license/wolkwork/data-management-suite)](https://github.com/wolkwork/data-management-suite/blob/master/LICENSE)
 ![Coverage Report](assets/images/coverage.svg)
 
 Python package to easily work with STAC items in the Deltares Data Management Suite
 
 </div>
 
-## Very first steps
-
-### Initialize your code
-
-1. Initialize `git` inside your repo:
+## Installation
 
 ```bash
-cd deltares_datasuite && git init
+pip install -U deltares_datasuite
 ```
 
-2. If you don't have `Poetry` installed run:
+or install with `Poetry`
 
 ```bash
-make poetry-download
+poetry add deltares_datasuite
 ```
 
-3. Initialize poetry and install `pre-commit` hooks:
-
-```bash
-make install
-make pre-commit-install
-```
-
-4. Run the codestyle:
-
-```bash
-make codestyle
-```
-
-5. Upload initial code to GitHub:
-
-```bash
-git add .
-git commit -m ":tada: Initial commit"
-git branch -M main
-git remote add origin https://github.com/wolkwork/data-management-suite.git
-git push -u origin main
-```
-
-### Set up bots
-
-- Set up [Dependabot](https://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#enabling-github-dependabot-version-updates) to ensure you have the latest dependencies.
-- Set up [Stale bot](https://github.com/apps/stale) for automatic issue closing.
-
-### Poetry
-
-Want to know more about Poetry? Check [its documentation](https://python-poetry.org/docs/).
-
-<details>
-<summary>Details about Poetry</summary>
-<p>
-
-Poetry's [commands](https://python-poetry.org/docs/cli/#commands) are very intuitive and easy to learn, like:
-
-- `poetry add numpy@latest`
-- `poetry run pytest`
-- `poetry publish --build`
-
-etc
-
-</p>
-</details>
-
-### Building and releasing your package
-
-Building a new version of the application contains steps:
-
-- Bump the version of your package `poetry version <version>`. You can pass the new version explicitly, or a rule such as `major`, `minor`, or `patch`. For more details, refer to the [Semantic Versions](https://semver.org/) standard.
-- Make a commit to `GitHub`.
-- Create a `GitHub release`.
-- And... publish 🙂 `poetry publish --build`
+## Development
 
 ### Deployment features
 
@@ -103,19 +45,7 @@ Building a new version of the application contains steps:
 - Ready-to-use [Pull Requests templates](https://github.com/wolkwork/data-management-suite/blob/master/.github/PULL_REQUEST_TEMPLATE.md) and several [Issue templates](https://github.com/wolkwork/data-management-suite/tree/master/.github/ISSUE_TEMPLATE).
 - Files such as: `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` are generated automatically.
 - [`Stale bot`](https://github.com/apps/stale) that closes abandoned issues after a period of inactivity. (You will only [need to setup free plan](https://github.com/marketplace/stale)). Configuration is [here](https://github.com/wolkwork/data-management-suite/blob/master/.github/.stale.yml).
-- [Semantic Versions](https://semver.org/) specification with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter).
-
-## Installation
-
-```bash
-pip install -U deltares_datasuite
-```
-
-or install with `Poetry`
-
-```bash
-poetry add deltares_datasuite
-```
+- [Semantic Versions](https://semver.org/) specification with [`Release Please`](https://github.com/google-github-actions/release-please-action).
 
 ### Makefile usage
 
@@ -318,9 +248,9 @@ You can see the list of available releases on the [GitHub Releases](https://gith
 
 We follow [Semantic Versions](https://semver.org/) specification.
 
-We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). As pull requests are merged, a draft release is kept up-to-date listing the changes, ready to publish when you’re ready. With the categories option, you can categorize pull requests in release notes using labels.
+We use [`Release Please`](https://github.com/google-github-actions/release-please-action). As pull requests are merged, a release Pull Request is kept up-to-date listing the changes, ready to publish when you’re ready. With the categories option, you can categorize pull requests in release notes using labels.
 
-### List of labels and corresponding titles
+<!-- ### List of labels and corresponding titles
 
 |               **Label**               |  **Title in Releases**  |
 | :-----------------------------------: | :---------------------: |
@@ -333,27 +263,10 @@ We use [`Release Drafter`](https://github.com/marketplace/actions/release-drafte
 
 You can update it in [`release-drafter.yml`](https://github.com/wolkwork/data-management-suite/blob/master/.github/release-drafter.yml).
 
-GitHub creates the `bug`, `enhancement`, and `documentation` labels for you. Dependabot creates the `dependencies` label. Create the remaining labels on the Issues tab of your GitHub repository, when you need them.
+GitHub creates the `bug`, `enhancement`, and `documentation` labels for you. Dependabot creates the `dependencies` label. Create the remaining labels on the Issues tab of your GitHub repository, when you need them. -->
 
 ## 🛡 License
 
-[![License](https://img.shields.io/github/license/wolkwork/ddata-management-suite)](https://github.com/wolkwork/data-management-suite/blob/master/LICENSE)
+<!-- [![License](https://img.shields.io/github/license/wolkwork/data-management-suite)](https://github.com/wolkwork/data-management-suite/blob/main/utils/deltares_datasuite/LICENSE) -->
 
-This project is licensed under the terms of the `MIT` license. See [LICENSE](https://github.com/wolkwork/data-management-suite/blob/master/LICENSE) for more details.
-
-## 📃 Citation
-
-```bibtex
-@misc{deltares_datasuite,
-  author = {Deltares},
-  title = {Python package to easily work with STAC items in the Deltares Data Management Suite},
-  year = {2023},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/wolkwork/data-management-suite}}
-}
-```
-
-## Credits [![🚀 Your next Python package needs a bleeding-edge project structure.](https://img.shields.io/badge/python--package--template-%F0%9F%9A%80-brightgreen)](https://github.com/TezRomacH/python-package-template)
-
-This project was generated with [`python-package-template`](https://github.com/TezRomacH/python-package-template)
+This project is licensed under the terms of the `MIT` license. See [LICENSE](https://github.com/wolkwork/data-management-suite/blob/main/utils/deltares_datasuite/LICENSE) for more details.

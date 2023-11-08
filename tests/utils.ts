@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test'
 import { Access, MemberRole, Role } from '@prisma/client'
 import { encodeToken } from '~/utils/apiKey'
 import { db } from '~/utils/db.server'
@@ -18,6 +19,27 @@ export async function truncateDatabase() {
   } catch (error) {
     console.log({ error })
   }
+}
+
+export async function loginAsAdmin(page: Page) {
+  let person = {
+    id: 'admin',
+    name: 'Admin',
+    email: 'admin@admin.com',
+  }
+  await db.person.upsert({
+    where: { id: person.id },
+    create: person,
+    update: person,
+  })
+
+  await page.goto('/auth/mock')
+
+  await page.getByRole('textbox', { name: /Username/i }).fill('admin')
+  await page
+    .getByRole('textbox', { name: /Password/i })
+    .fill(process.env.PLAYWRIGHT_USER_PASSWORD!)
+  await page.getByRole('button', { name: /Login/i }).click()
 }
 
 export async function createToken() {
