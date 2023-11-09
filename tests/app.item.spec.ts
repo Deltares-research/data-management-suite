@@ -107,7 +107,7 @@ test('can edit item', async ({ page }) => {
   await page.goto(routes.editItem(item.id), { waitUntil: 'networkidle' })
 
   let title = await page.getByText(/Edit metadata record/i)
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test("can't edit item without permissions", async ({ page }) => {
@@ -136,7 +136,7 @@ test("can't edit item without permissions", async ({ page }) => {
 
   // Should redirect back to list when no permissions
   let title = await page.getByRole('heading', { name: /Items/i })
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test('can list items', async ({ page }) => {
@@ -179,5 +179,5 @@ test('can list items', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Items/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })

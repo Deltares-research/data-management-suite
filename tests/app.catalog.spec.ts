@@ -12,7 +12,7 @@ test('can list catalogs', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Catalogs/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test('can create catalogs', async ({ page }) => {
@@ -20,7 +20,7 @@ test('can create catalogs', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Create catalog/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test('can edit catalogs', async ({ page }) => {
@@ -35,7 +35,7 @@ test('can edit catalogs', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Edit catalog/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test('cannot create a catalog without admins', async ({ page }) => {
@@ -43,7 +43,7 @@ test('cannot create a catalog without admins', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Create catalog/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 
   await page.getByRole('textbox', { name: /Title/i }).fill('Test Catalog')
   await page
@@ -55,7 +55,7 @@ test('cannot create a catalog without admins', async ({ page }) => {
     /Catalog should have at least one permission group/i,
   )
 
-  expect(requiredError).toBeInViewport()
+  await expect(requiredError).toBeInViewport()
 
   await page.getByRole('button', { name: /Add permission/i }).click()
   await page.getByRole('button', { name: /Save/i }).click()
@@ -64,5 +64,5 @@ test('cannot create a catalog without admins', async ({ page }) => {
     /Catalog should have at least one admin/i,
   )
 
-  expect(adminError).toBeInViewport()
+  await expect(adminError).toBeInViewport()
 })
