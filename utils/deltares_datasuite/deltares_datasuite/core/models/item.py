@@ -8,14 +8,41 @@ from pystac import Asset, Catalog, Item
 
 
 class DataManagementSuiteItem(Item):
-    """_summary_
+    """A DataManagementSuiteItem is a STAC Item with additional properties. It is used to
+    represent a dataset in the Data Management Suite. It is a subclass of a STAC Item and
+    therefore has all the properties of a STAC Item.
 
     Args:
-        Item (_type_): _description_
-
-    Returns:
-        _type_: _description_
+        title (str): Title describing the Item
+        projectNumber (str): Deltares project number the data was created for
+        location (str): Storage location of the data, e.g. P-Drive or S3 bucket URI
+        description (str): A thorough description of the data and how it was created.
+            This should include information on the data source, processing steps and
+            the data format.
+        license (str): License under which the data is published
+        collection (str): ID of the collection this item belongs to
+        geometry (Polygon): Polygon describing the spatial extent of the data
+        properties (Dict[str, Any]):  A dictionary of additional metadata for the item.
+        id (str, optional): ID of existing item to update. Defaults to "".
+        bbox (Optional[List[float]], optional): Bounding Box of the asset represented by this item
+            using either 2D or 3D geometries. The length of the array must be 2*n
+            where n is the number of dimensions. Could also be None in the case of a
+            null geometry. Defaults to None.
+        datetime (Optional[Datetime], optional): datetime associated with this item. If None,
+            a start_datetime and end_datetime must be supplied.
+        start_datetime : Optional start datetime, part of common metadata. This value
+            will override any `start_datetime` key in properties.
+        end_datetime : Optional end datetime, part of common metadata. This value
+            will override any `end_datetime` key in properties.stac_extensions (Optional[List[str]], optional): _description_. Defaults to None.
+        href (Optional[str], optional): Optional HREF for this item, which be set as the item's
+            self link's HREF.
+        extra_fields (Optional[Dict[str, Any]], optional): Extra fields that are part of the top-level JSON
+            properties of the Item.
+        assets (Optional[Dict[str, Asset]], optional): A dictionary mapping string keys to :class:`~pystac.Asset` objects. All
+            :class:`~pystac.Asset` values in the dictionary will have their
+            :attr:`~pystac.Asset.owner` attribute set to the created Item.
     """
+
     # We set the id to be optional because we want to be able to create an item
     # and let the Datamanagement suite assign the id
     id: str = ""
