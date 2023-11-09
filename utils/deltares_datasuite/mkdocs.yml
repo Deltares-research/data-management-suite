@@ -1,6 +1,6 @@
 site_name: 'Deltares Datasuite Python SDK'
 site_url: https://datasuite.deltares.nl/docs
-repo_url: https://github.com/wolkwork/data-management-suite
+repo_url: https://github.com/Deltares-research/data-management-suite
 edit_uri: 'blob/main/utils/deltares_datasuite/docs/'
 theme:
   name: material
@@ -31,4 +31,4 @@ nav:
       - DataManagementSuiteClient: 'classes/client.md'
       - DataManagementSuiteItem: 'classes/item.md'
   - Back to the App: '/'
-  - Issue Tracker: 'https://github.com/wolkwork/data-management-suite/issues'
+  - Issue Tracker: 'https://github.com/Deltares-research/data-management-suite/issues'

@@ -10,7 +10,7 @@ description = "Python package to easily work with STAC items in the Deltares Dat
 readme = "README.md"
 authors = ["Deltares <nathan@wolk.work>"]
 license = "MIT"
-repository = "https://github.com/wolkwork/data-management-suite"
+repository = "https://github.com/Deltares-research/data-management-suite"
 homepage = "https://datasuite.deltares.nl"
 
 # Keywords description https://python-poetry.org/docs/pyproject/#keywords
