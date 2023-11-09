@@ -74,7 +74,7 @@ export default function App() {
             <div className="flex gap-5 items-center py-2">
               <MenuItem to={routes.home()}>Home</MenuItem>
               <MenuItem to={routes.search()}>Search</MenuItem>
-              <MenuItem to={routes.items()}>CMS</MenuItem>
+              <MenuItem to={routes.items()}>Register</MenuItem>
             </div>
 
             {user && (
