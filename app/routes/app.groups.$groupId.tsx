@@ -34,7 +34,7 @@ import {
 import { FormSubmit } from '~/components/ui/form'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
-import type { appLoader } from './app'
+import type { rootLoader } from '~/root'
 
 let addPeopleSchema = z.object({
   peopleIds: z.string().array(),
@@ -328,7 +328,7 @@ function createColumns(
 
 export default function GroupPage() {
   let group = useLoaderData<typeof loader>()
-  let user = useRouteLoaderData<typeof appLoader>('routes/app')
+  let user = useRouteLoaderData<typeof rootLoader>('root')
   let [open, setOpen] = React.useState(false)
   let navigation = useNavigation()
 
