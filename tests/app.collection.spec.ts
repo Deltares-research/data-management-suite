@@ -12,7 +12,7 @@ test('can list collections', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Collections/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test('can create collections', async ({ page }) => {
@@ -20,7 +20,7 @@ test('can create collections', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Create collection/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
 
 test('can edit collections', async ({ page }) => {
@@ -40,5 +40,5 @@ test('can edit collections', async ({ page }) => {
 
   let title = await page.getByRole('heading', { name: /Edit Collection/i })
 
-  expect(title).toBeInViewport()
+  await expect(title).toBeInViewport()
 })
