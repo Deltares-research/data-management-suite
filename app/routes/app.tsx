@@ -1,113 +1,16 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node'
-import type { NavLinkProps } from '@remix-run/react'
-import { Form, Link, NavLink, Outlet, useLoaderData } from '@remix-run/react'
-import { Avatar, AvatarFallback } from '~/components/ui/avatar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu'
-import { Separator } from '~/components/ui/separator'
-import { routes } from '~/routes'
-import { createAuthenticator } from '~/services/auth.server'
-import { db } from '~/utils/db.server'
-
-export async function appLoader({ request }: LoaderArgs) {
-  let authenticator = createAuthenticator(request)
-  let user = await authenticator.isAuthenticated(request)
-
-  return db.person.findUnique({
-    where: {
-      id: user?.id ?? '',
-    },
-    include: {
-      memberOf: true,
-    },
-  })
-}
-
-export let loader = appLoader
-
-export async function action({ request }: ActionArgs) {
-  let authenticator = createAuthenticator(request)
-  await authenticator.logout(request, { redirectTo: routes.login() })
-}
+import { Outlet, useRouteLoaderData } from '@remix-run/react'
+import { Sidebar } from '~/components/Sidebar'
+import type { rootLoader } from '~/root'
 
 export default function AppLayout() {
-  let user = useLoaderData<typeof loader>()
-  let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
-
-  // let canWrite = user?.memberOf.some(
-  //   member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
-  // )
-  // let isAdmin = user?.memberOf.some(
-  //   member => member.role === Role.ADMIN || member.role === Role.CONTRIBUTOR,
-  // )
+  let user = useRouteLoaderData<typeof rootLoader>('root')
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="border-b flex-shrink-0 h-16 px-8 flex items-center justify-between">
-        <div className="flex gap-5 items-center">
-          <MenuItem to={routes.home()}>Home</MenuItem>
-          <MenuItem to={routes.search()}>Search</MenuItem>
-
-          <Separator className="h-4" orientation="vertical" />
-          <MenuItem to={routes.items()}>Datasets</MenuItem>
-          <MenuItem to={routes.collections()}>Collections</MenuItem>
-          <MenuItem to={routes.catalogs()}>Catalogs</MenuItem>
-          {/* <MenuItem to={routes.keywords()}>Keywords</MenuItem> */}
-
-          <Separator className="h-4" orientation="vertical" />
-          <MenuItem to={routes.externalCatalogs()}>External Catalogs</MenuItem>
-          <Separator className="h-4" orientation="vertical" />
-
-          <MenuItem to={routes.groups()}>Groups</MenuItem>
-          <Separator className="h-4" orientation="vertical" />
-          <MenuItem to={routes.docs()}>API</MenuItem>
-          <MenuItem to={routes.pythonDocs()}>Python Docs</MenuItem>
-        </div>
-
-        <div>
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar>
-                <AvatarFallback>
-                  {firstName?.[0]}
-                  {lastName?.[0]}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem asChild>
-                <Link to={routes.settings()}>Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Form method="post" action="/app">
-                  <button>Logout</button>
-                </Form>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-      <main className="flex-1 flex flex-col">
+    <main className="grid grid-cols-5 h-full">
+      <Sidebar user={user} />
+      <div className="col-span-3 lg:col-span-4 lg:border-l">
         <Outlet />
-      </main>
-    </div>
-  )
-}
-
-function MenuItem(props: NavLinkProps) {
-  return (
-    // eslint-disable-next-line jsx-a11y/anchor-has-content
-    <NavLink
-      className={({ isActive }) =>
-        `text-sm font-medium transition-colors hover:text-primary ${
-          isActive ? 'text-primary' : 'text-muted-foreground'
-        }`
-      }
-      {...props}
-    />
+      </div>
+    </main>
   )
 }

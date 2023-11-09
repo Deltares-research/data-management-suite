@@ -7,7 +7,7 @@ export let routes = {
     return `/`
   },
   search() {
-    return `${appPrefix}/search`
+    return `/search`
   },
   settings() {
     return `${appPrefix}/settings`

@@ -61,7 +61,7 @@ test('Create Item', async ({ request, baseURL }) => {
       return res.json()
     })
 
-  expect(result).toMatchObject(exampleResponseBody)
+  await expect(result).toMatchObject(exampleResponseBody)
 })
 
 test('Edit Item', async ({ request }) => {
@@ -116,7 +116,7 @@ test('Edit Item', async ({ request }) => {
       return res.json()
     })
 
-  expect(result).toMatchObject(exampleResponseBody)
+  await expect(result).toMatchObject(exampleResponseBody)
 })
 
 test('Get Item', async ({ request }) => {
@@ -159,7 +159,7 @@ test('Get Item', async ({ request }) => {
   let existingItem = await request.get(`/stac/items/${item.id}`)
 
   // Assert
-  expect(existingItem.ok()).toBeTruthy()
+  await expect(existingItem.ok()).toBeTruthy()
   let exampleResponseBody = {
     properties: {
       ...(exampleItem.properties as Object),
@@ -173,7 +173,7 @@ test('Get Item', async ({ request }) => {
       ),
     },
   }
-  expect(await existingItem.json()).toMatchObject(exampleResponseBody)
+  await expect(await existingItem.json()).toMatchObject(exampleResponseBody)
 })
 
 test('Item Search', async ({ request }) => {
@@ -220,5 +220,5 @@ test('Item Search', async ({ request }) => {
 
   let searchResult = await request.get(`/api/search`).then(res => res.json())
 
-  expect(searchResult.features.length).toBe(10)
+  await expect(searchResult.features.length).toBe(10)
 })

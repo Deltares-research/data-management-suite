@@ -134,7 +134,7 @@ export function ItemForm({
 
   return (
     <>
-      <div className="max-w-6xl w-full mx-auto py-12">
+      <div className="px-8 max-w-6xl w-full mx-auto py-12">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">
             {defaultValues ? 'Edit' : 'Register'} metadata record
