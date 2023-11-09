@@ -80,9 +80,9 @@ export function GroupSelector({
             <CommandInput
               value={search}
               onValueChange={setSearch}
-              placeholder="Search people..."
+              placeholder="Search groups..."
             />
-            <CommandEmpty>No people found.</CommandEmpty>
+            <CommandEmpty>No groups found.</CommandEmpty>
             <CommandGroup>
               {fetcher.data?.map(group => (
                 <CommandItem
