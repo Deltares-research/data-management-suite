@@ -37,5 +37,5 @@ nav:
   - Classes:
       - DataManagementSuiteClient: 'classes/client.md'
       - DataManagementSuiteItem: 'classes/item.md'
-  - Back to the App: '/'
+  - Back to the App: '/app/items'
   - Issue Tracker: 'https://github.com/Deltares-research/data-management-suite/issues'
