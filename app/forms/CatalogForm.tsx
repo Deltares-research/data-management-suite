@@ -1,6 +1,6 @@
 import { randUuid } from '@ngneat/falso'
 import { Access, Role } from '@prisma/client'
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
 import { Lock, Plus, Unlock, X } from 'lucide-react'
@@ -57,7 +57,7 @@ let catalogValidator = withZod(catalogSchema)
 export async function submitCatalogForm({
   request,
   id,
-}: ActionArgs & { id?: string }) {
+}: ActionFunctionArgs & { id?: string }) {
   let form = await catalogValidator.validate(await request.formData())
 
   if (form.error) {

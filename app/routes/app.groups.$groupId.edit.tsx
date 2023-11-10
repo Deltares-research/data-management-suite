@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
@@ -8,7 +8,7 @@ import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   await requireAuthentication(args.request)
 
   let { groupId } = zx.parseParams(args.params, { groupId: z.string() })
@@ -18,7 +18,7 @@ export async function action(args: ActionArgs) {
   return redirect(routes.groups())
 }
 
-export async function loader({ request, params }: LoaderArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   await requireAuthentication(request)
 
   let { groupId } = await zx.parseParams(params, {

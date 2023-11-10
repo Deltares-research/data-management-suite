@@ -1,6 +1,10 @@
 import { useLoaderData } from '@remix-run/react'
 
-import type { ActionArgs, LoaderArgs, V2_MetaFunction } from '@remix-run/node'
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  V2_MetaFunction,
+} from '@remix-run/node'
 import { requireAuthentication } from '~/services/auth.server'
 import { routes } from '~/routes'
 
@@ -14,7 +18,7 @@ export const meta: V2_MetaFunction = () => {
   return [{ title: 'Register metadata' }]
 }
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let collections = await db.collection.findMany({
@@ -31,7 +35,7 @@ export async function loader({ request }: LoaderArgs) {
   return { collections }
 }
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   await submitItemForm(args)
 
   return redirect(routes.items())

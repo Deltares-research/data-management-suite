@@ -1,5 +1,9 @@
 import { cssBundleHref } from '@remix-run/css-bundle'
-import type { ActionArgs, LinksFunction, LoaderArgs } from '@remix-run/node'
+import type {
+  ActionFunctionArgs,
+  LinksFunction,
+  LoaderFunctionArgs,
+} from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
 import {
   Links,
@@ -34,7 +38,7 @@ export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ]
 
-export async function rootLoader({ request }: LoaderArgs) {
+export async function rootLoader({ request }: LoaderFunctionArgs) {
   let authenticator = createAuthenticator(request)
   let user = await authenticator.isAuthenticated(request)
 
@@ -50,7 +54,7 @@ export async function rootLoader({ request }: LoaderArgs) {
 
 export let loader = rootLoader
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let authenticator = createAuthenticator(request)
   await authenticator.logout(request, { redirectTo: routes.login() })
 }

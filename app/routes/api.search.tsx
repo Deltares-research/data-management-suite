@@ -1,4 +1,4 @@
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import type { Item } from '@prisma/client'
 import { zx } from 'zodix'
@@ -7,7 +7,7 @@ import { prismaToStacItem } from '~/utils/prismaToStac'
 import type { FeatureCollection } from 'geojson'
 import { createAuthenticator } from '~/services/auth.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let authenticator = createAuthenticator(request)
   let user = await authenticator.isAuthenticated(request)
 

@@ -1,7 +1,7 @@
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 import { zx } from 'zodix'
 
-export function getDataTableFilters(request: LoaderArgs['request']) {
+export function getDataTableFilters(request: LoaderFunctionArgs['request']) {
   let { page = 0, take = 10 } = zx.parseQuery(request, {
     page: zx.IntAsString.optional(),
     take: zx.IntAsString.refine(

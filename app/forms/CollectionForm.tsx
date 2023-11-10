@@ -1,5 +1,5 @@
 import type { Catalog, Prisma } from '@prisma/client'
-import type { ActionArgs, SerializeFrom } from '@remix-run/node'
+import type { ActionFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
 import { ValidatedForm, validationError } from 'remix-validated-form'
@@ -22,7 +22,7 @@ let collectionValidator = withZod(collectionSchema)
 export async function submitCollectionForm({
   request,
   id,
-}: ActionArgs & { id?: string }) {
+}: ActionFunctionArgs & { id?: string }) {
   let form = await collectionValidator.validate(await request.formData())
 
   if (form.error) {

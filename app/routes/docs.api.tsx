@@ -26,7 +26,7 @@ import { searchQuerySchema } from './search'
 import type { loader as searchLoader } from './api.search'
 import { Link, useLoaderData } from '@remix-run/react'
 import { routes } from '~/routes'
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 import type { StacItem } from '~/utils/prismaToStac'
 
 let itemSchema = createItemFormSchema()
@@ -108,7 +108,7 @@ let searchItemsExample = {
   url: '/api/search',
 }
 
-export function loader({ request }: LoaderArgs) {
+export function loader({ request }: LoaderFunctionArgs) {
   return { host: new URL(request.url).host }
 }
 

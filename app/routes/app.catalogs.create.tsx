@@ -1,10 +1,10 @@
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { CatalogForm, submitCatalogForm } from '~/forms/CatalogForm'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   await requireAuthentication(args.request)
 
   await submitCatalogForm(args)
