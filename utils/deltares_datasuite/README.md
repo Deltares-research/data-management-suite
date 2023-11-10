@@ -2,15 +2,15 @@
 
 <div align="center">
 
-[![Build status](https://github.com/wolkwork/data-management-suite/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/wolkwork/data-management-suite/actions/workflows/python-package.yml)
+[![Build status](https://github.com/Deltares-research/data-management-suite/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/Deltares-research/data-management-suite/actions/workflows/python-package.yml)
 
 [![Python Version](https://img.shields.io/pypi/pyversions/deltares_datasuite.svg)](https://pypi.org/project/deltares_datasuite/)
-[![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/wolkwork/data-management-suite/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
+[![Dependencies Status](https://img.shields.io/badge/dependencies-up%20to%20date-brightgreen.svg)](https://github.com/Deltares-research/data-management-suite/pulls?utf8=%E2%9C%93&q=is%3Apr%20author%3Aapp%2Fdependabot)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Security: bandit](https://img.shields.io/badge/security-bandit-green.svg)](https://github.com/PyCQA/bandit)
-[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/wolkwork/data-management-suite/blob/master/.pre-commit-config.yaml)
-[![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/wolkwork/data-management-suite/releases)
+[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/Deltares-research/data-management-suite/blob/master/.pre-commit-config.yaml)
+[![Semantic Versions](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--versions-e10079.svg)](https://github.com/Deltares-research/data-management-suite/releases)
 ![Coverage Report](assets/images/coverage.svg)
 
 Python package to easily work with STAC items in the Deltares Data Management Suite
@@ -34,22 +34,22 @@ poetry add deltares_datasuite
 ### Deployment features
 
 - `GitHub` integration: issue and pr templates.
-- `Github Actions` with predefined [build workflow](https://github.com/wolkwork/data-management-suite/blob/master/.github/workflows/build.yml) as the default CI/CD.
-- Everything is already set up for security checks, codestyle checks, code formatting, testing, linting, docker builds, etc with [`Makefile`](https://github.com/wolkwork/data-management-suite/blob/master/Makefile#L89). More details in [makefile-usage](#makefile-usage).
-- [Dockerfile](https://github.com/wolkwork/data-management-suite/blob/master/docker/Dockerfile) for your package.
+- `Github Actions` with predefined [build workflow](https://github.com/Deltares-research/data-management-suite/blob/master/.github/workflows/build.yml) as the default CI/CD.
+- Everything is already set up for security checks, codestyle checks, code formatting, testing, linting, docker builds, etc with [`Makefile`](https://github.com/Deltares-research/data-management-suite/blob/master/Makefile#L89). More details in [makefile-usage](#makefile-usage).
+- [Dockerfile](https://github.com/Deltares-research/data-management-suite/blob/master/docker/Dockerfile) for your package.
 - Always up-to-date dependencies with [`@dependabot`](https://dependabot.com/). You will only [enable it](https://docs.github.com/en/github/administering-a-repository/enabling-and-disabling-version-updates#enabling-github-dependabot-version-updates).
-- Automatic drafts of new releases with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). You may see the list of labels in [`release-drafter.yml`](https://github.com/wolkwork/data-management-suite/blob/master/.github/release-drafter.yml). Works perfectly with [Semantic Versions](https://semver.org/) specification.
+- Automatic drafts of new releases with [`Release Drafter`](https://github.com/marketplace/actions/release-drafter). You may see the list of labels in [`release-drafter.yml`](https://github.com/Deltares-research/data-management-suite/blob/master/.github/release-drafter.yml). Works perfectly with [Semantic Versions](https://semver.org/) specification.
 
 ### Open source community features
 
-- Ready-to-use [Pull Requests templates](https://github.com/wolkwork/data-management-suite/blob/master/.github/PULL_REQUEST_TEMPLATE.md) and several [Issue templates](https://github.com/wolkwork/data-management-suite/tree/master/.github/ISSUE_TEMPLATE).
+- Ready-to-use [Pull Requests templates](https://github.com/Deltares-research/data-management-suite/blob/master/.github/PULL_REQUEST_TEMPLATE.md) and several [Issue templates](https://github.com/Deltares-research/data-management-suite/tree/master/.github/ISSUE_TEMPLATE).
 - Files such as: `LICENSE`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `SECURITY.md` are generated automatically.
-- [`Stale bot`](https://github.com/apps/stale) that closes abandoned issues after a period of inactivity. (You will only [need to setup free plan](https://github.com/marketplace/stale)). Configuration is [here](https://github.com/wolkwork/data-management-suite/blob/master/.github/.stale.yml).
+- [`Stale bot`](https://github.com/apps/stale) that closes abandoned issues after a period of inactivity. (You will only [need to setup free plan](https://github.com/marketplace/stale)). Configuration is [here](https://github.com/Deltares-research/data-management-suite/blob/master/.github/.stale.yml).
 - [Semantic Versions](https://semver.org/) specification with [`Release Please`](https://github.com/google-github-actions/release-please-action).
 
 ### Makefile usage
 
-[`Makefile`](https://github.com/wolkwork/data-management-suite/blob/master/Makefile) contains a lot of functions for faster development.
+[`Makefile`](https://github.com/Deltares-research/data-management-suite/blob/master/Makefile) contains a lot of functions for faster development.
 
 <details>
 <summary>1. Download and remove Poetry</summary>
@@ -201,7 +201,7 @@ Remove docker image with
 make docker-remove
 ```
 
-More information [about docker](https://github.com/wolkwork/data-management-suite/tree/master/docker).
+More information [about docker](https://github.com/Deltares-research/data-management-suite/tree/master/docker).
 
 </p>
 </details>
@@ -244,7 +244,7 @@ make cleanup
 
 ## 📈 Releases
 
-You can see the list of available releases on the [GitHub Releases](https://github.com/wolkwork/data-management-suite/releases) page.
+You can see the list of available releases on the [GitHub Releases](https://github.com/Deltares-research/data-management-suite/releases) page.
 
 We follow [Semantic Versions](https://semver.org/) specification.
 
@@ -261,12 +261,12 @@ We use [`Release Please`](https://github.com/google-github-actions/release-pleas
 |            `documentation`            |    📝 Documentation     |
 |            `dependencies`             | ⬆️ Dependencies updates |
 
-You can update it in [`release-drafter.yml`](https://github.com/wolkwork/data-management-suite/blob/master/.github/release-drafter.yml).
+You can update it in [`release-drafter.yml`](https://github.com/Deltares-research/data-management-suite/blob/master/.github/release-drafter.yml).
 
 GitHub creates the `bug`, `enhancement`, and `documentation` labels for you. Dependabot creates the `dependencies` label. Create the remaining labels on the Issues tab of your GitHub repository, when you need them. -->
 
 ## 🛡 License
 
-<!-- [![License](https://img.shields.io/github/license/wolkwork/data-management-suite)](https://github.com/wolkwork/data-management-suite/blob/main/utils/deltares_datasuite/LICENSE) -->
+<!-- [![License](https://img.shields.io/github/license/Deltares-research/data-management-suite)](https://github.com/Deltares-research/data-management-suite/blob/main/utils/deltares_datasuite/LICENSE) -->
 
-This project is licensed under the terms of the `MIT` license. See [LICENSE](https://github.com/wolkwork/data-management-suite/blob/main/utils/deltares_datasuite/LICENSE) for more details.
+This project is licensed under the terms of the `MIT` license. See [LICENSE](https://github.com/Deltares-research/data-management-suite/blob/main/utils/deltares_datasuite/LICENSE) for more details.

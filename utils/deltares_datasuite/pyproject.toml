@@ -6,12 +6,14 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry]
 name = "deltares_datasuite"
 version = "0.3.0"
-description = "Python package to easily work with STAC items in the Deltares Data Management Suite"
+description = "Python package to create and update STAC items in the Deltares Data Management Suite"
 readme = "README.md"
-authors = ["Deltares <nathan@wolk.work>"]
+authors = ["Deltares <nathan.clerks@deltares.nl>"]
+maintainers = ["Deltares <nathan.clerks@deltares.nl>"]
 license = "MIT"
-repository = "https://github.com/wolkwork/data-management-suite"
+repository = "https://github.com/Deltares-research/data-management-suite"
 homepage = "https://datasuite.deltares.nl"
+documentation = "https://datasuite.deltares.nl/docs"
 
 # Keywords description https://python-poetry.org/docs/pyproject/#keywords
 keywords = [] #! Update me
@@ -52,6 +54,10 @@ coverage-badge = "^1.1.0"
 pytest-html = "^4.1.1"
 pytest-cov = "^4.1.0"
 psycopg = { extras = ["binary"], version = "^3.1.12" }
+mkdocs = "^1.5.3"
+mkdocs-material = "^9.4.8"
+mkdocstrings = { extras = ["python"], version = "^0.23.0" }
+mkdocs-macros-plugin = "^1.0.5"
 
 [tool.black]
 # https://github.com/psf/black

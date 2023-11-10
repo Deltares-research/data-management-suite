@@ -84,6 +84,10 @@ docker-remove:
 	@echo Removing docker $(IMAGE):$(VERSION) ...
 	docker rmi -f $(IMAGE):$(VERSION)
 
+.PHONY: docs
+docs:
+	mkdocs build -d ../../public/docs
+
 #* Cleaning
 .PHONY: pycache-remove
 pycache-remove:
