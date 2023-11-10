@@ -10,6 +10,11 @@ theme:
   icon:
     logo: material/library
 
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+
 plugins:
   - search
   - mkdocstrings:
@@ -23,9 +28,11 @@ plugins:
               - pystac
   - autorefs
   - tags
+  - macros
 
 nav:
-  - Introduction: 'index.md'
+  - Home: 'index.md'
+  - Installation: 'installation.md'
   - User Guide: 'guide.md'
   - Classes:
       - DataManagementSuiteClient: 'classes/client.md'
