@@ -37,6 +37,25 @@ RUN npx prisma generate
 ADD . .
 RUN npm run build
 
+FROM python:3.9-slim-buster as python-docs-builder
+
+
+WORKDIR /src/deltares_datasuite
+
+ENV POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_VIRTUALENVS_IN_PROJECT=false \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VERSION=1.6.1
+ENV PATH="$PATH:$POETRY_HOME/bin"
+RUN pip install "poetry==$POETRY_VERSION"
+COPY /utils/deltares_datasuite/poetry.lock /src/deltares_datasuite
+COPY /utils/deltares_datasuite/pyproject.toml /src/deltares_datasuite
+RUN poetry install
+
+COPY /utils/deltares_datasuite /src/deltares_datasuite
+RUN mkdocs build
+
 # Build the dev image with dev dependencies
 FROM base as dev
 
@@ -47,6 +66,7 @@ COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
+COPY --from=python-docs-builder /src/deltares_datasuite/site /app/public/docs
 COPY . .
 
 CMD ["npx", "remix", "dev"]
@@ -61,6 +81,7 @@ COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 
 COPY --from=build /app/build /app/build
 COPY --from=build /app/public /app/public
+COPY --from=python-docs-builder /src/deltares_datasuite/site /app/public/docs
 COPY . .
 
 CMD ["npm", "start"]

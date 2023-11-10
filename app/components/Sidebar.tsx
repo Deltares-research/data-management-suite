@@ -10,6 +10,7 @@ import {
   LinkIcon,
   LogOut,
   Settings,
+  ScrollText,
   Users,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from './ui/avatar'
@@ -105,6 +106,17 @@ export function Sidebar({
                 >
                   <FileCode2 className="mr-2 w-4 h-4" />
                   API Documentation
+                </Button>
+              )}
+            </NavLink>
+            <NavLink to={routes.pythonDocs()} reloadDocument>
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className="w-full justify-start"
+                >
+                  <ScrollText className="mr-2 w-4 h-4" />
+                  Python Documentation
                 </Button>
               )}
             </NavLink>

@@ -96,6 +96,8 @@ let searchItemsResponseBody: Awaited<ReturnType<typeof searchLoader>> = {
         start_datetime: randRecentDate().toISOString(),
         end_datetime: randRecentDate().toISOString(),
       },
+      catalogTitle: 'Animals',
+      collectionTitle: randAnimal(),
     },
   ],
 }
@@ -122,53 +124,53 @@ export default function ApiDocs() {
               Items
             </h4>
             <div className="grid grid-flow-row auto-rows-max text-sm">
-              <a
+              <Link
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="#auth"
+                to="#auth"
               >
                 Authorization
-              </a>
-              <a
+              </Link>
+              <Link
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="#get"
+                to="#get"
               >
                 Get
-              </a>
-              <a
+              </Link>
+              <Link
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="#create"
+                to="#create"
               >
                 Create
-              </a>
-              <a
+              </Link>
+              <Link
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="#edit"
+                to="#edit"
               >
                 Edit
-              </a>
-              <a
+              </Link>
+              <Link
                 className="group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline text-muted-foreground"
                 target=""
                 rel=""
-                href="#search"
+                to="#search"
               >
                 Search
-              </a>
+              </Link>
             </div>
           </div>
         </aside>
       </div>
 
       <div className="grid grid-flow-row lg:grid-cols-2 gap-x-6">
-        <div id="get" className="bg-white py-6">
+        <div id="auth" className="bg-white py-6">
           <H4>Authorization</H4>
           <div className="pt-3">
             Endpoints that perform mutations require authorization through a{' '}
