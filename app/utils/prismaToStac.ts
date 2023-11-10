@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client'
+import type { Asset, Prisma } from '@prisma/client'
 import type { Feature } from 'geojson'
 import type {
   CommonMetadata,
@@ -16,6 +16,7 @@ export function prismaToStacItem({
   geometry,
   properties,
   collectionId,
+  assets,
 }: {
   id: string
   geometry: {
@@ -27,6 +28,7 @@ export function prismaToStacItem({
   start_datetime?: Date | null
   end_datetime?: Date | null
   collectionId: string
+  assets: Asset[]
 }): StacItem {
   return {
     id,
@@ -54,7 +56,15 @@ export function prismaToStacItem({
       },
     ],
     // TODO: Add assets
-    assets: {},
+    assets: assets?.reduce((acc, asset) => {
+      acc[asset.key] = {
+        ...asset,
+        type: asset.type ?? undefined,
+        title: asset.title ?? undefined,
+        description: asset.description ?? undefined,
+      }
+      return acc
+    }, {} as Record<string, StacAsset>),
   }
 }
 

@@ -38,6 +38,9 @@ export async function loader({ request, params }: LoaderArgs) {
       id: itemId,
       collection: getCollectionAuthWhere(user.id),
     },
+    include: {
+      assets: true,
+    },
   })
 
   if (!defaultValues) throw redirect(routes.items())
