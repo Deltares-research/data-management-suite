@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "deltares_datasuite"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python package to create and update STAC items in the Deltares Data Management Suite"
 readme = "README.md"
 authors = ["Deltares <nathan.clerks@deltares.nl>"]
