@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/Deltares-research/data-management-suite/compare/v0.2.0...v0.3.0) (2023-11-10)
+
+
+### Features
+
+* add python docs ([#15](https://github.com/Deltares-research/data-management-suite/issues/15)) ([f180371](https://github.com/Deltares-research/data-management-suite/commit/f1803716085bba0cfa8b00a5e38ffa9d59428bbb))
+* Add sidebar menu ([#76](https://github.com/Deltares-research/data-management-suite/issues/76)) ([b3986c3](https://github.com/Deltares-research/data-management-suite/commit/b3986c32b7622b10d36335aa3154e17a2421afb9))
+
 ## [0.2.0](https://github.com/Deltares-research/data-management-suite/compare/v0.1.0...v0.2.0) (2023-11-08)
 
 ### Features
