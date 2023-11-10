@@ -34,6 +34,17 @@
     },
     { "type": "ci", "section": ":package: Testing & CI/CD", "hidden": false },
 
+    {
+      "type": "deps",
+      "section": ":arrow_up: Dependencies updates",
+      "hidden": false
+    },
+    {
+      "type": "dependencies",
+      "section": ":arrow_up: Dependencies updates",
+      "hidden": false
+    },
+
     { "type": "chore", "section": "Miscellaneous", "hidden": true }
   ],
   "packages": {
