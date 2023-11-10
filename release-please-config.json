@@ -1,8 +1,45 @@
 {
+  "separate-pull-requests": true,
+  "changelog-sections": [
+    { "type": "feat", "section": ":rocket: Features", "hidden": false },
+
+    {
+      "type": "bug",
+      "section": ":wrench: Bug Fixes & Refactoring",
+      "hidden": false
+    },
+    {
+      "type": "refactoring",
+      "section": ":wrench: Bug Fixes & Refactoring",
+      "hidden": false
+    },
+    {
+      "type": "bugfix",
+      "section": ":wrench: Bug Fixes & Refactoring",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": ":wrench: Bug Fixes & Refactoring",
+      "hidden": false
+    },
+
+    { "type": "docs", "section": ":pencil: Documentation", "hidden": false },
+
+    { "type": "test", "section": ":package: Testing & CI/CD", "hidden": false },
+    {
+      "type": "build",
+      "section": ":package: Testing & CI/CD",
+      "hidden": false
+    },
+    { "type": "ci", "section": ":package: Testing & CI/CD", "hidden": false },
+
+    { "type": "chore", "section": "Miscellaneous", "hidden": true }
+  ],
   "packages": {
     ".": {
       "release-type": "node",
-      "packacge-name": "data-management-suite",
+      "package-name": "data-management-suite",
       "exclude-paths": ["utils/deltares_datasuite"]
     },
 
