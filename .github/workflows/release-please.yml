@@ -36,7 +36,7 @@ jobs:
         working-directory: ./utils/deltares_datasuite
         run: |
           make poetry-download
-          poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
+          poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}' --build
 
       - name: Add python files to release
         if: ${{ steps.release.outputs['utils/deltares_datasuite--release_created'] }}
