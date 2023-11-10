@@ -12,7 +12,7 @@
     "e2e:setupdb": "prisma migrate reset -f && prisma db seed",
     "e2e:setupplaywright": "playwright install --with-deps",
     "e2e:test": "npx remix-serve ./build/index.js & playwright test",
-    "start": "prisma migrate deploy ; remix-serve build",
+    "start": "prisma migrate deploy ; remix-serve ./build/index.js",
     "typecheck": "tsc -b"
   },
   "prisma": {
