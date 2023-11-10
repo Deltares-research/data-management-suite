@@ -1,8 +1,8 @@
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
 import { routes } from '~/routes'
 import { createAuthenticator } from '~/services/auth.server'
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let authenticator = createAuthenticator(request)
   return await authenticator.authenticate('form', request, {
     successRedirect: routes.items(),

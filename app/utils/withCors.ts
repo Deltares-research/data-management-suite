@@ -1,8 +1,11 @@
-import type { LoaderArgs, LoaderFunction } from '@remix-run/node'
+import type { LoaderFunctionArgs, LoaderFunction } from '@remix-run/node'
 import { Response, json } from '@remix-run/node'
 
 export function withCors(loader: LoaderFunction) {
-  return async function loaderWithCors({ request, ...args }: LoaderArgs) {
+  return async function loaderWithCors({
+    request,
+    ...args
+  }: LoaderFunctionArgs) {
     if (request.method === `OPTIONS`) {
       return new Response(null, {
         headers: {

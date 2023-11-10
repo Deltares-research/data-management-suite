@@ -6,7 +6,7 @@ import React from 'react'
 import { buildTree } from '~/utils/buildTree'
 import { Check, ChevronRight, DotIcon, Plus, X } from 'lucide-react'
 import { Card, CardContent, CardHeader } from '~/components/ui/card'
-import type { ActionArgs, SerializeFrom } from '@remix-run/node'
+import type { ActionFunctionArgs, SerializeFrom } from '@remix-run/node'
 import {
   FormInput,
   FormSelect,
@@ -38,7 +38,7 @@ export async function loader() {
   return { keywords, standards }
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   await requireAuthentication(request)
 
   let formData = await request.formData()

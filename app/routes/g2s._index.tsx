@@ -1,4 +1,4 @@
-import { redirect, type ActionArgs } from '@remix-run/node'
+import { redirect, type ActionFunctionArgs } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
 import {
   ValidatedForm,
@@ -17,7 +17,7 @@ let schema = z.object({
 
 let validator = withZod(schema)
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let form = await validator.validate(await request.formData())
 
   if (form.error) {

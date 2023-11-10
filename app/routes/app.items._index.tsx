@@ -1,8 +1,8 @@
 import { Role } from '@prisma/client'
 import {
   json,
-  type ActionArgs,
-  type LoaderArgs,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
   type SerializeFrom,
 } from '@remix-run/node'
 import { Form, Link, useLoaderData } from '@remix-run/react'
@@ -28,7 +28,7 @@ import { getCollectionAuthWhere } from '~/utils/authQueries'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 
@@ -96,7 +96,7 @@ export async function loader({ request }: LoaderArgs) {
   return { count, items }
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let user = await requireAuthentication(request)
   let { id } = await zx.parseForm(request, { id: z.string() })
 

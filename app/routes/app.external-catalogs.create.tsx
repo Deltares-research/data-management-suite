@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client'
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
 import { ValidatedForm, validationError } from 'remix-validated-form'
@@ -17,7 +17,7 @@ let externalCatalogSchema = z.object({
 
 let externalCatalogValidator = withZod(externalCatalogSchema)
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let form = await externalCatalogValidator.validate(await request.formData())
 
   if (form.error) {

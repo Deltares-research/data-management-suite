@@ -4,7 +4,7 @@ import { FormStrategy } from 'remix-auth-form'
 import { Authenticator } from 'remix-auth'
 import { sessionStorage } from '~/services/session.server'
 import { db } from '~/utils/db.server'
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 import { assert } from '~/utils/assert'
 import { routes } from '~/routes'
 import { encodeToken } from '~/utils/apiKey'
@@ -31,7 +31,7 @@ let playwrightAdminPassword = assert(
   'PLAYWRIGHT_USER_PASSWORD should be set',
 )
 
-function createMicrosoftStrategy(request: LoaderArgs['request']) {
+function createMicrosoftStrategy(request: LoaderFunctionArgs['request']) {
   let url = new URL(request.url)
 
   let microsoftStrategy = new MicrosoftStrategy(
@@ -68,13 +68,15 @@ function createMicrosoftStrategy(request: LoaderArgs['request']) {
   return microsoftStrategy
 }
 
-export function createAuthenticator(request: LoaderArgs['request']) {
+export function createAuthenticator(request: LoaderFunctionArgs['request']) {
   authenticator.use(createMicrosoftStrategy(request))
 
   return authenticator
 }
 
-export async function requireAuthentication(request: LoaderArgs['request']) {
+export async function requireAuthentication(
+  request: LoaderFunctionArgs['request'],
+) {
   try {
     return await checkApiKey(request)
   } catch (e) {

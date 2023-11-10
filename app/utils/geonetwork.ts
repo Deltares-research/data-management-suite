@@ -2,7 +2,7 @@ import stacPackageJson from 'stac-spec/package.json'
 import { getHost } from '~/routes'
 import { z } from 'zod'
 import { zx } from 'zodix'
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 import type { StacItem } from './prismaToStac'
 import type { Geometry } from 'geojson'
 
@@ -90,7 +90,7 @@ export async function geonetworkItem2StacItem({
   return stacItem
 }
 
-export function getBaseUrl({ params, request }: LoaderArgs) {
+export function getBaseUrl({ params, request }: LoaderFunctionArgs) {
   let { source64 } = zx.parseParams(params, {
     source64: z.string(),
   })
