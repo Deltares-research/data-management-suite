@@ -13,7 +13,7 @@ export let routes = {
     return `${appPrefix}/settings`
   },
   docs() {
-    return `${appPrefix}/api/docs`
+    return `/docs/api`
   },
 
   pythonDocs() {
