@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/Deltares-research/data-management-suite/compare/deltares_datasuite-v0.3.0...deltares_datasuite-v0.4.0) (2023-11-10)
+
+
+### :rocket: Features
+
+* add python docs ([#15](https://github.com/Deltares-research/data-management-suite/issues/15)) ([f180371](https://github.com/Deltares-research/data-management-suite/commit/f1803716085bba0cfa8b00a5e38ffa9d59428bbb))
+
 ## [0.3.0](https://github.com/Deltares-research/data-management-suite/compare/deltares_datasuite-v0.2.0...deltares_datasuite-v0.3.0) (2023-11-08)
 
 ### Features
