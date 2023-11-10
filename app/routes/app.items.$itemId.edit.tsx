@@ -1,7 +1,11 @@
 import { useLoaderData } from '@remix-run/react'
 
 import { redirect } from '@remix-run/node'
-import type { LoaderArgs, ActionArgs, V2_MetaFunction } from '@remix-run/node'
+import type {
+  LoaderFunctionArgs,
+  ActionFunctionArgs,
+  V2_MetaFunction,
+} from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { requireAuthentication } from '~/services/auth.server'
@@ -17,7 +21,7 @@ export const meta: V2_MetaFunction = () => {
   return [{ title: 'Edit metadata' }]
 }
 
-export async function loader({ request, params }: LoaderArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let { itemId } = await zx.parseParams(params, { itemId: z.string() })
@@ -58,7 +62,7 @@ export async function loader({ request, params }: LoaderArgs) {
   }
 }
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   let { itemId } = zx.parseParams(args.params, { itemId: z.string() })
 
   await submitItemForm({ ...args, id: itemId })

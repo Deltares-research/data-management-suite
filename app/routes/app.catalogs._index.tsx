@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client'
-import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
+import type { LoaderFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal, Plus } from 'lucide-react'
@@ -19,7 +19,7 @@ import { requireAuthentication } from '~/services/auth.server'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 

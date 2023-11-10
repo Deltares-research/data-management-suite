@@ -1,4 +1,4 @@
-import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
+import type { LoaderFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { ExternalLink, MoreHorizontal, Plus } from 'lucide-react'
@@ -16,7 +16,7 @@ import { routes } from '~/routes'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let filters = await getDataTableFilters(request)
 
   let [count, catalogs] = await db.$transaction([

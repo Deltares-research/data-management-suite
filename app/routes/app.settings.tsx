@@ -1,4 +1,8 @@
-import { json, type ActionArgs, type LoaderArgs } from '@remix-run/node'
+import {
+  json,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+} from '@remix-run/node'
 import { useActionData, useLoaderData } from '@remix-run/react'
 import { withZod } from '@remix-validated-form/with-zod'
 import { formatDistanceToNow } from 'date-fns'
@@ -20,7 +24,7 @@ import {
   CardTitle,
 } from '~/components/ui/card'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let apiKeys = await db.apiKey.findMany({
@@ -49,7 +53,7 @@ let newApiKeySchema = z.object({
 
 let newApiKeyValidator = withZod(newApiKeySchema)
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   let formData = await request.formData()
   let subaction = formData.get('subaction')?.toString()
 

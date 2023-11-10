@@ -1,7 +1,7 @@
 import { Link } from '@remix-run/react'
 import { Button } from '~/components/ui/button'
 import type { z } from 'zod'
-import type { ActionArgs, SerializeFrom } from '@remix-run/node'
+import type { ActionFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
 import { updateGeometry } from '~/services/item.server'
 import { ValidatedForm, validationError } from 'remix-validated-form'
@@ -23,7 +23,7 @@ import { Plus, X } from 'lucide-react'
 export async function submitItemForm({
   request,
   id,
-}: ActionArgs & { id?: string }) {
+}: ActionFunctionArgs & { id?: string }) {
   let user = await requireAuthentication(request)
 
   let formDataRaw = await requestJsonOrFormData(request)

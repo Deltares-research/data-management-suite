@@ -1,4 +1,4 @@
-import type { LoaderArgs, SerializeFrom } from '@remix-run/node'
+import type { LoaderFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { Link, useLoaderData } from '@remix-run/react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
@@ -10,7 +10,7 @@ import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   return db.group.findMany({

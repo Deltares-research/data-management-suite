@@ -1,5 +1,5 @@
 import { MemberRole, type Prisma } from '@prisma/client'
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
 import { ValidatedForm, validationError } from 'remix-validated-form'
@@ -20,7 +20,7 @@ let groupValidator = withZod(groupSchema)
 export async function submitGroupForm({
   request,
   id,
-}: ActionArgs & { id?: string }) {
+}: ActionFunctionArgs & { id?: string }) {
   let user = await requireAuthentication(request)
   let form = await groupValidator.validate(await request.formData())
 

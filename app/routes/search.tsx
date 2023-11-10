@@ -1,6 +1,6 @@
 import type {
   LinksFunction,
-  LoaderArgs,
+  LoaderFunctionArgs,
   V2_MetaFunction,
 } from '@remix-run/node'
 import type { MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl'
@@ -65,7 +65,7 @@ export let searchQuerySchema = {
   q: z.string().optional().describe('Will search item title and description'),
 }
 
-export async function loader(args: LoaderArgs) {
+export async function loader(args: LoaderFunctionArgs) {
   let data = await searchLoader(args)
 
   return {

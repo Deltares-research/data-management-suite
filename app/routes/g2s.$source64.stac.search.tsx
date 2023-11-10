@@ -10,12 +10,12 @@ let GN_BASE_URL = 'https://deltaresdata.openearth.eu'
 
 const ITEMS_PER_PAGE = 20
 
-export let loader = withCors(async loaderArgs => {
-  let { request } = loaderArgs
+export let loader = withCors(async LoaderFunctionArgs => {
+  let { request } = LoaderFunctionArgs
 
   let validate = await getStacValidator('Item')
 
-  let baseUrl = getBaseUrl(loaderArgs)
+  let baseUrl = getBaseUrl(LoaderFunctionArgs)
 
   let {
     q = '',
