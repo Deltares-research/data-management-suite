@@ -5,6 +5,7 @@ import { withZod } from '@remix-validated-form/with-zod'
 import { ValidatedForm, validationError } from 'remix-validated-form'
 import { z } from 'zod'
 import { CatalogSelector } from '~/components/CatalogSelector'
+import { ID } from '~/components/ID'
 import { H3 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { FormInput, FormTextarea } from '~/components/ui/form'
@@ -45,12 +46,17 @@ export function CollectionForm({
   defaultValues,
 }: {
   catalogs: SerializeFrom<Catalog>[]
-  defaultValues?: z.infer<typeof collectionSchema>
+  defaultValues?: z.infer<typeof collectionSchema> & { id: string }
 }) {
   return (
     <div className="py-12 w-full h-full flex flex-col items-center justify-center">
       <div className="max-w-2xl w-full">
         <H3>{defaultValues ? 'Edit' : 'Create'} Collection</H3>
+        {defaultValues && (
+          <div className="pt-3">
+            <ID>{defaultValues.id}</ID>
+          </div>
+        )}
         <ValidatedForm
           method="post"
           validator={collectionValidator}
