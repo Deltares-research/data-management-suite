@@ -30,6 +30,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './components/ui/tooltip'
+import { datadogLogs } from '@datadog/browser-logs'
+import React from 'react'
+import { assert } from './utils/assert'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -59,7 +62,31 @@ export async function action({ request }: ActionFunctionArgs) {
   await authenticator.logout(request, { redirectTo: routes.login() })
 }
 
+let datadogToken = process.env.DATADOG_CLIENT_TOKEN
+let applicationEnv = assert(
+  process.env.APPLICATION_ENVIRONMENT,
+  'APPLICATION_ENVIRONMENT should be set',
+)
+
 export default function App() {
+  React.useEffect(() => {
+    if (datadogToken) {
+      datadogLogs.init({
+        clientToken: datadogToken,
+        site: 'datadoghq.com',
+        service: 'data-management-suite',
+        env: applicationEnv,
+        forwardErrorsToLogs: true,
+        sessionSampleRate: 10,
+      })
+      console.info('Datadog logger initialized')
+    } else {
+      console.warn(
+        'DATADOG_CLIENT_TOKEN not set, skipping datadog initialization',
+      )
+    }
+  }, [datadogToken, applicationEnv])
+
   let user = useLoaderData<typeof loader>()
   let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
 
