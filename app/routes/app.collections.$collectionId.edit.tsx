@@ -7,7 +7,7 @@ import { submitCatalogForm } from '~/forms/CatalogForm'
 import { CollectionForm } from '~/forms/CollectionForm'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
-import { getCollectionAuthWhere } from '~/utils/authQueries'
+import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
 
 export async function action(args: ActionArgs) {
@@ -35,7 +35,7 @@ export async function loader({ params, request }: LoaderArgs) {
       },
     }),
     db.catalog.findMany({
-      where: getCollectionAuthWhere(user.id).catalog,
+      where: getCollectionAuthReadWhere(user.id).catalog,
     }),
   ])
 

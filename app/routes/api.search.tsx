@@ -69,13 +69,16 @@ export async function loader({ request }: LoaderArgs) {
     LEFT JOIN "Permission" ON "Permission"."catalogId" = "Catalog"."id"
     LEFT JOIN "Group" ON "Group"."id" = "Permission"."groupId"
     LEFT JOIN "Member" ON "Member"."groupId" = "Group"."id"
-    WHERE ST_Intersects("Item"."geometry", ST_MakeEnvelope(${bbox[0].toFixed(
-      12,
-    )}::double precision, ${bbox[1].toFixed(
+    WHERE (
+      ST_Intersects("Item"."geometry", ST_MakeEnvelope(${bbox[0].toFixed(
+        12,
+      )}::double precision, ${bbox[1].toFixed(
     12,
   )}::double precision, ${bbox[2].toFixed(
     12,
   )}::double precision, ${bbox[3].toFixed(12)}::double precision, 4326))
+      OR "Item"."geometry" IS NULL
+      )
 
     AND (
       (

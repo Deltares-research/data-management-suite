@@ -75,18 +75,34 @@ test('can create item', async ({ page }) => {
   await grid.getByText(/14/i).click()
   await grid.getByText(/17/i).click()
 
+  await page.getByRole('button', { name: /Add Asset/i }).click()
+
+  let assetForm = await page.getByTestId('asset-form-0')
+  await assetForm.getByRole('textbox', { name: /Key/i }).fill('test')
+  await assetForm.getByRole('textbox', { name: /Title/i }).fill(randAnimal())
+  await assetForm
+    .getByRole('textbox', { name: /Link/i })
+    .fill('https://example.com')
+  await assetForm.getByRole('textbox', { name: /Description/i }).fill('Test')
+  await assetForm
+    .getByRole('textbox', { name: /Type/i })
+    .fill('application/json')
+  await assetForm.getByRole('textbox', { name: /Roles/i }).fill('test')
+
   await page.getByRole('button', { name: /Numerical Models/i }).click()
 
   let name = randFirstName()
 
-  await page
+  let numericalModelForm = await page.getByTestId('numerical-model-form')
+  await numericalModelForm
     .getByRole('textbox', { name: /title/i })
     .fill(`${name} the ${animal}`)
-  await page.getByRole('textbox', { name: /description/i }).fill('Test')
-  await page
+  await numericalModelForm
+    .getByRole('textbox', { name: /description/i })
+    .fill('Test')
+  await numericalModelForm
     .getByRole('textbox', { name: /project number/i })
     .fill(`Project ${name}`)
-  await page.getByRole('textbox', { name: /^location/i }).fill('P://test')
 
   await page.getByRole('button', { name: /Save/i }).click()
 

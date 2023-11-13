@@ -8,7 +8,7 @@ import { redirect } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { ItemForm, submitItemForm } from '~/forms/items/ItemForm'
-import { getCollectionAuthWhere } from '~/utils/authQueries'
+import { getCollectionAuthContributeWhere } from '~/utils/authQueries'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Register metadata' }]
@@ -25,7 +25,7 @@ export async function loader({ request }: LoaderArgs) {
         },
       },
     },
-    where: getCollectionAuthWhere(user.id),
+    where: getCollectionAuthContributeWhere(user.id),
   })
 
   return { collections }
