@@ -4,7 +4,7 @@ import { useLoaderData } from '@remix-run/react'
 import { CollectionForm, submitCollectionForm } from '~/forms/CollectionForm'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
-import { getCollectionAuthWhere } from '~/utils/authQueries'
+import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
 
 export async function action(args: ActionFunctionArgs) {
@@ -17,7 +17,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let catalogs = await db.catalog.findMany({
-    where: getCollectionAuthWhere(user.id).catalog,
+    where: getCollectionAuthReadWhere(user.id).catalog,
   })
 
   return { catalogs }

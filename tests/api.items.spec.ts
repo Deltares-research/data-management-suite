@@ -37,6 +37,15 @@ test('Create Item', async ({ request, baseURL }) => {
     },
     geometry: randomPolygon().features[0].geometry,
     collection: await createPrivateCollection().then(c => c.id),
+    assets: {
+      thumbnail: {
+        href: 'http://test.com',
+        title: 'Thumbnail',
+        description: 'Thumbnail',
+        type: 'image/png',
+        roles: ['thumbnail'],
+      },
+    },
   }
 
   let exampleResponseBody = {
@@ -48,6 +57,15 @@ test('Create Item', async ({ request, baseURL }) => {
         type: 'application/json',
       },
     ]),
+    assets: expect.objectContaining({
+      thumbnail: expect.objectContaining({
+        href: 'http://test.com',
+        title: 'Thumbnail',
+        description: 'Thumbnail',
+        type: 'image/png',
+        roles: ['thumbnail'],
+      }),
+    }),
   }
 
   let result = await request

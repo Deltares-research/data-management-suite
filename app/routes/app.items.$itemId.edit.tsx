@@ -15,7 +15,7 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import type { AllowedGeometry } from '~/types'
 import { prismaToStacItem } from '~/utils/prismaToStac'
-import { getCollectionAuthWhere } from '~/utils/authQueries'
+import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 
 export const meta: V2_MetaFunction = () => {
   return [{ title: 'Edit metadata' }]
@@ -34,13 +34,16 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         },
       },
     },
-    where: getCollectionAuthWhere(user.id),
+    where: getCollectionAuthReadWhere(user.id),
   })
 
   let defaultValues = await db.item.findUnique({
     where: {
       id: itemId,
-      collection: getCollectionAuthWhere(user.id),
+      collection: getCollectionAuthReadWhere(user.id),
+    },
+    include: {
+      assets: true,
     },
   })
 

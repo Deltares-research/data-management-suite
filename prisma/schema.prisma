@@ -121,6 +121,7 @@ model Link {
 }
 
 model Asset {
+  key         String
   href        String
   title       String?
   description String?
@@ -130,7 +131,7 @@ model Asset {
   item   Item   @relation(fields: [itemId], references: [id])
   itemId String
 
-  @@id([itemId, href])
+  @@id([itemId, key])
 }
 
 // STAC Catalog

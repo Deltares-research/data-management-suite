@@ -29,6 +29,19 @@ export function createItemFormSchema(extraFormTypes: string[] = []) {
   return z.object({
     collection: z.string().min(1, { message: 'Please select a collection' }),
     geometry: geometrySchema,
+    assets: z
+      .record(
+        z.string(),
+        z.object({
+          key: z.string().nullish(),
+          href: z.string().min(1, { message: 'Required' }),
+          title: z.string().nullish(),
+          description: z.string().nullish(),
+          type: z.string().nullish(),
+          roles: z.union([z.string(), z.array(z.string()).nullish()]),
+        }),
+      )
+      .optional(),
     properties:
       properties ??
       z
