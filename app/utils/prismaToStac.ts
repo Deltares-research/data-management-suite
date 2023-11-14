@@ -7,6 +7,7 @@ import type {
   StacLink,
 } from 'stac-ts'
 import stacPackageJson from 'stac-spec/package.json'
+import { stacRoutes } from '~/routes'
 
 export function prismaToStacItem({
   id,
@@ -17,6 +18,7 @@ export function prismaToStacItem({
   properties,
   collectionId,
   assets,
+  request,
 }: {
   id: string
   geometry: {
@@ -29,6 +31,7 @@ export function prismaToStacItem({
   end_datetime?: Date | null
   collectionId: string
   assets: Asset[]
+  request: Request
 }): StacItem {
   return {
     id,
@@ -47,12 +50,12 @@ export function prismaToStacItem({
       {
         rel: 'self',
         type: 'application/json',
-        href: `/items/${id}`,
+        href: stacRoutes(request).stacItem(id),
       },
       {
         rel: 'collection',
         type: 'application/json',
-        href: `/collections/${collectionId}`,
+        href: stacRoutes(request).stacCollection(collectionId),
       },
     ],
     // TODO: Add assets

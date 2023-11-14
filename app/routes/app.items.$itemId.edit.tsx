@@ -61,6 +61,7 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     defaultValues: prismaToStacItem({
       ...defaultValues,
       geometry: JSON.parse(geometry) as AllowedGeometry,
+      request,
     }),
   }
 }

@@ -109,6 +109,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         ...prismaToStacItem({
           ...item,
           geometry,
+          request,
         }),
         collectionTitle: item.collectionTitle,
         catalogTitle: item.catalogTitle,

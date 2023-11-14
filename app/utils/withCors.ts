@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, LoaderFunction } from '@remix-run/node'
-import { Response, json } from '@remix-run/node'
+import { json } from '@remix-run/node'
 
 export function withCors(loader: LoaderFunction) {
   return async function loaderWithCors({

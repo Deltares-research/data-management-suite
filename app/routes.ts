@@ -80,11 +80,47 @@ export let routes = {
   login() {
     return `/auth/microsoft`
   },
+}
 
-  // STAC
-  stacAPIRoot() {
-    return `/stac`
-  },
+export function stacRoutes(request: Request) {
+  let host = getHost(request)
+
+  return {
+    stacAPIRoot() {
+      return `${host}/stac`
+    },
+    stacItem(itemId: string) {
+      return `${host}/stac/items/${itemId}`
+    },
+    stacCollection(collectionId: string) {
+      return `${host}/stac/collections/${collectionId}`
+    },
+    stacItems({
+      collectionId,
+      ...queryParams
+    }: { collectionId: string } & Record<string, string>) {
+      return `${host}/stac/collections/${collectionId}/items?${new URLSearchParams(
+        queryParams,
+      ).toString()}`
+    },
+    stacCatalog(catalogId: string) {
+      return `${host}/stac/catalogs/${catalogId}`
+    },
+    stacCollections({
+      catalogId,
+      ...queryParams
+    }: { catalogId: string } & Record<string, string>) {
+      return `${host}/stac/catalogs/${catalogId}/collections?${new URLSearchParams(
+        queryParams,
+      ).toString()}`
+    },
+    stacSearch() {
+      return `${host}/stac/search`
+    },
+    stacQueryables() {
+      return `${host}/stac/queryables`
+    },
+  }
 }
 
 export function getHost(request: LoaderFunctionArgs['request']) {

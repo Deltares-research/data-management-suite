@@ -121,6 +121,7 @@ export async function submitItemForm({
   return prismaToStacItem({
     ...item,
     geometry,
+    request,
   })
 }
 
