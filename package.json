@@ -26,7 +26,6 @@
   ],
   "dependencies": {
     "@azure/msal-browser": "^2.37.1",
-    "@datadog/browser-logs": "^5.2.0",
     "@hookform/resolvers": "^3.1.1",
     "@mapbox/geojson-rewind": "^0.5.2",
     "@mapbox/mapbox-gl-draw": "^1.4.2",
