@@ -21,8 +21,6 @@ services:
     build:
       context: .
       target: dev
-    volumes:
-      - .:/app
     # Set environment variables for the web service
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@postgres:5432/remix'

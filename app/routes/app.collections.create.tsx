@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { CollectionForm, submitCollectionForm } from '~/forms/CollectionForm'
@@ -7,13 +7,13 @@ import { requireAuthentication } from '~/services/auth.server'
 import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   await submitCollectionForm(args)
 
   return redirect(routes.collections())
 }
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let catalogs = await db.catalog.findMany({

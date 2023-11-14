@@ -2,5 +2,8 @@ version: '3'
 
 services:
   web:
+    volumes:
+      - ./app:/app/app
+      - ./public:/app/public
     env_file:
       - .env

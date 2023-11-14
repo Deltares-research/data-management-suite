@@ -1,4 +1,4 @@
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 
 let appPrefix = `/app`
 
@@ -13,9 +13,12 @@ export let routes = {
     return `${appPrefix}/settings`
   },
   docs() {
-    return `${appPrefix}/api/docs`
+    return `/docs/api`
   },
 
+  pythonDocs() {
+    return `/docs/`
+  },
   items() {
     return `${appPrefix}/items`
   },
@@ -84,7 +87,7 @@ export let routes = {
   },
 }
 
-export function getHost(request: LoaderArgs['request']) {
+export function getHost(request: LoaderFunctionArgs['request']) {
   let url = new URL(request.url)
 
   return `${url.hostname === 'localhost' ? 'http' : 'https'}://${url.host}`

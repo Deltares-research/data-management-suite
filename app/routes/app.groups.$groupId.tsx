@@ -1,5 +1,9 @@
 import { MemberRole, type Person } from '@prisma/client'
-import type { ActionArgs, LoaderArgs, SerializeFrom } from '@remix-run/node'
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  SerializeFrom,
+} from '@remix-run/node'
 import {
   Form,
   useLoaderData,
@@ -47,7 +51,7 @@ let personSchema = z.object({
 let addPeopleValidator = withZod(addPeopleSchema)
 let personValidator = withZod(personSchema)
 
-export async function loader({ request, params }: LoaderArgs) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let { groupId } = zx.parseParams(params, { groupId: z.string() })
@@ -84,7 +88,7 @@ async function toggleAdmin({
   request,
   params,
   formData,
-}: ActionArgs & { formData: FormData }) {
+}: ActionFunctionArgs & { formData: FormData }) {
   let user = await requireAuthentication(request)
   let { groupId } = zx.parseParams(params, { groupId: z.string() })
 
@@ -129,7 +133,7 @@ async function deleteMember({
   request,
   params,
   formData,
-}: ActionArgs & { formData: FormData }) {
+}: ActionFunctionArgs & { formData: FormData }) {
   let user = await requireAuthentication(request)
   let { groupId } = zx.parseParams(params, { groupId: z.string() })
 
@@ -161,7 +165,7 @@ async function addMembers({
   request,
   params,
   formData,
-}: ActionArgs & { formData: FormData }) {
+}: ActionFunctionArgs & { formData: FormData }) {
   let user = await requireAuthentication(request)
   let { groupId } = zx.parseParams(params, { groupId: z.string() })
 
@@ -191,7 +195,7 @@ async function addMembers({
   })
 }
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   let formData = await args.request.formData()
 
   switch (formData.get('subaction') as Action) {

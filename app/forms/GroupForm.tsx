@@ -1,10 +1,11 @@
 import { MemberRole, type Prisma } from '@prisma/client'
-import type { ActionArgs } from '@remix-run/node'
+import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
+import { useActionData } from '@remix-run/react'
 import { withZod } from '@remix-validated-form/with-zod'
 import { ValidatedForm, validationError } from 'remix-validated-form'
 import { z } from 'zod'
-import { H3 } from '~/components/typography'
+import { ErrorMessage, H3 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { FormInput } from '~/components/ui/form'
 import { routes } from '~/routes'
@@ -15,14 +16,32 @@ let groupSchema = z.object({
   name: z.string(),
 }) satisfies z.ZodType<Prisma.GroupCreateInput>
 
-let groupValidator = withZod(groupSchema)
+let clientGroupValidator = withZod(groupSchema)
 
 export async function submitGroupForm({
   request,
   id,
-}: ActionArgs & { id?: string }) {
+}: ActionFunctionArgs & { id?: string }) {
+  let serverGroupValidator = withZod(
+    groupSchema.refine(
+      async ({ name }) => {
+        let existingGroup = await db.group.findFirst({
+          where: {
+            name,
+          },
+        })
+
+        return !existingGroup
+      },
+      {
+        message: 'A group with this name already exists',
+        path: ['name'],
+      },
+    ),
+  )
+
   let user = await requireAuthentication(request)
-  let form = await groupValidator.validate(await request.formData())
+  let form = await serverGroupValidator.validate(await request.formData())
 
   if (form.error) {
     return validationError(form.error)
@@ -77,17 +96,22 @@ export function GroupForm({
 }: {
   defaultValues?: z.infer<typeof groupSchema>
 }) {
+  let data = useActionData<typeof submitGroupForm>()
+
   return (
     <div className="py-12 w-full h-full flex flex-col items-center justify-center">
       <div className="max-w-2xl w-full">
         <H3>Create Group</H3>
         <ValidatedForm
           method="post"
-          validator={groupValidator}
+          validator={clientGroupValidator}
           defaultValues={defaultValues}
         >
           <div className="mt-12 grid w-full items-center gap-8">
             <FormInput name="name" label="Name" />
+            {data?.fieldErrors.name && (
+              <ErrorMessage>{data.fieldErrors.name}</ErrorMessage>
+            )}
             <Button>Save</Button>
           </div>
         </ValidatedForm>

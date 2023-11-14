@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from '@remix-run/node'
+import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
@@ -10,7 +10,7 @@ import { requireAuthentication } from '~/services/auth.server'
 import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
 
-export async function action(args: ActionArgs) {
+export async function action(args: ActionFunctionArgs) {
   await requireAuthentication(args.request)
 
   let { collectionId } = zx.parseParams(args.params, {
@@ -22,7 +22,7 @@ export async function action(args: ActionArgs) {
   return redirect(routes.collections())
 }
 
-export async function loader({ params, request }: LoaderArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
 
   let { collectionId } = zx.parseParams(params, {

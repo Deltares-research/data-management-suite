@@ -1,11 +1,11 @@
-import { type LoaderArgs } from '@remix-run/node'
+import { type LoaderFunctionArgs } from '@remix-run/node'
 import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
 import { conformsTo, getStacValidator } from '~/utils/stacspec'
 import { db } from '~/utils/db.server'
 import { getHost } from '~/routes'
 
-export let loader = withCors(async ({ request }: LoaderArgs) => {
+export let loader = withCors(async ({ request }: LoaderFunctionArgs) => {
   let validate = await getStacValidator('Catalog')
 
   let baseUrl = `${getHost(request)}/stac`
