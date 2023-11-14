@@ -7,7 +7,7 @@ import {
   randSoonDate,
 } from '@ngneat/falso'
 import { test, expect } from '@playwright/test'
-import { type Prisma } from '@prisma/client'
+import { Access, type Prisma } from '@prisma/client'
 import { randomPolygon } from '@turf/turf'
 import type { z } from 'zod'
 import { createItemFormSchema } from '~/forms/items'
@@ -53,7 +53,7 @@ test('Create Item', async ({ request, baseURL }) => {
     links: expect.arrayContaining([
       {
         rel: 'collection',
-        href: `/collections/${exampleRequestBody.collection}`,
+        href: `http://localhost:3000/stac/collections/${exampleRequestBody.collection}`,
         type: 'application/json',
       },
     ]),
@@ -116,7 +116,7 @@ test('Edit Item', async ({ request }) => {
     links: expect.arrayContaining([
       {
         rel: 'collection',
-        href: `/collections/${exampleRequestBody.collection}`,
+        href: `http://localhost:3000/stac/collections/${exampleRequestBody.collection}`,
         type: 'application/json',
       },
     ]),
@@ -159,6 +159,7 @@ test('Get Item', async ({ request }) => {
             create: {
               title: 'Test Catalog',
               description: 'Catalog created during automated test',
+              access: Access.PUBLIC,
             },
           },
         },
