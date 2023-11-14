@@ -30,9 +30,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './components/ui/tooltip'
-import { datadogLogs } from '@datadog/browser-logs'
-import React from 'react'
-import { assert } from './utils/assert'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
