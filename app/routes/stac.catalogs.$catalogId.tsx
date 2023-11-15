@@ -1,57 +1,53 @@
 import { type LoaderFunctionArgs } from '@remix-run/node'
-import stacPackageJson from 'stac-spec/package.json'
 import { withCors } from '~/utils/withCors'
-import { conformsTo, getStacValidator } from '~/utils/stacspec'
+import { conformsTo } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { db } from '~/utils/db.server'
-import { getHost } from '~/routes'
+import { getHost, stacRoutes } from '~/routes'
+import type { StacCatalog } from 'stac-ts'
+import { Access } from '@prisma/client'
 
 export let loader = withCors(
-  async ({ request, params }: LoaderFunctionArgs) => {
+  async ({ request, params }: LoaderFunctionArgs): Promise<StacCatalog> => {
     let { catalogId } = zx.parseParams(params, { catalogId: z.string() })
-
-    let validate = await getStacValidator('Catalog')
 
     let catalog = await db.catalog.findUniqueOrThrow({
       where: {
         id: catalogId,
+        access: Access.PUBLIC,
       },
     })
 
-    let baseUrl = `${getHost(request)}/stac/catalogs/${catalogId}`
+    let baseUrl = `${getHost(request)}/stac`
 
-    let data = {
+    let stacCatalog: StacCatalog = {
       type: 'Catalog',
-      id: catalog.title,
+      id: catalog.title ?? catalog.id,
       description: catalog.description,
-      stac_version: stacPackageJson.version,
+      stac_version: '1.0.0',
       links: [
         {
           rel: 'self',
           type: 'application/json',
-          href: `${baseUrl}`,
+          href: baseUrl,
         },
         {
           rel: 'search',
           type: 'application/geo+json',
           title: 'STAC Search',
-          href: `${baseUrl}/search`,
+          href: stacRoutes(request).stacSearch(),
           method: 'GET',
         },
         {
           rel: 'data',
           type: 'application/json',
-          href: `${baseUrl}/collections`,
+          href: stacRoutes(request).stacCollections({ catalogId: catalog.id }),
         },
       ],
       conformsTo,
     }
 
-    if (validate(data)) {
-      return data
-    } else {
-      return { errors: validate.errors, data }
-    }
+    return stacCatalog
   },
 )

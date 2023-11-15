@@ -53,6 +53,7 @@ export let loader = withCors(async ({ request, params }) => {
     prismaToStacItem({
       ...item,
       geometry: JSON.parse(item.geometry),
+      request,
     }),
   )
 

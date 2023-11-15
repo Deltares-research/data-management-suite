@@ -1,28 +1,28 @@
 import { db } from '~/utils/db.server'
 import { withCors } from '~/utils/withCors'
-import stacPackageJson from 'stac-spec/package.json'
-import { getStacValidator } from '~/utils/stacspec'
 import { zx } from 'zodix'
 import { z } from 'zod'
-import { getHost } from '~/routes'
+import { stacRoutes } from '~/routes'
+import type { StacCollection } from 'stac-ts'
+import { Access } from '@prisma/client'
 
 export let loader = withCors(async ({ request, params }) => {
   let { collectionId } = zx.parseParams(params, {
     collectionId: z.string(),
   })
-  let validate = await getStacValidator('Collection')
-
-  let baseUrl = `${getHost(request)}/stac`
 
   let collection = await db.collection.findUniqueOrThrow({
     where: {
       id: collectionId,
+      catalog: {
+        access: Access.PUBLIC,
+      },
     },
   })
 
-  let stacCollection = {
+  let stacCollection: StacCollection = {
     type: 'Collection',
-    stac_version: stacPackageJson.version,
+    stac_version: '1.0.0',
     id: collection.title,
     description: collection.description ?? '',
     license: 'MIT',
@@ -34,7 +34,7 @@ export let loader = withCors(async ({ request, params }) => {
         interval: [
           [
             collection.startTime?.toISOString() ?? new Date().toISOString(),
-            collection.endTime ?? null,
+            collection.endTime?.toISOString() ?? null,
           ],
         ],
       },
@@ -43,19 +43,20 @@ export let loader = withCors(async ({ request, params }) => {
       {
         rel: 'items',
         type: 'application/geo+json',
-        href: `${baseUrl}/collections/${collection.id}/items`,
+        href: stacRoutes(request).stacItems({ collectionId: collection.id }),
       },
       {
         rel: 'self',
         type: 'application/json',
-        href: `${baseUrl}/collections/${collection.id}`,
+        href: stacRoutes(request).stacCollection(collection.id),
+      },
+      {
+        rel: 'catalog',
+        type: 'application/json',
+        href: stacRoutes(request).stacCatalog(collection.catalogId),
       },
     ],
   }
 
-  if (validate(stacCollection)) {
-    return stacCollection
-  } else {
-    return { errors: validate.errors, data: stacCollection }
-  }
+  return stacCollection
 })
