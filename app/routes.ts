@@ -39,15 +39,19 @@ export let routes = {
   editCollection(collectionId: string) {
     return `${appPrefix}/collections/${collectionId}/edit`
   },
-  createCollection() {
-    return `${appPrefix}/collections/create`
+  createCollection(query?: { redirectUrl: string }) {
+    return `${appPrefix}/collections/create?${new URLSearchParams(
+      query,
+    ).toString()}`
   },
 
   catalogs() {
     return `${appPrefix}/catalogs`
   },
-  createCatalog() {
-    return `${appPrefix}/catalogs/create`
+  createCatalog(query?: { redirectUrl: string }) {
+    return `${appPrefix}/catalogs/create?${new URLSearchParams(
+      query,
+    ).toString()}`
   },
   editCatalog(catalogId: string) {
     return `${appPrefix}/catalogs/${catalogId}/edit`
@@ -72,8 +76,8 @@ export let routes = {
   group(id: string) {
     return `${appPrefix}/groups/${id}`
   },
-  createGroup() {
-    return `${appPrefix}/groups/create`
+  createGroup(query?: { redirectUrl: string }) {
+    return `${appPrefix}/groups/create?${new URLSearchParams(query).toString()}`
   },
 
   // Authentication

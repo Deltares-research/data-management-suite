@@ -7,7 +7,7 @@
     "build": "remix build",
     "format": "prettier --write .",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-    "dev": "remix dev",
+    "dev": "remix dev --manual",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "e2e": "npm run e2e:setupdb && npm run e2e:setupplaywright npm run e2e:test",
     "e2e:setupdb": "prisma migrate reset -f && prisma db seed",

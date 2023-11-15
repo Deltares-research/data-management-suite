@@ -5,6 +5,7 @@ import { useActionData } from '@remix-run/react'
 import { withZod } from '@remix-validated-form/with-zod'
 import { ValidatedForm, validationError } from 'remix-validated-form'
 import { z } from 'zod'
+import { zx } from 'zodix'
 import { ErrorMessage, H3 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
 import { FormInput } from '~/components/ui/form'
@@ -22,6 +23,10 @@ export async function submitGroupForm({
   request,
   id,
 }: ActionFunctionArgs & { id?: string }) {
+  let { redirectUrl } = zx.parseQuery(request, {
+    redirectUrl: z.string().optional(),
+  })
+
   let serverGroupValidator = withZod(
     groupSchema.refine(
       async ({ name }) => {
@@ -88,7 +93,7 @@ export async function submitGroupForm({
     })
   }
 
-  return redirect(routes.groups())
+  return redirect(redirectUrl ?? routes.groups())
 }
 
 export function GroupForm({

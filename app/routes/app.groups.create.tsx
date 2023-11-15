@@ -5,7 +5,7 @@ import { requireAuthentication } from '~/services/auth.server'
 export async function action(args: ActionFunctionArgs) {
   await requireAuthentication(args.request)
 
-  return await submitGroupForm(args)
+  return submitGroupForm(args)
 }
 
 export default function CreateGroupPage() {
