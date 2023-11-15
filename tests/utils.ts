@@ -1,3 +1,4 @@
+import { randAirport, randAnimal } from '@ngneat/falso'
 import type { Page } from '@playwright/test'
 import { Access, MemberRole, Role } from '@prisma/client'
 import { encodeToken } from '~/utils/apiKey'
@@ -29,7 +30,19 @@ export async function loginAsAdmin(page: Page) {
   }
   await db.person.upsert({
     where: { id: person.id },
-    create: person,
+    create: {
+      ...person,
+      memberOf: {
+        create: {
+          role: MemberRole.ADMIN,
+          group: {
+            create: {
+              name: randAnimal(),
+            },
+          },
+        },
+      },
+    },
     update: person,
   })
 
