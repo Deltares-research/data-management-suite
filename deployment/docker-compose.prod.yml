@@ -10,3 +10,29 @@ services:
       - ./prod.env
     ports:
       - 80:80
+    labels:
+      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "data-management-suite", "env": "prod"}]'
+
+  datadog-agent:
+    container_name: datadog-agent
+    image: datadog/agent:latest
+    pid: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /proc/:/host/proc/:ro
+      - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+    environment:
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_CONTAINER_LABELS_AS_TAGS=true
+      - DD_CONTAINER_EXCLUDE=name:datadog-agent
+      - DD_SITE=datadoghq.com
+      - DD_ENV=prod
+      - DD_SERVICE=data-management-suite
+    env_file:
+      - ./dd.env

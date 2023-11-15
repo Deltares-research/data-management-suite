@@ -37,7 +37,7 @@ RUN npx prisma generate
 ADD . .
 RUN npm run build
 
-FROM python:3.9-slim-buster as python-docs-builder
+FROM python:3.9-buster as python-docs-builder
 
 
 WORKDIR /src/deltares_datasuite
