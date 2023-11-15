@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react'
+import { Link, useLocation } from '@remix-run/react'
 import { Button } from '~/components/ui/button'
 import type { ActionFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { db } from '~/utils/db.server'
@@ -18,8 +18,10 @@ import { prismaToStacItem } from '~/utils/prismaToStac'
 import { formTypes, createItemFormSchema } from '.'
 import { Label } from '~/components/ui/label'
 import React from 'react'
-import { Plus, X } from 'lucide-react'
+import { BookIcon, Plus, X } from 'lucide-react'
 import { randUuid } from '@ngneat/falso'
+import { H2, H3, Muted } from '~/components/typography'
+import { routes } from '~/routes'
 
 export async function submitItemForm({
   request,
@@ -134,6 +136,8 @@ export function ItemForm({
   >[]
   defaultValues?: StacItem & {}
 }) {
+  let location = useLocation()
+
   let [extraFormTypes, setExtraFormTypes] = React.useState<
     (keyof typeof formTypes)[]
   >(
@@ -162,6 +166,32 @@ export function ItemForm({
 
   // TODO: Make global error view
   // let { fieldErrors } = useFormContext('myform')
+
+  if (collections.length <= 0) {
+    return (
+      <div className="px-8 max-w-xl w-full h-full mx-auto py-12">
+        <div className="w-full h-full items-center flex flex-col justify-center text-center gap-1.5">
+          <div className="bg-muted w-12 h-12 flex items-center justify-center rounded-full mb-3">
+            <BookIcon />
+          </div>
+          <H3>No eligible collections</H3>
+          <Muted>
+            There are no collections in which you can add items. Ask an admin to
+            join a group or create your own collection.
+          </Muted>
+          <Button asChild className="mt-6">
+            <Link
+              to={routes.createCollection({
+                redirectUrl: location.pathname + location.search,
+              })}
+            >
+              <Plus className="w-4 h-4 mr-1.5" /> Create New Collection
+            </Link>
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>

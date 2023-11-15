@@ -11,6 +11,7 @@ import {
   validationError,
 } from 'remix-validated-form'
 import { z } from 'zod'
+import { zx } from 'zodix'
 import { GroupSelector } from '~/components/GroupSelector'
 import { ErrorMessage, H3, H4, Muted } from '~/components/typography'
 import { Button } from '~/components/ui/button'
@@ -58,6 +59,9 @@ export async function submitCatalogForm({
   request,
   id,
 }: ActionFunctionArgs & { id?: string }) {
+  let { redirectUrl } = zx.parseQuery(request, {
+    redirectUrl: z.string().optional(),
+  })
   let form = await catalogValidator.validate(await request.formData())
 
   if (form.error) {
@@ -85,7 +89,7 @@ export async function submitCatalogForm({
     },
   })
 
-  return redirect(routes.catalogs())
+  return redirect(redirectUrl ?? routes.catalogs())
 }
 
 export function CatalogForm({

@@ -3,7 +3,7 @@ import { useLoaderData } from '@remix-run/react'
 import type {
   ActionFunctionArgs,
   LoaderFunctionArgs,
-  V2_MetaFunction,
+  MetaFunction,
 } from '@remix-run/node'
 import { requireAuthentication } from '~/services/auth.server'
 import { routes } from '~/routes'
@@ -14,7 +14,7 @@ import { db } from '~/utils/db.server'
 import { ItemForm, submitItemForm } from '~/forms/items/ItemForm'
 import { getCollectionAuthContributeWhere } from '~/utils/authQueries'
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [{ title: 'Register metadata' }]
 }
 

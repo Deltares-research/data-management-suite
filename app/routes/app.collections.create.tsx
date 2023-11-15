@@ -1,16 +1,12 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { CollectionForm, submitCollectionForm } from '~/forms/CollectionForm'
-import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
 import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
 
 export async function action(args: ActionFunctionArgs) {
-  await submitCollectionForm(args)
-
-  return redirect(routes.collections())
+  return submitCollectionForm(args)
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
