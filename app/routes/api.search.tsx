@@ -63,35 +63,48 @@ export async function loader({ request }: LoaderFunctionArgs) {
       catalogTitle: string
     })[]
   >`
-    SELECT ST_AsGeoJson("Item"."geometry") as geometry, "Item"."id" as id, "Item"."datetime", "Item"."start_datetime", "Item"."end_datetime", "Item"."properties", "Collection"."title" as "collectionTitle", "Catalog"."title" as "catalogTitle" FROM "Item"
+  WITH AuthorizedCatalogs as (
+    SELECT 
+      DISTINCT "Catalog".id 
+    FROM "Catalog"
+      LEFT JOIN "Permission" ON "Permission"."catalogId" = "Catalog"."id"
+      LEFT JOIN "Group" ON "Group"."id" = "Permission"."groupId"
+      LEFT JOIN "Member" ON "Member"."groupId" = "Group"."id"
+      where (
+        (
+          "Catalog"."access" = 'PUBLIC'
+        )
+        OR 
+        (
+          "Permission"."role" IN ('ADMIN', 'CONTRIBUTOR', 'READER') 
+          AND 
+          "Member"."personId" =  ${user?.id ?? '-1'}
+        )
+      )
+  )
+    SELECT 
+      ST_AsGeoJson("Item"."geometry") as geometry, 
+      "Item"."id" as id, 
+      "Item"."datetime", 
+      "Item"."start_datetime", 
+      "Item"."end_datetime", 
+      "Item"."properties", 
+      "Collection"."title" as "collectionTitle", 
+      "Catalog"."title" as "catalogTitle" 
+    FROM "Item"
     JOIN "Collection" ON "Collection"."id" = "Item"."collectionId"
     JOIN "Catalog" ON "Catalog"."id" = "Collection"."catalogId"
-    LEFT JOIN "Permission" ON "Permission"."catalogId" = "Catalog"."id"
-    LEFT JOIN "Group" ON "Group"."id" = "Permission"."groupId"
-    LEFT JOIN "Member" ON "Member"."groupId" = "Group"."id"
+    INNER JOIN AuthorizedCatalogs on AuthorizedCatalogs.id = "Catalog"."id"
     WHERE (
-      ST_Intersects("Item"."geometry", ST_MakeEnvelope(${bbox[0].toFixed(
-        12,
-      )}::double precision, ${bbox[1].toFixed(
-    12,
-  )}::double precision, ${bbox[2].toFixed(
-    12,
-  )}::double precision, ${bbox[3].toFixed(12)}::double precision, 4326))
+      ST_Intersects("Item"."geometry", 
+        ST_MakeEnvelope(
+          ${bbox[0].toFixed(12)}::double precision, 
+          ${bbox[1].toFixed(12)}::double precision, 
+          ${bbox[2].toFixed(12)}::double precision,
+          ${bbox[3].toFixed(12)}::double precision, 
+          4326))
       OR "Item"."geometry" IS NULL
       )
-
-    AND (
-      (
-        "Catalog"."access" = 'PUBLIC'
-      )
-      OR 
-      (
-        "Permission"."role" IN ('ADMIN', 'CONTRIBUTOR', 'READER') 
-        AND 
-        "Member"."personId" = ${user?.id ?? '-1'}
-      )
-    )
-
     AND 
       ("Item"."properties"->>'title' ILIKE ${
         '%' + q + '%'
