@@ -1,0 +1,63 @@
+on:
+  push:
+    branches:
+      - prod
+      - test
+    tags:
+      - web-v*
+
+name: Tag images
+
+permissions:
+  contents: read
+  issues: read
+  id-token: write
+  actions: write
+  checks: write
+  pull-requests: write
+
+# Set up environment variables
+env:
+  BUILT_IMAGE_NAME: data-management-suite/web-dev:${{ github.sha }}
+  IMAGE_TO_PUSH: data-management-suite/web
+  CONTAINER_REGISTRY_ADDRESS: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
+  FULL_BUILT_IMAGE_NAME: ${{ env.CONTAINER_REGISTRY_ADDRESS }}/${{ env.BUILT_IMAGE_NAME }}
+  FULL_IMAGE_TO_PUSH_W_TAG: ${{ env.CONTAINER_REGISTRY_ADDRESS }}/${{ env.IMAGE_TO_PUSH }}
+
+# When pushing to the test or prod branch, tag the image with the 'test' or 'prod' tag
+# When pushing a tag, tag the image with the version parsed from the tag
+
+jobs:
+  tag-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Determine tag to push when pushing to test or prod branch
+        if: github.ref_type == 'branch'
+        run: echo "TAG_TO_PUSH=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Determine tag to push when pushing a tag
+        if: github.ref_type == 'tag'
+        run: |
+          echo "TAG_TO_PUSH=$(echo "${{ github.ref_name }}"| awk '{split($0,a,"web-"); print a[2]}')" >> $GITHUB_ENV
+
+      - name: Display tag to push
+        run: |
+          echo "TAG_TO_PUSH=${{ env.TAG_TO_PUSH }}"
+          echo "FULL_BUILT_IMAGE_NAME=${{ env.FULL_BUILT_IMAGE_NAME }}"
+          echo "FULL_IMAGE_TO_PUSH=${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}"
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
+      - name: Login to ACR
+        run: |
+          az acr login --name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+
+      - name: Build and push container image
+        run: |
+          docker buildx imagetools create ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}
