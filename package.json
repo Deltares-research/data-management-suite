@@ -73,7 +73,7 @@
     "react-day-picker": "^8.8.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.2",
-    "react-map-gl": "^7.1.2",
+    "react-map-gl": "^7.1.6",
     "react-virtuoso": "^4.5.0",
     "remix-auth": "^3.4.0",
     "remix-auth-form": "^1.4.0",
