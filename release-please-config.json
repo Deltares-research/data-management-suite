@@ -50,13 +50,13 @@
   "packages": {
     ".": {
       "release-type": "node",
-      "package-name": "data-management-suite",
+      "package-name": "web",
       "exclude-paths": ["utils/deltares_datasuite"]
     },
 
     "utils/deltares_datasuite": {
       "release-type": "python",
-      "package-name": "deltares_datasuite"
+      "package-name": "python_sdk"
     }
   }
 }
