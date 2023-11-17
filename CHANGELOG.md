@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.4.0](https://github.com/Deltares-research/data-management-suite/compare/data-management-suite-v0.3.0...data-management-suite-v0.4.0) (2023-11-17)
+
+
+### :rocket: Features
+
+* add datadog to app and docker deployments ([#34](https://github.com/Deltares-research/data-management-suite/issues/34)) ([3d1e57b](https://github.com/Deltares-research/data-management-suite/commit/3d1e57bfa148d27c6122e95bd2dc74fa21c5f64d))
+
+
+### :wrench: Bug Fixes & Refactoring
+
+* fix start command used in prod ([#24](https://github.com/Deltares-research/data-management-suite/issues/24)) ([f015118](https://github.com/Deltares-research/data-management-suite/commit/f015118ea748b96b21db39da3e7857a77ca29530))
+* remove double search outcomes with query fix ([#45](https://github.com/Deltares-research/data-management-suite/issues/45)) ([5b1f2c5](https://github.com/Deltares-research/data-management-suite/commit/5b1f2c55f8a84124a4ae90731956e37fef25470c))
+
+
+### :package: Testing & CI/CD
+
+* dont run terraform plan on dependabot PR ([889ad56](https://github.com/Deltares-research/data-management-suite/commit/889ad5684371f5db64c79b3b0c3977f007d2a108))
+* fix poetry publish by building first ([f428c7b](https://github.com/Deltares-research/data-management-suite/commit/f428c7be699c6114e760e637a028b82251ae636a))
+
+
+### :arrow_up: Dependencies updates
+
+* bump prisma from 5.0.0 to 5.6.0 ([#39](https://github.com/Deltares-research/data-management-suite/issues/39)) ([cf0b78c](https://github.com/Deltares-research/data-management-suite/commit/cf0b78c2ea8977212916136b00342c23abe0ba9a))
+* bump react-map-gl from 7.1.2 to 7.1.6 ([#40](https://github.com/Deltares-research/data-management-suite/issues/40)) ([f689b95](https://github.com/Deltares-research/data-management-suite/commit/f689b95a51273f6bc902bf34f93e02e1916d02e3))
+* bump semver from 6.3.0 to 6.3.1 ([#35](https://github.com/Deltares-research/data-management-suite/issues/35)) ([63937c7](https://github.com/Deltares-research/data-management-suite/commit/63937c71b4ce43726d2e04e49b398a9772a4f0a8))
+* bump typescript from 5.1.3 to 5.2.2 ([#37](https://github.com/Deltares-research/data-management-suite/issues/37)) ([983aca2](https://github.com/Deltares-research/data-management-suite/commit/983aca29357f39235ec235283e576c95d577b037))
+* **dev:** bump @playwright/test from 1.36.1 to 1.39.0 ([#36](https://github.com/Deltares-research/data-management-suite/issues/36)) ([5fd4c49](https://github.com/Deltares-research/data-management-suite/commit/5fd4c4994f9aba25cf64653d29e5cecc317c9f2a))
+
 ## [0.3.0](https://github.com/Deltares-research/data-management-suite/compare/data-management-suite-v0.2.0...data-management-suite-v0.3.0) (2023-11-10)
 
 ### :rocket: Features
