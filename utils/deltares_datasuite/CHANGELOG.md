@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/Deltares-research/data-management-suite/compare/deltares_datasuite-v0.4.0...deltares_datasuite-v0.4.1) (2023-11-17)
+
+
+### :arrow_up: Dependencies updates
+
+* bump mypy from 1.6.1 to 1.7.0 in /utils/deltares_datasuite ([#38](https://github.com/Deltares-research/data-management-suite/issues/38)) ([a833ca3](https://github.com/Deltares-research/data-management-suite/commit/a833ca34821b8cafe29db84f0276c7a1870cb099))
+
 ## [0.4.0](https://github.com/Deltares-research/data-management-suite/compare/deltares_datasuite-v0.3.0...deltares_datasuite-v0.4.0) (2023-11-10)
 
 
