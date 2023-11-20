@@ -88,7 +88,7 @@
     "zodix": "^0.4.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.39.0",
+    "@playwright/test": "^1.40.0",
     "@remix-run/dev": "2.2.0",
     "@remix-run/eslint-config": "2.2.0",
     "@types/geojson": "^7946.0.10",
