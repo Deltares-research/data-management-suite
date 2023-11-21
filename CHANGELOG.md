@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.4.1](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.0...web-v0.4.1) (2023-11-21)
+
+
+### :package: Testing & CI/CD
+
+* Deploy image from registry ([#66](https://github.com/Deltares-research/data-management-suite/issues/66)) ([4e20c0c](https://github.com/Deltares-research/data-management-suite/commit/4e20c0c0b0263950711853bb8ecc2b38b62ad63b))
+* fix tag image workflow ([#65](https://github.com/Deltares-research/data-management-suite/issues/65)) ([b0b73ae](https://github.com/Deltares-research/data-management-suite/commit/b0b73ae0d005e0b84982db186b697790dae13338))
+
+
+### :arrow_up: Dependencies updates
+
+* bump @playwright/test from 1.39.0 to 1.40.0 ([#52](https://github.com/Deltares-research/data-management-suite/issues/52)) ([93e1db7](https://github.com/Deltares-research/data-management-suite/commit/93e1db780a1c8ff80d9d8b5b74f6211dcb2bcb2d))
+* bump @remix-run/node from 2.2.0 to 2.3.0 ([#47](https://github.com/Deltares-research/data-management-suite/issues/47)) ([476de72](https://github.com/Deltares-research/data-management-suite/commit/476de720ff14079092eb4746c5794d7454b8f0ec))
+* bump @remix-validated-form/with-zod from 2.0.6 to 2.0.7 ([#51](https://github.com/Deltares-research/data-management-suite/issues/51)) ([0f36155](https://github.com/Deltares-research/data-management-suite/commit/0f36155f9676fcc28ee311983833778318e6493a))
+* bump eslint from 8.43.0 to 8.53.0 ([#48](https://github.com/Deltares-research/data-management-suite/issues/48)) ([71ba0b6](https://github.com/Deltares-research/data-management-suite/commit/71ba0b6be40b10a5421d8676850e8e0def2dbcbf))
+* bump lru-cache from 10.0.0 to 10.0.2 ([#53](https://github.com/Deltares-research/data-management-suite/issues/53)) ([b163642](https://github.com/Deltares-research/data-management-suite/commit/b16364279c709154c573ae397be177a78866316b))
+
 ## [0.4.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.3.0...web-v0.4.0) (2023-11-17)
 
 ### :rocket: Features
