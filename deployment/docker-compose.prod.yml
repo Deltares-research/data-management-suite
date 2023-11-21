@@ -10,6 +10,12 @@ services:
       - ./prod.env
     ports:
       - 80:80
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/healthcheck']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "data-management-suite", "env": "prod"}]'
       com.centurylinklabs.watchtower.enable: 'true'
