@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.2...web-v0.4.3) (2023-11-21)
+
+
+### :package: Testing & CI/CD
+
+* add building of image to release please workflow ([bf6664a](https://github.com/Deltares-research/data-management-suite/commit/bf6664a6a1b0107ce88c31703894a65b1b35bafc))
+
 ## [0.4.2](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.1...web-v0.4.2) (2023-11-21)
 
 
