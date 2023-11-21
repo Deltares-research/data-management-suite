@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.4.4](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.3...web-v0.4.4) (2023-11-21)
+
+
+### :package: Testing & CI/CD
+
+* use correct outputs from releaseplease action ([1d9915f](https://github.com/Deltares-research/data-management-suite/commit/1d9915f23dde5f15a44b108352084fb8c8523476))
+
+
+### :arrow_up: Dependencies updates
+
+* bump @hookform/resolvers from 3.1.1 to 3.3.2 ([#62](https://github.com/Deltares-research/data-management-suite/issues/62)) ([e07fa0e](https://github.com/Deltares-research/data-management-suite/commit/e07fa0e8e4421247ca6f6470f2de0c91274b0ffb))
+* bump @radix-ui/react-popover from 1.0.6 to 1.0.7 ([#61](https://github.com/Deltares-research/data-management-suite/issues/61)) ([5f2e3fe](https://github.com/Deltares-research/data-management-suite/commit/5f2e3fe5b45e1ff13dc761f6a4d9b05da986dbcb))
+* bump @radix-ui/react-select from 1.2.2 to 2.0.0 ([#60](https://github.com/Deltares-research/data-management-suite/issues/60)) ([5bc8fd0](https://github.com/Deltares-research/data-management-suite/commit/5bc8fd0c8ba4ea4a89ae26f6c89547d93b64f1fe))
+* bump isbot from 3.6.12 to 3.7.1 ([#64](https://github.com/Deltares-research/data-management-suite/issues/64)) ([9888f7f](https://github.com/Deltares-research/data-management-suite/commit/9888f7f07365e9e0456b08bb49d7a82448133ea7))
+
 ## [0.4.3](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.2...web-v0.4.3) (2023-11-21)
 
 
