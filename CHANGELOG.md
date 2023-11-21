@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.5](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.4...web-v0.4.5) (2023-11-21)
+
+
+### :package: Testing & CI/CD
+
+* login to azure before trying to push an image ([8f071a4](https://github.com/Deltares-research/data-management-suite/commit/8f071a48318f40b583073e4361837c1dd7c323d0))
+
 ## [0.4.4](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.3...web-v0.4.4) (2023-11-21)
 
 
