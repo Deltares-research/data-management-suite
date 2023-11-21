@@ -3,15 +3,30 @@ version: '3'
 services:
   web:
     container_name: dms-web-test
-    image: dms-web
-    build: ../
+    image: crdmsdevwesteurope.azurecr.io/data-management-suite/web:test
+    pull_policy: always
     restart: unless-stopped
     env_file:
       - ./test.env
     ports:
       - 80:80
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:80/healthcheck']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
     labels:
       com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "data-management-suite", "env": "test"}]'
+      com.centurylinklabs.watchtower.enable: 'true'
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 60 --cleanup --label-enable --include-stopped
+    env_file:
+      - ./watchtower.env
 
   datadog-agent:
     container_name: datadog-agent
@@ -36,3 +51,5 @@ services:
       - DD_SERVICE=data-management-suite
     env_file:
       - ./dd.env
+    labels:
+      com.centurylinklabs.watchtower.enable: 'false'

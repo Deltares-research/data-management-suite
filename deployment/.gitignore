@@ -1,3 +1,2 @@
-prod.env
-test.env
-dd.env
+*.env
+!example.*.env
