@@ -64,18 +64,18 @@ jobs:
         run: |
           if [ $(docker manifest inspect ${{ env.FULL_BUILT_IMAGE_NAME }}) ]; then
             echo "Image already exists"
-            exit 0
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "Image does not exist, we will build and push it"
-            exit 1
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Tag existing container image
-        if: ${{ steps.check_image.conclusion == 'success' }}
+        if: ${{ steps.check_image.outputs.image_exists == 'true' }}
         run: |
           docker buildx imagetools create ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}
 
       - name: Build and Push image to ACR
-        if: ${{ steps.check_image.conclusion == 'failure' }}
+        if: ${{ steps.check_image.outputs.image_exists == 'false' }}
         run: |
           docker buildx build --platform linux/amd64 --tag ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }} --push .
