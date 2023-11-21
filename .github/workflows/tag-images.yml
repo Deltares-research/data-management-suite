@@ -21,8 +21,8 @@ env:
   BUILT_IMAGE_NAME: data-management-suite/web-dev:${{ github.sha }}
   IMAGE_TO_PUSH: data-management-suite/web
   CONTAINER_REGISTRY_ADDRESS: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
-  FULL_BUILT_IMAGE_NAME: ${{ env.CONTAINER_REGISTRY_ADDRESS }}/${{ env.BUILT_IMAGE_NAME }}
-  FULL_IMAGE_TO_PUSH_W_TAG: ${{ env.CONTAINER_REGISTRY_ADDRESS }}/${{ env.IMAGE_TO_PUSH }}
+  FULL_BUILT_IMAGE_NAME: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web-dev:${{ github.sha }}
+  FULL_IMAGE_TO_PUSH_W_TAG: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web
 
 # When pushing to the test or prod branch, tag the image with the 'test' or 'prod' tag
 # When pushing a tag, tag the image with the version parsed from the tag
