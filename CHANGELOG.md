@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.2](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.1...web-v0.4.2) (2023-11-21)
+
+
+### :package: Testing & CI/CD
+
+* fix tag trigger ([a78bf7b](https://github.com/Deltares-research/data-management-suite/commit/a78bf7b84148bac579156d2a0a6b99bdc67a34e9))
+* persist image name to GH action env ([78e4c6c](https://github.com/Deltares-research/data-management-suite/commit/78e4c6c7e6922dbbd63b70262d7199ed620e53ac))
+
 ## [0.4.1](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.0...web-v0.4.1) (2023-11-21)
 
 
