@@ -18,11 +18,12 @@ permissions:
 
 # Set up environment variables
 env:
-  BUILT_IMAGE_NAME: data-management-suite/web-dev:${{ github.sha }}
+  BUILT_IMAGE_NAME: data-management-suite/web-dev
+  BUILT_IMAGE_TAG: ${{ github.sha }}
   IMAGE_TO_PUSH: data-management-suite/web
   CONTAINER_REGISTRY_ADDRESS: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io
-  FULL_BUILT_IMAGE_NAME: ${{ env.CONTAINER_REGISTRY_ADDRESS }}/${{ env.BUILT_IMAGE_NAME }}
-  FULL_IMAGE_TO_PUSH_W_TAG: ${{ env.CONTAINER_REGISTRY_ADDRESS }}/${{ env.IMAGE_TO_PUSH }}
+  FULL_BUILT_IMAGE_NAME: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web-dev:${{ github.sha }}
+  FULL_IMAGE_TO_PUSH_W_TAG: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web
 
 # When pushing to the test or prod branch, tag the image with the 'test' or 'prod' tag
 # When pushing a tag, tag the image with the version parsed from the tag
@@ -58,6 +59,23 @@ jobs:
         run: |
           az acr login --name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
 
-      - name: Build and push container image
+      - name: Check image already exists
+        id: check_image
+        run: |
+          if [ $(docker manifest inspect ${{ env.FULL_BUILT_IMAGE_NAME }}) ]; then
+            echo "Image already exists"
+            echo "image_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Image does not exist, we will build and push it"
+            echo "image_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Tag existing container image
+        if: ${{ steps.check_image.outputs.image_exists == 'true' }}
         run: |
           docker buildx imagetools create ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}
+
+      - name: Build and Push image to ACR
+        if: ${{ steps.check_image.outputs.image_exists == 'false' }}
+        run: |
+          docker buildx build --platform linux/amd64 --tag ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }} --push .
