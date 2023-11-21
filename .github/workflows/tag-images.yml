@@ -73,9 +73,9 @@ jobs:
       - name: Tag existing container image
         if: ${{ steps.check_image.outputs.image_exists == 'true' }}
         run: |
-          docker buildx imagetools create ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}
+          docker buildx imagetools create ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.BUILT_IMAGE_TAG }} --tag ${{ env.FULL_IMAGE_TO_PUSH }}
 
       - name: Build and Push image to ACR
         if: ${{ steps.check_image.outputs.image_exists == 'false' }}
         run: |
-          docker buildx build --platform linux/amd64 --tag ${{ env.FULL_BUILT_IMAGE_NAME }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }} --push .
+          docker buildx build --platform linux/amd64 --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.BUILT_IMAGE_TAG }} --tag ${{ env.FULL_IMAGE_TO_PUSH }} --push .
