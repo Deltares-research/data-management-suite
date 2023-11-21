@@ -4,7 +4,7 @@ on:
       - prod
       - test
     tags:
-      - web-v*
+      - 'web-v*'
 
 name: Tag images
 
