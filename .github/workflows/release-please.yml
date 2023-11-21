@@ -43,3 +43,14 @@ jobs:
         working-directory: ./utils/deltares_datasuite
         run: |
           gh release upload ${{ steps.release.outputs['utils/deltares_datasuite--tag_name'] }} .dist/*
+
+      - name: Build image and push tag after web release
+        # We push tags here because tags pushed by release-please do not trigger the tag-images workflow
+        if: ${{ steps.release.outputs['.--release_created'] }}
+        env:
+          FULL_IMAGE_TO_PUSH_W_TAG: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web
+        run: |
+          az acr login --name ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}
+          TAG_TO_PUSH=$(echo "${{ steps.release.outputs['.--tag_name']}}"| awk '{split($0,a,"web-"); print a[2]}')
+          echo "TAG_TO_PUSH: $TAG_TO_PUSH"
+          docker buildx build --platform linux/amd64 --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ github.sha }} --tag ${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:$TAG_TO_PUSH --push .
