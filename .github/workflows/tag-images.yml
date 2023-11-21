@@ -49,6 +49,7 @@ jobs:
           echo "TAG_TO_PUSH=${{ env.TAG_TO_PUSH }}"
           echo "FULL_BUILT_IMAGE_NAME=${{ env.FULL_BUILT_IMAGE_NAME }}"
           echo "FULL_IMAGE_TO_PUSH=${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}"
+          echo "FULL_IMAGE_TO_PUSH=${{ env.FULL_IMAGE_TO_PUSH_W_TAG }}:${{ env.TAG_TO_PUSH }}" >> $GITHUB_ENV
 
       - name: Login to Azure
         uses: azure/login@v1
