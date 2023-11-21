@@ -44,8 +44,15 @@ jobs:
         run: |
           gh release upload ${{ steps.release.outputs['utils/deltares_datasuite--tag_name'] }} .dist/*
 
+      - name: Login to Azure
+        if: ${{ steps.release.outputs['release_created'] }}
+        uses: azure/login@v1
+        with:
+          creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
       - name: Build image and push tag after web release
         # We push tags here because tags pushed by release-please do not trigger the tag-images workflow
+        # Check if a release was created for the root package (web)
         if: ${{ steps.release.outputs['release_created'] }}
         env:
           FULL_IMAGE_TO_PUSH_W_TAG: ${{ vars.AZURE_CONTAINER_REGISTRY_NAME }}.azurecr.io/data-management-suite/web
