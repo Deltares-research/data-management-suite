@@ -1,53 +1,90 @@
-# Welcome to Remix!
+# Data Management Suite
 
-- [Remix Docs](https://remix.run/docs)
+Welcome to Data Management Suite, an integrative platform for managing and searching your metadata efficiently.
 
-## Development
+## Features
 
-From your terminal:
+- Web application interface for easy data handling
+- Python SDK for programmatic access
+- Docker containerization for consistent development and deployment
+- Continuous integration and deployment pipelines
+- Prisma ORM for robust database operations
+- Remix framework for reactive UI components
+- Tailwind CSS for a modern and responsive design
+- TypeScript for type-safe code
 
-```sh
-npm run dev
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- Docker and Docker Compose installed
+- Node.js and npm installed
+
+## Setup
+
+To set up the project for local development:
+
+1. Clone the repository to your local machine.
+
+   ```
+   git clone https://github.com/Deltares-research/data-management-suite.git
+   cd data-management-suite
+   ```
+
+2. Install the project dependencies.
+
+   ```
+   npm install
+   ```
+
+3. Start the postgres database in the Docker environment.
+
+   ```
+   docker compose up postgres -d
+   ```
+
+4. Run the development server.
+   ```
+   npm run dev
+   ```
+
+The application should now be running on [http://localhost:3000](http://localhost:3000).
+
+It is also possible to run the remix server in a docker container, then we only need 1 step to start a development server:
+
+```
+docker compose up
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+## Tests
+
+To run the tests:
+
+```bash
+npx playwright install --with-deps
+npx remix-serve ./build/index.js & npx playwright test
+```
 
 ## Deployment
 
-First, build your app for production:
+For deployment instructions, refer to the `deployment` directory which should contain the necessary scripts and configuration files.
 
-```sh
-npm run build
-```
+## Contributing
 
-Then run the app in production mode:
+We welcome contributions! Please follow these steps to contribute:
 
-```sh
-npm start
-```
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Make your changes and commit them (`git commit -am 'Add some feature'`).
+4. Push to the branch (`git push origin feature/YourFeature`).
+5. Create a new Pull Request.
 
-Now you'll need to pick a host to deploy it to.
+Please ensure you update tests as appropriate.
 
-### DIY
+## License
 
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
+This project is licensed under the [GPL v3.0 License](./LICENSE) - see the LICENSE file for details.
 
-Make sure to deploy the output of `remix build`
+## Contact
 
-- `build/`
-- `public/build/`
-
-### Using a Template
-
-When you ran `npx create-remix@latest` there were a few choices for hosting. You can run that again to create a new project, then copy over your `app/` folder to the new project that's pre-configured for your target server.
-
-```sh
-cd ..
-# create a new project, and pick a pre-configured host
-npx create-remix@latest
-cd my-new-remix-app
-# remove the new project's app (not the old one!)
-rm -rf app
-# copy your app over
-cp -R ../my-old-remix-app/app app
-```
+For any additional questions or comments, reach out through [issue tracker](https://github.com/Deltares-research/data-management-suite/issues) or directly to the maintainers.
