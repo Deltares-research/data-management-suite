@@ -36,6 +36,7 @@ pystac = "^1.8.4"
 geojson = "^3.0.1"
 requests = "^2.31.0"
 types-requests = "^2.31.0.10"
+python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.5"
