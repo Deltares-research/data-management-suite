@@ -1,19 +1,31 @@
 site_name: 'Deltares Datasuite Python SDK'
 site_url: https://datasuite.deltares.nl/docs
 repo_url: https://github.com/Deltares-research/data-management-suite
-edit_uri: 'blob/main/utils/deltares_datasuite/docs/'
+edit_uri: 'edit/main/utils/deltares_datasuite/docs/'
 theme:
   name: material
+  features:
+    - navigation.footer
+    - content.action.edit
+    - content.action.view
+    - content.copy.code
   palette:
     primary: black
   favicon: /favicon.ico
   icon:
     logo: material/library
-
+extra:
+  generator: false
 markdown_extensions:
   - attr_list
   - md_in_html
   - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
 
 plugins:
   - search
@@ -32,7 +44,6 @@ plugins:
 
 nav:
   - Home: 'index.md'
-  - Installation: 'installation.md'
   - User Guide: 'guide.md'
   - Classes:
       - DataManagementSuiteClient: 'classes/client.md'

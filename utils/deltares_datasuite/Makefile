@@ -88,6 +88,10 @@ docker-remove:
 docs:
 	mkdocs build -d ../../public/docs
 
+.PHONY: docs-serve
+docs-serve:
+	mkdocs serve
+
 #* Cleaning
 .PHONY: pycache-remove
 pycache-remove:

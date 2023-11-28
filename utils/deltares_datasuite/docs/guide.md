@@ -1,4 +1,4 @@
-# Example on how to use the library
+# User Guide
 
 ## Usage
 
@@ -7,17 +7,53 @@ Here we show a simple example on how to use the library.
 ### Create an API key
 
 The API key can be created in the [Data Management Suite](https://datasuite.deltares.nl/app/settings) under the user settings.
-![Create an api key](assets/create-api-key.png)
+
+<figure markdown>
+<style>
+   img {border: medium solid black;}
+</style>
+  ![Create an api key](assets/create-api-key.png)
+  <figcaption>Create an API key in the Datamanagement Suite settings</figcaption>
+</figure>
+
+### Storing the API key safely
+
+<mark> The API key should not be stored in the code, but in a secure way so that it doesn't get uploaded to you Git repository. </mark>
+A standard way to do this is to store it in a file called `.env` in the root of the project.
+
+```shell title=".env"
+DATAMANAGEMENT_SUITE_API_KEY=PUT_YOUR_API_KEY_HERE
+```
+
+The `.env` file should not be committed to the repository.
+This can be prevented by adding it to the `.gitignore` file.
+
+```text title=".gitignore"
+.env
+```
+
+### Reading the API key in Python
+
+Now we can read the API key in Python using the [python-dotenv](https://pypi.org/project/python-dotenv/) library.
+
+```python
+from dotenv import load_dotenv
+
+load_dotenv()  # take environment variables from .env.
+```
 
 ### Create a client
 
 First we import the library and define the necessary variables to create a client.
+Notice how we load the api key from the environment variable we loaded earlier.
 
 ```python
+import os
 from deltares_datasuite import DataManagementSuiteClient
+
 # Define the necessary variables
 dms_url = "https://datasuite.deltares.nl"
-api_key = "example_api_key"
+api_key = os.environ["DATAMANAGEMENT_SUITE_API_KEY"]
 
 client = DataManagementSuiteClient(dms_url, api_key)
 ```
