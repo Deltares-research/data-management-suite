@@ -80,7 +80,7 @@
     "remix-auth-oauth2": "^1.7.0",
     "remix-validated-form": "^5.1.5",
     "stac-spec": "github:radiantearth/stac-spec#v1.0.0-beta.2",
-    "tailwind-merge": "^2.0.0",
+    "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.6",
     "uuid": "^9.0.0",
     "zod": "^3.22.4",
