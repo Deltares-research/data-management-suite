@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test'
-import { loginAsAdmin } from './utils'
+import { loginAsAdmin, truncateDatabase } from './utils'
 import { randAnimal, randEmail, randUserName } from '@ngneat/falso'
 import { db } from '~/utils/db.server'
 
 test('can create a group and add members', async ({ page }) => {
   // Setup
+  await truncateDatabase()
   await loginAsAdmin(page)
 
   let person = await db.person.create({

@@ -1,9 +1,15 @@
 import { expect, test } from '@playwright/test'
 import { routes } from '~/routes'
 import { db } from '~/utils/db.server'
-import { loginAsAdmin } from './utils'
+import {
+  createPrivateCatalog,
+  createPrivateCollection,
+  loginAsAdmin,
+  truncateDatabase,
+} from './utils'
 
 test.beforeEach(async ({ page }) => {
+  await truncateDatabase()
   await loginAsAdmin(page)
 })
 
@@ -16,6 +22,8 @@ test('can list collections', async ({ page }) => {
 })
 
 test('can create collections', async ({ page }) => {
+  await createPrivateCatalog()
+
   await page.goto(routes.createCollection())
 
   let title = await page.getByRole('heading', { name: /Create collection/i })
@@ -24,17 +32,7 @@ test('can create collections', async ({ page }) => {
 })
 
 test('can edit collections', async ({ page }) => {
-  let collection = await db.collection.create({
-    data: {
-      title: 'Playwright Collection',
-      catalog: {
-        create: {
-          title: 'Playwright Catalog',
-          description: 'Playwright Catalog',
-        },
-      },
-    },
-  })
+  let collection = await createPrivateCollection()
 
   await page.goto(routes.editCollection(collection.id))
 

@@ -1,4 +1,4 @@
-import { randAirport, randAnimal } from '@ngneat/falso'
+import { randAnimal } from '@ngneat/falso'
 import type { Page } from '@playwright/test'
 import { Access, MemberRole, Role } from '@prisma/client'
 import { encodeToken } from '~/utils/apiKey'
@@ -77,6 +77,42 @@ export async function createToken() {
   })
 
   return token
+}
+
+export async function createPrivateCatalog() {
+  return db.catalog.create({
+    data: {
+      access: Access.PRIVATE,
+      title: 'Test Catalog',
+      description: 'Catalog created during automated test',
+      permissions: {
+        create: {
+          role: Role.CONTRIBUTOR,
+          group: {
+            create: {
+              name: `${randAnimal()} group`,
+              members: {
+                create: {
+                  role: MemberRole.ADMIN,
+                  person: {
+                    connectOrCreate: {
+                      where: {
+                        id: 'admin',
+                      },
+                      create: {
+                        name: 'Admin',
+                        email: 'admin@admin.com',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
 }
 
 export async function createPrivateCollection() {
