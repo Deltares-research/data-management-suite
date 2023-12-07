@@ -63,7 +63,7 @@ jobs:
       - name: Check image already exists
         id: check_image
         run: |
-          if [ $(docker manifest inspect ${{ env.FULL_BUILT_IMAGE_NAME }}) ]; then
+          if [ "$(docker manifest inspect ${{ env.FULL_BUILT_IMAGE_NAME }})" ]; then
             echo "Image already exists"
             echo "image_exists=true" >> "$GITHUB_OUTPUT"
           else
