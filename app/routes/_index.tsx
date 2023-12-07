@@ -76,6 +76,23 @@ export default function HomePage() {
         <H3>Links</H3>
 
         <ul className="pt-12 max-w-xl flex flex-col gap-10">
+          <li>
+            <Link
+              to={routes.storageFinder()}
+              className="flex justify-between gap-5"
+            >
+              <div>
+                <strong className="font-medium">Storage Finder</strong>
+                <Muted>Find the best storage solution for your data.</Muted>
+              </div>
+              <div className="flex-shrink-0">
+                <Badge variant="success" className="uppercase flex-shrink-0">
+                  New
+                </Badge>
+              </div>
+            </Link>
+          </li>
+
           <li className="flex justify-between gap-5">
             <div>
               <strong className="font-medium">Data Management Plan</strong>
@@ -83,21 +100,6 @@ export default function HomePage() {
             </div>
             <div className="flex-shrink-0">
               <Badge variant="secondary" className="uppercase">
-                Coming Soon
-              </Badge>
-            </div>
-          </li>
-
-          <li className="flex justify-between gap-5">
-            <div>
-              <strong className="font-medium">FAIR Methods</strong>
-              <Muted>
-                Guides on how to ensure FAIR data and workflows for your
-                projects.
-              </Muted>
-            </div>
-            <div className="flex-shrink-0">
-              <Badge variant="secondary" className="uppercase flex-shrink-0">
                 Coming Soon
               </Badge>
             </div>

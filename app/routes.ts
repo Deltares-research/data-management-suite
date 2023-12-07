@@ -15,6 +15,9 @@ export let routes = {
   docs() {
     return `/docs/api`
   },
+  storageFinder() {
+    return `/storage-finder`
+  },
 
   pythonDocs() {
     return `/docs/`
