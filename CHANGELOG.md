@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.6](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.5...web-v0.4.6) (2023-12-07)
+
+
+### :package: Testing & CI/CD
+
+* fix command to check whether image exists ([5bcc08b](https://github.com/Deltares-research/data-management-suite/commit/5bcc08bd0c062b3bde5d3490b42a26ac5a61216b))
+* improvements to makefile used for deployment ([ec3a43c](https://github.com/Deltares-research/data-management-suite/commit/ec3a43c1027c1d5444026faeb29e921c55df14d5))
+
+
+### :arrow_up: Dependencies updates
+
+* bump @mapbox/mapbox-gl-draw and @types/mapbox__mapbox-gl-draw ([#78](https://github.com/Deltares-research/data-management-suite/issues/78)) ([84e86d1](https://github.com/Deltares-research/data-management-suite/commit/84e86d1c124134be11de9d221801530adcd2e5e6))
+* bump @remix-run/eslint-config from 2.2.0 to 2.3.1 ([#76](https://github.com/Deltares-research/data-management-suite/issues/76)) ([6216968](https://github.com/Deltares-research/data-management-suite/commit/621696837334b4e6071c806cf5671c508b1e1630))
+* bump @types/react from 18.2.13 to 18.2.38 ([#75](https://github.com/Deltares-research/data-management-suite/issues/75)) ([8b241e7](https://github.com/Deltares-research/data-management-suite/commit/8b241e73f44a1a3bba3f22154a812af2161eabab))
+* bump react-virtuoso from 4.5.0 to 4.6.2 ([#84](https://github.com/Deltares-research/data-management-suite/issues/84)) ([8db1de9](https://github.com/Deltares-research/data-management-suite/commit/8db1de9cf7ca8fb6154de7e3e912ea29c50a0d59))
+* bump remix-validated-form from 5.0.2 to 5.1.5 ([#77](https://github.com/Deltares-research/data-management-suite/issues/77)) ([4c34c1c](https://github.com/Deltares-research/data-management-suite/commit/4c34c1ce36eb7f7f7ea18dbf7e15c19b3d1baf37))
+* bump tailwind-merge from 1.14.0 to 2.0.0 ([#79](https://github.com/Deltares-research/data-management-suite/issues/79)) ([f8e3f8f](https://github.com/Deltares-research/data-management-suite/commit/f8e3f8f3d91fd9cf77c36e7e07cece24a8361d23))
+* bump tailwind-merge from 2.0.0 to 2.1.0 ([#83](https://github.com/Deltares-research/data-management-suite/issues/83)) ([97eeb4e](https://github.com/Deltares-research/data-management-suite/commit/97eeb4e80a3f2e6e52f6c3aa2095c94408d4c8f1))
+
 ## [0.4.5](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.4...web-v0.4.5) (2023-11-21)
 
 
