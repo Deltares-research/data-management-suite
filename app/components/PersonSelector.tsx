@@ -116,6 +116,7 @@ export function PersonSelector({
                         ? currentValue.filter(v => v !== newValue)
                         : [...currentValue, newValue],
                     )
+                    setOpen(false)
                   }}
                 >
                   <Check
@@ -124,8 +125,8 @@ export function PersonSelector({
                       value.includes(person.id) ? 'opacity-100' : 'opacity-0',
                     )}
                   />
-                  <div className="flex items-center gap-1">
-                    <strong className="text-foreground flex items-center gap-1.5 font-medium">
+                  <div className="flex flex-col gap-0.5">
+                    <strong className="text-foreground gap-1.5 font-medium">
                       {person.name}
                     </strong>
                     <small className="text-muted-foreground">
