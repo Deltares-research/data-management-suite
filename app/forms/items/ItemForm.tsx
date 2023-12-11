@@ -20,7 +20,7 @@ import { Label } from '~/components/ui/label'
 import React from 'react'
 import { BookIcon, Plus, X } from 'lucide-react'
 import { randUuid } from '@ngneat/falso'
-import { H2, H3, Muted } from '~/components/typography'
+import { H3, Muted } from '~/components/typography'
 import { routes } from '~/routes'
 
 export async function submitItemForm({
@@ -231,7 +231,22 @@ export function ItemForm({
                   Basic information about the data
                 </p>
               </div>
-              <div className="col-span-2 flex flex-col gap-6">
+              <div
+                className="col-span-2 flex flex-col gap-6"
+                data-testid="general-form"
+              >
+                <FormInput name="properties[title]" label="Title" />
+                <FormTextarea
+                  name="properties[description]"
+                  label="Description"
+                />
+                <FormTextarea name="properties[license]" label="License" />
+                <FormInput
+                  name="properties[projectNumber]"
+                  label="Project Number"
+                />
+                <FormInput name="properties[contact]" label="Contact" />
+
                 <div className="flex flex-col gap-1.5">
                   {collections ? (
                     <CollectionSelector

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { FormInput, FormTextarea } from '~/components/ui/form'
+import { FormInput } from '~/components/ui/form'
 
 export let config = {
   id: 'numerical',
@@ -7,11 +7,6 @@ export let config = {
 }
 
 export let propertiesSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().optional(),
-  license: z.string().optional(),
-  projectNumber: z.string().optional(),
-  contact: z.string().optional(),
   reportLocation: z.string().optional(),
   timeScale: z
     .object({
@@ -28,11 +23,6 @@ export function Form() {
       className="grid w-full items-center gap-6"
       data-testid="numerical-model-form"
     >
-      <FormInput name="properties[title]" label="Title" />
-      <FormTextarea name="properties[description]" label="Description" />
-      <FormTextarea name="properties[license]" label="License" />
-      <FormInput name="properties[projectNumber]" label="Project Number" />
-      <FormInput name="properties[contact]" label="Contact" />
       <FormInput name="properties[reportLocation]" label="Report Location" />
       <FormInput name="properties[model]" label="Model" />
 

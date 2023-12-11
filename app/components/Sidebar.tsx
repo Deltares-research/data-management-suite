@@ -26,7 +26,7 @@ export function Sidebar({
   let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
 
   return (
-    <div className={cn('h-full relative', className)}>
+    <div className={cn('h-full w-[240px] flex-shrink-0 relative', className)}>
       <div className="py-4 flex flex-col h-full gap-y-4">
         <div className="px-3 py-2">
           <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">

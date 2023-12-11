@@ -1,10 +1,10 @@
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 import { Outlet, useRouteLoaderData } from '@remix-run/react'
 import { Sidebar } from '~/components/Sidebar'
 import type { rootLoader } from '~/root'
 import { requireAuthentication } from '~/services/auth.server'
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   await requireAuthentication(request)
 
   return null
@@ -14,9 +14,9 @@ export default function AppLayout() {
   let user = useRouteLoaderData<typeof rootLoader>('root')
 
   return (
-    <main className="grid grid-cols-5 h-full">
+    <main className="flex h-full">
       <Sidebar user={user} />
-      <div className="col-span-4 border-l">
+      <div className="border-l flex-1">
         <Outlet />
       </div>
     </main>
