@@ -1,3 +1,4 @@
+import type { MetaFunction } from '@remix-run/node'
 import { Link, Outlet } from '@remix-run/react'
 import { AlertTriangle } from 'lucide-react'
 import React from 'react'
@@ -15,6 +16,14 @@ import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group'
 import type { Feature } from '~/data/storage-finder'
 import { storageCategories, storageOptions } from '~/data/storage-finder'
 import { routes } from '~/routes'
+
+export let meta: MetaFunction = () => {
+  return [
+    {
+      title: 'Storage Finder',
+    },
+  ]
+}
 
 export default function StorageFinderPage() {
   let [values, setValues] = React.useState<Record<string, string>>({})
@@ -60,16 +69,17 @@ export default function StorageFinderPage() {
                 key={storageOption.id}
               >
                 <Card
-                  className={
-                    flatValues.every(v =>
-                      [
-                        ...storageOption.features,
-                        ...storageOption.maybeFeatures,
-                      ].includes(v),
-                    )
-                      ? 'opacity-100'
-                      : 'opacity-30'
-                  }
+                  className={`h-full
+                    ${
+                      flatValues.every(v =>
+                        [
+                          ...storageOption.features,
+                          ...storageOption.maybeFeatures,
+                        ].includes(v),
+                      )
+                        ? 'opacity-100'
+                        : 'opacity-30'
+                    }`}
                 >
                   <CardHeader>
                     <CardTitle>{storageOption.name}</CardTitle>

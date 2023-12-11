@@ -1,3 +1,5 @@
+import pDiskPage from './options/p-disk.mdx'
+
 export let storageCategories = [
   {
     id: 'sharing',
@@ -122,6 +124,7 @@ export type Feature =
 interface StorageOption {
   id: string
   name: string
+  component: React.ComponentType
   description: string
   features: Feature[]
   maybeFeatures: Feature[]
@@ -132,6 +135,7 @@ export let storageOptions: StorageOption[] = [
     id: 'p-disk',
     name: 'Basic storage P:\\',
     description: 'Basic storage on the Deltares Network Drive',
+    component: pDiskPage,
     features: [
       'sharing-internal',
       'collab-no',
@@ -150,6 +154,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'ms365-onedrive',
     name: 'MS365 OneDrive',
+    component: pDiskPage,
     description: 'OneDrive for Business',
     features: [
       'sharing-personal',
@@ -171,6 +176,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'surf-research-drive',
     name: 'Surf Research Drive',
+    component: pDiskPage,
     description: 'SURF Research Drive',
     features: [
       'sharing-external',
@@ -188,6 +194,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'minio',
     name: 'MinIO',
+    component: pDiskPage,
     description: 'S3 compatible object storage',
     features: [
       'sharing-internal',
@@ -210,6 +217,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'surf-filesender',
     name: 'SURF filesender',
+    component: pDiskPage,
     description: 'Send files to external parties',
     features: [
       'sharing-external',
@@ -230,6 +238,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'ftps',
     name: 'FTPS',
+    component: pDiskPage,
     description: 'Secure FTP server',
     features: [
       'sharing-external',

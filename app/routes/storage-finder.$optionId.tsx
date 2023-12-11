@@ -17,13 +17,18 @@ export default function StorageFinderPage() {
 
   if (!storageOption) return null
 
+  let Component = storageOption.component
+
   return (
     <Dialog open onOpenChange={() => navigate(routes.storageFinder())}>
-      <DialogContent>
+      <DialogContent className="max-h-[calc(100vh-96px)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{storageOption.name}</DialogTitle>
           <DialogDescription>{storageOption.description}</DialogDescription>
         </DialogHeader>
+        <div className="prose prose-sm prose-h1:text-lg prose-h2:text-base prose-headings:font-medium">
+          <Component />
+        </div>
       </DialogContent>
     </Dialog>
   )
