@@ -93,14 +93,12 @@ test('can create item', async ({ page }) => {
 
   let name = randFirstName()
 
-  let numericalModelForm = await page.getByTestId('numerical-model-form')
-  await numericalModelForm
+  let generalForm = await page.getByTestId('general-form')
+  await generalForm
     .getByRole('textbox', { name: /title/i })
     .fill(`${name} the ${animal}`)
-  await numericalModelForm
-    .getByRole('textbox', { name: /description/i })
-    .fill('Test')
-  await numericalModelForm
+  await generalForm.getByRole('textbox', { name: /description/i }).fill('Test')
+  await generalForm
     .getByRole('textbox', { name: /project number/i })
     .fill(`Project ${name}`)
 
