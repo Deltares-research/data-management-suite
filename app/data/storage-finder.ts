@@ -1,4 +1,9 @@
 import pDiskPage from './options/p-disk.mdx'
+import surfResearchDrivePage from './options/surf-research-drive.mdx'
+import minioPage from './options/minio.mdx'
+import surfFileSenderPage from './options/surf-filesender.mdx'
+import ftpsPage from './options/ftps.mdx'
+import ms365Page from './options/ms365-onedrive.mdx'
 
 export let storageCategories = [
   {
@@ -154,7 +159,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'ms365-onedrive',
     name: 'MS365 OneDrive',
-    component: pDiskPage,
+    component: ms365Page,
     description: 'OneDrive for Business',
     features: [
       'sharing-personal',
@@ -176,7 +181,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'surf-research-drive',
     name: 'Surf Research Drive',
-    component: pDiskPage,
+    component: surfResearchDrivePage,
     description: 'SURF Research Drive',
     features: [
       'sharing-external',
@@ -194,7 +199,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'minio',
     name: 'MinIO',
-    component: pDiskPage,
+    component: minioPage,
     description: 'S3 compatible object storage',
     features: [
       'sharing-internal',
@@ -217,7 +222,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'surf-filesender',
     name: 'SURF filesender',
-    component: pDiskPage,
+    component: surfFileSenderPage,
     description: 'Send files to external parties',
     features: [
       'sharing-external',
@@ -238,7 +243,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'ftps',
     name: 'FTPS',
-    component: pDiskPage,
+    component: ftpsPage,
     description: 'Secure FTP server',
     features: [
       'sharing-external',
