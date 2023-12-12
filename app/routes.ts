@@ -15,6 +15,12 @@ export let routes = {
   docs() {
     return `/docs/api`
   },
+  storageFinder() {
+    return `/storage-finder`
+  },
+  storageFinderOption(optionId: string) {
+    return `/storage-finder/${optionId}`
+  },
 
   pythonDocs() {
     return `/docs/`
