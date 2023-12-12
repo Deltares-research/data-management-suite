@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.5.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.6...web-v0.5.0) (2023-12-12)
+
+
+### :rocket: Features
+
+* **ui:** Add storage finder ([#99](https://github.com/Deltares-research/data-management-suite/issues/99)) ([adfdd5d](https://github.com/Deltares-research/data-management-suite/commit/adfdd5dda244c12bce9490e2c6dc2acd54ed3328))
+
+
+### :wrench: Bug Fixes & Refactoring
+
+* **ItemForm:** move props from numerical model to general ([#104](https://github.com/Deltares-research/data-management-suite/issues/104)) ([8f9a9f7](https://github.com/Deltares-research/data-management-suite/commit/8f9a9f72f1f89ed32b38c4c5ec9065b7a88d55b4))
+
+
+### :arrow_up: Dependencies updates
+
+* bump @radix-ui/react-avatar from 1.0.3 to 1.0.4 ([#86](https://github.com/Deltares-research/data-management-suite/issues/86)) ([3d32af0](https://github.com/Deltares-research/data-management-suite/commit/3d32af0efdd0b844d0e5e5653ab6d46fc22463b2))
+* bump @remix-run/react from 2.2.0 to 2.3.1 ([#110](https://github.com/Deltares-research/data-management-suite/issues/110)) ([bc8bf29](https://github.com/Deltares-research/data-management-suite/commit/bc8bf29dcd4d535ea3230a8a9a5fbe36880777fc))
+* bump @tanstack/react-table from 8.9.3 to 8.10.7 ([#111](https://github.com/Deltares-research/data-management-suite/issues/111)) ([16b9a6f](https://github.com/Deltares-research/data-management-suite/commit/16b9a6f329938085d9bd4f8962f0e22473c3fb3b))
+* bump eslint from 8.53.0 to 8.55.0 ([#85](https://github.com/Deltares-research/data-management-suite/issues/85)) ([07d8be8](https://github.com/Deltares-research/data-management-suite/commit/07d8be8b27baa5407e44d84a06ba33d84c64a37f))
+* bump react-hook-form from 7.45.2 to 7.48.2 ([#82](https://github.com/Deltares-research/data-management-suite/issues/82)) ([34defca](https://github.com/Deltares-research/data-management-suite/commit/34defca53c4a4713f9430bea2af9f638d9fc861d))
+* bump react-hook-form from 7.48.2 to 7.49.0 ([#112](https://github.com/Deltares-research/data-management-suite/issues/112)) ([780a143](https://github.com/Deltares-research/data-management-suite/commit/780a1436fbc2de1d1eaa4a3366dc7ce238e25a0e))
+
 ## [0.4.6](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.5...web-v0.4.6) (2023-12-07)
 
 
