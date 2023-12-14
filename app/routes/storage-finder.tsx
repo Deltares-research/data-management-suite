@@ -8,15 +8,9 @@ import { Link, Outlet, useLoaderData, useSubmit } from '@remix-run/react'
 import { AlertTriangle, Info, Mail } from 'lucide-react'
 import React from 'react'
 import { H2 } from '~/components/typography'
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-} from '~/components/ui/accordion'
 import { Button } from '~/components/ui/button'
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
