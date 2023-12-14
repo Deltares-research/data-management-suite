@@ -21,7 +21,7 @@ export default function StorageFinderPage() {
 
   return (
     <Dialog open onOpenChange={() => navigate(routes.storageFinder())}>
-      <DialogContent className="max-h-[calc(100vh-96px)] overflow-y-auto">
+      <DialogContent className="max-h-[calc(100vh-96px)] overflow-y-auto max-w-2xl">
         <DialogHeader>
           <DialogTitle>{storageOption.name}</DialogTitle>
           <DialogDescription>{storageOption.description}</DialogDescription>

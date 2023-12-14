@@ -7,8 +7,24 @@ import ms365Page from './options/ms365-onedrive.mdx'
 
 export let storageCategories = [
   {
+    id: 'store-transfer',
+    description: 'Do you want to store or transfer your data?',
+    dependentOn: [],
+    options: [
+      {
+        id: 'store',
+        description: 'Store',
+      },
+      {
+        id: 'transfer',
+        description: 'Transfer',
+      },
+    ],
+  },
+  {
     id: 'sharing',
     description: 'Do you want to share your data?',
+    dependentOn: ['store'],
     options: [
       {
         id: 'sharing-personal',
@@ -27,6 +43,7 @@ export let storageCategories = [
   {
     id: 'collaboration',
     description: 'Do you want to collaborate/co-create on your data?',
+    dependentOn: ['store'],
     options: [
       {
         id: 'collab-no',
@@ -42,23 +59,11 @@ export let storageCategories = [
       },
     ],
   },
-  {
-    id: 'store-transfer',
-    description: 'Do you want to store or transfer your data?',
-    options: [
-      {
-        id: 'store',
-        description: 'Store',
-      },
-      {
-        id: 'transfer',
-        description: 'Transfer',
-      },
-    ],
-  },
+
   {
     id: 'size',
     description: 'Does the total amount of data exceed 10TB?',
+    dependentOn: [],
     options: [
       {
         id: 'size-less-than-10tb',
@@ -73,6 +78,7 @@ export let storageCategories = [
   {
     id: 'personal-or-project',
     description: 'Is the data personal or project data?',
+    dependentOn: [],
     options: [
       {
         id: 'personal',
@@ -88,6 +94,7 @@ export let storageCategories = [
     id: 'confidentiality',
     description:
       'What is the classification of your data regarding CONFIDENTIALITY?',
+    dependentOn: [],
     options: [
       {
         id: 'confidentiality-basic',
@@ -106,6 +113,7 @@ export let storageCategories = [
   {
     id: 'integrity',
     description: 'What is the classification of your data regarding INTEGRITY?',
+    dependentOn: [],
     options: [
       {
         id: 'integrity-basic',
