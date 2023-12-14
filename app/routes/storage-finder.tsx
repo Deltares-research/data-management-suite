@@ -222,11 +222,8 @@ export default function StorageFinderPage() {
                 <h2 className="text-lg font-medium mb-5">
                   No options available for these filters.
                 </h2>
-                <Button asChild className="">
-                  <a href="mailto:dataplatformteam@deltares.nl">
-                    <Mail className="w-4 h-4 mr-1.5" /> Contact Data Platform
-                    Team
-                  </a>
+                <Button onClick={() => setIntroOpen(true)}>
+                  <Mail className="w-4 h-4 mr-1.5" /> Contact your data steward
                 </Button>
               </div>
             )}
