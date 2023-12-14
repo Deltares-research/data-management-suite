@@ -88,6 +88,23 @@ export default function StorageFinderPage() {
     )
   })
 
+  React.useEffect(() => {
+    setValues(current =>
+      Object.entries(current).reduce((acc, [key, value]) => {
+        let category = storageCategories.find(c => c.id === key)
+
+        let dependenciesMet =
+          category?.dependentOn.every(dep => flatValues.includes(dep)) ?? false
+
+        if (dependenciesMet) return acc
+
+        let { [key]: _, ...rest } = acc
+
+        return rest
+      }, current),
+    )
+  }, [flatValues])
+
   return (
     <div className="py-12 px-8">
       <Outlet />
@@ -113,7 +130,7 @@ export default function StorageFinderPage() {
           <div className="flex flex-col gap-8">
             {storageCategories.map(category => {
               let disabled = category.dependentOn.some(
-                dep => !values.hasOwnProperty(dep),
+                dep => !flatValues.includes(dep),
               )
 
               return (
@@ -127,11 +144,13 @@ export default function StorageFinderPage() {
                   </h3>
                   <div className="pt-3">
                     <RadioGroup
+                      key={disabled ? 'disabled' : 'enabled'}
                       disabled={disabled}
                       name={category.id}
-                      onValueChange={value =>
+                      value={values[category.id]}
+                      onValueChange={value => {
                         setValues({ ...values, [category.id]: value })
-                      }
+                      }}
                     >
                       {category.options.map(option => (
                         <div

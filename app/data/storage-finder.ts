@@ -7,9 +7,24 @@ import ms365Page from './options/ms365-onedrive.mdx'
 
 export let storageCategories = [
   {
+    id: 'store-transfer',
+    description: 'Do you want to store or transfer your data?',
+    dependentOn: [],
+    options: [
+      {
+        id: 'store',
+        description: 'Store',
+      },
+      {
+        id: 'transfer',
+        description: 'Transfer',
+      },
+    ],
+  },
+  {
     id: 'sharing',
     description: 'Do you want to share your data?',
-    dependentOn: [],
+    dependentOn: ['store'],
     options: [
       {
         id: 'sharing-personal',
@@ -28,7 +43,7 @@ export let storageCategories = [
   {
     id: 'collaboration',
     description: 'Do you want to collaborate/co-create on your data?',
-    dependentOn: [],
+    dependentOn: ['store'],
     options: [
       {
         id: 'collab-no',
@@ -44,21 +59,7 @@ export let storageCategories = [
       },
     ],
   },
-  {
-    id: 'store-transfer',
-    description: 'Do you want to store or transfer your data?',
-    dependentOn: [],
-    options: [
-      {
-        id: 'store',
-        description: 'Store',
-      },
-      {
-        id: 'transfer',
-        description: 'Transfer',
-      },
-    ],
-  },
+
   {
     id: 'size',
     description: 'Does the total amount of data exceed 10TB?',
