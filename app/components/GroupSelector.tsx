@@ -1,113 +1,69 @@
-import type { Group } from '@prisma/client'
-import { useFetcher } from '@remix-run/react'
 import React from 'react'
-import { useField } from 'remix-validated-form'
 import type { loader as groupsApiLoader } from '~/routes/api.groups'
-import { Label } from './ui/label'
-import { Button } from './ui/button'
-import { Check, ChevronsUpDown, Loader } from 'lucide-react'
-import { ErrorMessage } from './typography'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from './ui/command'
-import { cn } from '~/utils'
+import { createMultiCombobox } from './MultiCombobox'
+import { createCombobox } from './Combobox'
 
-export function GroupSelector({
-  label,
-  name,
-}: {
-  label: string
-  name: string
-}) {
-  // TODO: Generalize
-  let [groupCache, setGroupCache] = React.useState<Record<string, Group>>({})
-  let { defaultValue, error } = useField(name)
-  let [open, setOpen] = React.useState(false)
-  let [value, setValue] = React.useState<string>(defaultValue ?? '')
+type ItemType = Awaited<ReturnType<typeof groupsApiLoader>>[number]
+
+let Combobox = createCombobox<ItemType>()
+let MultiCombobox = createMultiCombobox<ItemType>()
+
+export function GroupSelector(
+  props: Omit<
+    React.ComponentProps<typeof Combobox.Root>,
+    'url' | 'children'
+  > & { label: string; name: string },
+) {
   let [search, setSearch] = React.useState('')
-  let id = React.useId()
-
-  let fetcher = useFetcher<typeof groupsApiLoader>()
-
-  React.useEffect(() => {
-    fetcher.load(`/api/groups?q=${search}`)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search])
-
-  React.useEffect(() => {
-    if (!fetcher.data) return
-
-    for (let group of fetcher.data) {
-      setGroupCache(c => {
-        return {
-          ...c,
-          [group.id]: group,
-        }
-      })
-    }
-  }, [fetcher.data])
 
   return (
-    <div>
-      <Label htmlFor={id}>{label}</Label>
-      <input type="hidden" name={name} value={value} />
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger id={id} asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {value
-              ? groupCache[value]?.name ?? (
-                  <Loader className="w-4 h-4 animate-spin" />
-                )
-              : 'Select group...'}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="p-0"
-          style={{ width: 'var(--radix-popover-trigger-width)' }}
-        >
-          <Command shouldFilter={false}>
-            <CommandInput
-              value={search}
-              onValueChange={setSearch}
-              placeholder="Search groups..."
-            />
-            <CommandEmpty>No groups found.</CommandEmpty>
-            <CommandGroup>
-              {fetcher.data?.map(group => (
-                <CommandItem
-                  key={group.id}
-                  value={group.id}
-                  onSelect={setValue}
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      value.includes(group.id) ? 'opacity-100' : 'opacity-0',
-                    )}
-                  />
-                  <div className="flex items-center gap-1">
-                    <strong className="text-foreground flex items-center gap-1.5 font-medium">
-                      {group.name}
-                    </strong>
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      {error && <ErrorMessage>{error}</ErrorMessage>}
-    </div>
+    <Combobox.Root {...props} url={`/api/groups?q=${search}`}>
+      <Combobox.Trigger placeholder="Select group...">
+        {({ item }) => item?.name}
+      </Combobox.Trigger>
+      <Combobox.Dropdown label="Search groups">
+        <Combobox.Input
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Search groups..."
+        />
+        <Combobox.Empty>No groups found.</Combobox.Empty>
+        <Combobox.Items component={GroupItem} />
+      </Combobox.Dropdown>
+    </Combobox.Root>
+  )
+}
+
+export function GroupsSelector(
+  props: Omit<
+    React.ComponentProps<typeof MultiCombobox.Root>,
+    'url' | 'children'
+  >,
+) {
+  let [search, setSearch] = React.useState('')
+
+  return (
+    <MultiCombobox.Root {...props} url={`/api/groups?q=${search}`}>
+      <MultiCombobox.Trigger placeholder="Select group...">
+        {() => 'Select group...'}
+      </MultiCombobox.Trigger>
+      <MultiCombobox.Dropdown label="Search groups">
+        <MultiCombobox.Input
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Search groups..."
+        />
+        <MultiCombobox.Empty>No groups found.</MultiCombobox.Empty>
+        <MultiCombobox.Items component={GroupItem} />
+      </MultiCombobox.Dropdown>
+    </MultiCombobox.Root>
+  )
+}
+
+function GroupItem({ item }: { item: ItemType }) {
+  return (
+    <strong className="text-foreground flex items-center font-medium">
+      {item.name}
+    </strong>
   )
 }

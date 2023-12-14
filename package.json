@@ -67,6 +67,7 @@
     "lucide-react": "^0.261.0",
     "mapbox-gl": "^2.15.0",
     "p-pipe": "^4.0.0",
+    "query-string": "8.1.0",
     "react": "^18.2.0",
     "react-code-blocks": "^0.1.4",
     "react-day-picker": "^8.8.0",

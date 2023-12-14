@@ -1,108 +1,77 @@
 import React from 'react'
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { ChevronsUpDown, Check } from 'lucide-react'
-import { cn } from '~/utils'
-import { Button } from './ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from './ui/command'
-import type { Collection } from '@prisma/client'
-import { useField } from 'remix-validated-form'
-import { Label } from './ui/label'
-import type { SerializeFrom } from '@remix-run/node'
-import { ErrorMessage } from './typography'
+import { createCombobox } from '~/components/Combobox'
+import type { collectionApiLoader } from '~/routes/api.collections'
+import { createMultiCombobox } from './MultiCombobox'
+
+type ItemType = Awaited<ReturnType<typeof collectionApiLoader>>[number]
+
+let Combobox = createCombobox<ItemType>()
+let MultiCombobox = createMultiCombobox<ItemType>()
 
 export function CollectionSelector({
-  collections,
-  name,
-  label,
-}: {
-  collections: SerializeFrom<
-    Collection & { catalog?: { title: string | null } }
-  >[]
-  name: string
-  label: string
+  accessType,
+  ...props
+}: Omit<React.ComponentProps<typeof Combobox.Root>, 'url' | 'children'> & {
+  accessType?: 'read' | 'contribute'
 }) {
-  let { defaultValue, error } = useField(name)
-  let [open, setOpen] = React.useState(false)
   let [search, setSearch] = React.useState('')
-  let [value, setValue] = React.useState<string>(defaultValue)
-  let id = React.useId()
-
-  let selectedCollection = collections.find(c => c.id === value)
 
   return (
-    <div>
-      <input type="hidden" name={name} value={value} />
-      <Label htmlFor={id}>{label}</Label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger id={id} asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {selectedCollection
-              ? selectedCollection.title
-              : 'Select collection...'}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent
-          className="p-0"
-          style={{ width: 'var(--radix-popover-trigger-width)' }}
-        >
-          <Command label="Search collections" shouldFilter={false}>
-            <CommandInput
-              placeholder="Search collections..."
-              value={search}
-              onValueChange={setSearch}
-            />
-            <CommandEmpty>No collections found.</CommandEmpty>
-            <CommandGroup>
-              {collections
-                .filter(
-                  c =>
-                    !search ||
-                    c?.title.toLowerCase().includes(search.toLowerCase()) ||
-                    c?.description
-                      ?.toLowerCase()
-                      .includes(search.toLowerCase()),
-                )
-                .map(collection => (
-                  <CommandItem
-                    key={collection.id}
-                    value={collection.id}
-                    onSelect={currentValue => {
-                      setValue(currentValue === value ? '' : currentValue)
-                      setOpen(false)
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        value === collection.id ? 'opacity-100' : 'opacity-0',
-                      )}
-                    />
-                    <div>
-                      <strong className="block">{collection.title}</strong>
-                      <span className="block text-muted-foreground">
-                        {collection.catalog?.title}
-                      </span>
-                    </div>
-                  </CommandItem>
-                ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
+    <Combobox.Root
+      {...props}
+      url={`/api/collections?q=${search}&accessType=${accessType}`}
+    >
+      <Combobox.Trigger placeholder="Select collection...">
+        {({ item }) => item?.title}
+      </Combobox.Trigger>
+      <Combobox.Dropdown label="Search collections">
+        <Combobox.Input
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Search collections..."
+        />
+        <Combobox.Empty>No collections found.</Combobox.Empty>
+        <Combobox.Items component={CollectionItem} />
+      </Combobox.Dropdown>
+    </Combobox.Root>
+  )
+}
 
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+export function MultiCollectionSelector({
+  accessType,
+  ...props
+}: Omit<React.ComponentProps<typeof Combobox.Root>, 'url' | 'children'> & {
+  accessType?: 'read' | 'contribute'
+}) {
+  let [search, setSearch] = React.useState('')
+
+  return (
+    <MultiCombobox.Root
+      {...props}
+      url={`/api/collections?q=${search}&accessType=${accessType}`}
+    >
+      <MultiCombobox.Badges component={({ item }) => item?.title} />
+      <MultiCombobox.Trigger placeholder="Select collection...">
+        {() => 'Select collections...'}
+      </MultiCombobox.Trigger>
+      <MultiCombobox.Dropdown label="Search collections">
+        <MultiCombobox.Input
+          value={search}
+          onValueChange={setSearch}
+          placeholder="Search collections..."
+        />
+        <MultiCombobox.Empty>No collections found.</MultiCombobox.Empty>
+        <MultiCombobox.Items component={CollectionItem} />
+      </MultiCombobox.Dropdown>
+    </MultiCombobox.Root>
+  )
+}
+
+function CollectionItem({ item }: { item: ItemType }) {
+  return (
+    <div>
+      <strong className="block">{item.title}</strong>
+      <span className="block text-muted-foreground">{item.catalog?.title}</span>
     </div>
   )
 }

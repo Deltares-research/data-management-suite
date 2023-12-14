@@ -3,4 +3,9 @@ module.exports = {
   ignoredRouteFiles: ['**/.*'],
   serverModuleFormat: 'cjs',
   postcss: true,
+  browserNodeBuiltinsPolyfill: {
+    modules: {
+      querystring: true,
+    },
+  },
 }

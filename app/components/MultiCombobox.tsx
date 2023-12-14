@@ -1,6 +1,6 @@
 import React from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
-import { ChevronsUpDown, Check, Loader } from 'lucide-react'
+import { ChevronsUpDown, Check, Loader, X } from 'lucide-react'
 import { cn } from '~/utils'
 import { Button } from './ui/button'
 import {
@@ -14,21 +14,22 @@ import { useField } from 'remix-validated-form'
 import { Label } from './ui/label'
 import { ErrorMessage } from './typography'
 import { useFetcher } from '@remix-run/react'
+import { Separator } from './ui/separator'
 
-type ComboboxItem = {
+type MultiComboboxItem = {
   id: string
 }
 
-export function createCombobox<TItem extends ComboboxItem>() {
-  let ComboboxContext = React.createContext<{
-    value: string
-    setValue(newValue: string): void
+export function createMultiCombobox<TItem extends MultiComboboxItem>() {
+  let MultiComboboxContext = React.createContext<{
+    value: string[]
+    setValue: React.Dispatch<React.SetStateAction<string[]>>
     id: string
     cache: Record<string, TItem>
     searchResults: TItem[]
     setOpen(open: boolean): void
   }>({
-    value: '',
+    value: [],
     setValue() {},
     id: '',
     cache: {},
@@ -36,7 +37,7 @@ export function createCombobox<TItem extends ComboboxItem>() {
     setOpen() {},
   })
 
-  function ComboboxRoot({
+  function MultiComboboxRoot({
     name,
     label,
     url,
@@ -53,7 +54,7 @@ export function createCombobox<TItem extends ComboboxItem>() {
 
     let { defaultValue, error } = useField(name)
     let [open, setOpen] = React.useState(false)
-    let [value, setValue] = React.useState<string>(defaultValue)
+    let [value, setValue] = React.useState<string[]>(defaultValue ?? [])
     let id = React.useId()
 
     React.useEffect(() => {
@@ -75,7 +76,7 @@ export function createCombobox<TItem extends ComboboxItem>() {
     }, [fetcher.data])
 
     return (
-      <ComboboxContext.Provider
+      <MultiComboboxContext.Provider
         value={{
           value,
           id,
@@ -86,7 +87,9 @@ export function createCombobox<TItem extends ComboboxItem>() {
         }}
       >
         <div className="flex flex-col gap-1.5">
-          <input type="hidden" name={name} value={value} />
+          {value.map((v, i) => (
+            <input key={v} type="hidden" name={`${name}`} value={v} />
+          ))}
           <Label htmlFor={id}>{label}</Label>
           <Popover open={open} onOpenChange={setOpen}>
             {children}
@@ -94,18 +97,18 @@ export function createCombobox<TItem extends ComboboxItem>() {
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </div>
-      </ComboboxContext.Provider>
+      </MultiComboboxContext.Provider>
     )
   }
 
-  function ComboboxTrigger({
+  function MultiComboboxTrigger({
     children,
     placeholder,
   }: {
-    children: ({ item }: { item?: TItem }) => React.ReactNode
+    children: ({ value }: { value?: string[] }) => React.ReactNode
     placeholder: string
   }) {
-    let { value, cache, id } = React.useContext(ComboboxContext)
+    let { value, id } = React.useContext(MultiComboboxContext)
 
     return (
       <PopoverTrigger id={id} asChild>
@@ -115,9 +118,7 @@ export function createCombobox<TItem extends ComboboxItem>() {
           className="w-full justify-between"
         >
           {value
-            ? children({ item: cache[value] }) ?? (
-                <Loader className="w-4 h-4 animate-spin" />
-              )
+            ? children({ value }) ?? <Loader className="w-4 h-4 animate-spin" />
             : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -125,7 +126,37 @@ export function createCombobox<TItem extends ComboboxItem>() {
     )
   }
 
-  function ComboboxDropdown({
+  function MultiComboboxBadges({
+    component: Component,
+  }: {
+    component: React.ComponentType<{ item?: TItem }>
+  }) {
+    let { value, setValue, cache } = React.useContext(MultiComboboxContext)
+
+    return (
+      value.length > 0 && (
+        <div className="mb-1.5 flex gap-1.5 flex-wrap">
+          {value.map(v => (
+            <Button
+              onClick={() => {
+                setValue(current => current.filter(c => c !== v))
+              }}
+              type="button"
+              key={v}
+              size="sm"
+              variant="secondary"
+            >
+              <Component item={cache[v]} />
+              <Separator orientation="vertical" className="h-[16px] mx-2" />
+              <X className="w-4 h-4" />
+            </Button>
+          ))}
+        </div>
+      )
+    )
+  }
+
+  function MultiComboboxDropdown({
     label,
     children,
   }: {
@@ -144,7 +175,7 @@ export function createCombobox<TItem extends ComboboxItem>() {
     )
   }
 
-  function ComboboxInput(props: {
+  function MultiComboboxInput(props: {
     onValueChange(newValue: string): void
     value: string
     placeholder: string
@@ -152,28 +183,31 @@ export function createCombobox<TItem extends ComboboxItem>() {
     return <CommandInput {...props} />
   }
 
-  function ComboboxItems({
+  function MultiComboboxItems({
     component: Component,
   }: {
     component: React.ComponentType<{ item: TItem }>
   }) {
-    let { searchResults, value, setValue, setOpen } =
-      React.useContext(ComboboxContext)
+    let { searchResults, value, setValue } =
+      React.useContext(MultiComboboxContext)
     return (
       <CommandGroup>
         {searchResults.map(item => (
           <CommandItem
             key={item.id}
             value={item.id}
-            onSelect={currentValue => {
-              setValue(currentValue === value ? '' : currentValue)
-              setOpen(false)
+            onSelect={newValue => {
+              setValue(currentValue =>
+                currentValue.includes(newValue)
+                  ? currentValue.filter(v => v !== newValue)
+                  : [...currentValue, newValue],
+              )
             }}
           >
             <Check
               className={cn(
                 'mr-2 h-4 w-4',
-                value === item.id ? 'opacity-100' : 'opacity-0',
+                value.includes(item.id) ? 'opacity-100' : 'opacity-0',
               )}
             />
             <Component item={item} />
@@ -183,14 +217,15 @@ export function createCombobox<TItem extends ComboboxItem>() {
     )
   }
 
-  let ComboboxEmpty = CommandEmpty
+  let MultiComboboxEmpty = CommandEmpty
 
   return {
-    Root: ComboboxRoot,
-    Trigger: ComboboxTrigger,
-    Dropdown: ComboboxDropdown,
-    Input: ComboboxInput,
-    Empty: ComboboxEmpty,
-    Items: ComboboxItems,
+    Root: MultiComboboxRoot,
+    Trigger: MultiComboboxTrigger,
+    Dropdown: MultiComboboxDropdown,
+    Input: MultiComboboxInput,
+    Empty: MultiComboboxEmpty,
+    Items: MultiComboboxItems,
+    Badges: MultiComboboxBadges,
   }
 }

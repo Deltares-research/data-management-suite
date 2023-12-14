@@ -1,11 +1,8 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node'
-import { redirect } from '@remix-run/node'
 import { useLoaderData } from '@remix-run/react'
 import { z } from 'zod'
 import { zx } from 'zodix'
-import { submitCatalogForm } from '~/forms/CatalogForm'
-import { CollectionForm } from '~/forms/CollectionForm'
-import { routes } from '~/routes'
+import { CollectionForm, submitCollectionForm } from '~/forms/CollectionForm'
 import { requireAuthentication } from '~/services/auth.server'
 import { getCollectionAuthReadWhere } from '~/utils/authQueries'
 import { db } from '~/utils/db.server'
@@ -17,9 +14,7 @@ export async function action(args: ActionFunctionArgs) {
     collectionId: z.string(),
   })
 
-  await submitCatalogForm({ ...args, id: collectionId })
-
-  return redirect(routes.collections())
+  return submitCollectionForm({ ...args, id: collectionId })
 }
 
 export async function loader({ params, request }: LoaderFunctionArgs) {

@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { db } from '~/utils/db.server'
-import type { Item } from '@prisma/client'
+import { Prisma, type Item } from '@prisma/client'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { prismaToStacItem } from '~/utils/prismaToStac'
@@ -12,9 +12,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let user = await authenticator.isAuthenticated(request)
 
   // let url = new URL(request.url)
-  let { bbox: bboxString, q = '' } = zx.parseQuery(request, {
+  let {
+    bbox: bboxString,
+    q = '',
+    collectionIds,
+  } = zx.parseQuery(request, {
     bbox: z.string().optional(),
     q: z.string().optional(),
+    collectionIds: z.array(z.string()).optional(),
   })
   let bbox = bboxString ? JSON.parse(bboxString) : [-180, -90, 180, 90]
 
@@ -109,6 +114,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ("Item"."properties"->>'title' ILIKE ${
         '%' + q + '%'
       } OR "Item"."properties"->>'description' ILIKE ${'%' + q + '%'})
+    
+    ${
+      collectionIds
+        ? Prisma.sql`AND "Collection"."id" IN (${Prisma.join(collectionIds)})`
+        : Prisma.empty
+    }
 
     LIMIT 100
   `

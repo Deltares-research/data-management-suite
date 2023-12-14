@@ -30,6 +30,7 @@ export async function submitCollectionForm({
   let { redirectUrl } = zx.parseQuery(request, {
     redirectUrl: z.string().optional(),
   })
+
   let form = await collectionValidator.validate(await request.formData())
 
   if (form.error) {

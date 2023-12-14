@@ -1,8 +1,9 @@
 import type {
   LinksFunction,
   LoaderFunctionArgs,
-  V2_MetaFunction,
+  MetaFunction,
 } from '@remix-run/node'
+import querystring from 'node:querystring'
 import type { MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl'
 import Map, { Layer, Source } from 'react-map-gl'
 import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
@@ -10,6 +11,7 @@ import {
   Form,
   Link,
   useLoaderData,
+  useLocation,
   useNavigation,
   useSearchParams,
 } from '@remix-run/react'
@@ -33,18 +35,23 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '~/components/ui/sheet'
 import { getHost } from '~/routes'
 import { loader as searchLoader } from '~/routes/api.search'
+import { ValidatedForm } from 'remix-validated-form'
+import { withZod } from '@remix-validated-form/with-zod'
+import { MultiCollectionSelector } from '~/components/CollectionSelector'
+import { zx } from 'zodix'
 
 // TODO: Get token from BE
 const MAPBOX_TOKEN =
   'pk.eyJ1Ijoicm9iZXJ0YnJvZXJzbWEiLCJhIjoiY2tjMjVwbnRuMjBoMjM0bXh1eHR5d2o0YSJ9.xZxWCeY2LEaGHDzME5JqfA'
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [{ title: 'Search' }]
 }
 
@@ -57,13 +64,16 @@ export let links: LinksFunction = () => {
   ]
 }
 
-export let searchQuerySchema = {
+export let searchQuerySchema = z.object({
   bbox: z
     .string()
     .optional()
     .describe('JSON stringified representation of a bbox'),
   q: z.string().optional().describe('Will search item title and description'),
-}
+  collectionIds: z.array(z.string()).optional(),
+})
+
+let validator = withZod(searchQuerySchema)
 
 export async function loader(args: LoaderFunctionArgs) {
   let data = await searchLoader(args)
@@ -81,17 +91,22 @@ export default function SearchPage() {
   let [bounds, setBounds] = React.useState<mapboxgl.LngLatBounds>()
   let [hoveredItemIds, setHoveredItemIds] = React.useState<string[]>([])
 
-  function handleMoveEnd(e: ViewStateChangeEvent) {
-    let newBounds = e.target.getBounds()
+  let [filtersOpen, setFiltersOpen] = React.useState(false)
 
-    setSearchParams(csp => {
-      csp.set('bbox', JSON.stringify([...newBounds.toArray().flat()]))
+  let handleMoveEnd = React.useCallback(
+    (e: ViewStateChangeEvent) => {
+      let newBounds = e.target.getBounds()
 
-      return csp
-    })
-  }
+      setSearchParams(csp => {
+        csp.set('bbox', JSON.stringify([...newBounds.toArray().flat()]))
 
-  function setSearchBounds() {
+        return csp
+      })
+    },
+    [setSearchParams],
+  )
+
+  let setSearchBounds = React.useCallback(() => {
     if (!bounds) return
 
     setSearchParams({
@@ -99,14 +114,15 @@ export default function SearchPage() {
     })
 
     setBounds(undefined)
-  }
+  }, [bounds, setSearchParams])
 
-  function handleMapHover(e: MapLayerMouseEvent) {
+  let handleMapHover = React.useCallback((e: MapLayerMouseEvent) => {
     setHoveredItemIds(e.features?.map(f => f.properties?.id) ?? [])
-  }
+  }, [])
 
   let qId = React.useId()
   let navigation = useNavigation()
+  let location = useLocation()
 
   return (
     <div className="grid grid-cols-2" style={{ height: 'calc(100vh - 64px)' }}>
@@ -138,22 +154,52 @@ export default function SearchPage() {
                 />
               </div>
 
-              <Sheet>
+              <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
                 <SheetTrigger>
                   <Button type="button" variant="outline">
                     Filter <Sliders className="ml-2 w-4 h-4" />
                   </Button>
                 </SheetTrigger>
                 <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Filters</SheetTitle>
-                    <SheetDescription>
-                      Adjust your filters and hit apply.
-                    </SheetDescription>
-                  </SheetHeader>
-                  <div className="mt-12">
-                    <Badge>Coming Soon</Badge>
-                  </div>
+                  <ValidatedForm
+                    method="get"
+                    validator={validator}
+                    defaultValues={querystring.parse(
+                      location.search.replace('?', ''),
+                    )}
+                    className="flex flex-col gap-5"
+                  >
+                    <SheetHeader>
+                      <SheetTitle>Filters</SheetTitle>
+                      <SheetDescription>
+                        Adjust your filters and hit apply.
+                      </SheetDescription>
+                    </SheetHeader>
+                    <MultiCollectionSelector
+                      name="collectionIds"
+                      label="Collections"
+                      accessType="read"
+                    />
+                    <input
+                      type="hidden"
+                      name="q"
+                      value={searchParams.get('q') ?? ''}
+                    />
+                    <input
+                      type="hidden"
+                      name="bbox"
+                      value={searchParams.get('bbox') ?? ''}
+                    />
+                    <SheetFooter>
+                      <Button
+                        className="w-full"
+                        variant="default"
+                        onClick={() => setFiltersOpen(false)}
+                      >
+                        Apply
+                      </Button>
+                    </SheetFooter>
+                  </ValidatedForm>
                 </SheetContent>
               </Sheet>
             </div>
