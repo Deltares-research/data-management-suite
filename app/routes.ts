@@ -25,6 +25,10 @@ export let routes = {
   pythonDocs() {
     return `/docs/`
   },
+  readme() {
+    return '/docs/readme'
+  },
+
   items() {
     return `${appPrefix}/items`
   },

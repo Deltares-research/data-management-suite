@@ -12,6 +12,7 @@ import {
   Settings,
   ScrollText,
   Users,
+  HelpCircle,
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from './ui/avatar'
 import type { rootLoader } from '~/root'
@@ -109,7 +110,7 @@ export function Sidebar({
                 </Button>
               )}
             </NavLink>
-            <NavLink to={routes.pythonDocs()} reloadDocument>
+            <NavLink to={routes.pythonDocs()} reloadDocument end>
               {({ isActive }) => (
                 <Button
                   variant={isActive ? 'secondary' : 'ghost'}
@@ -117,6 +118,17 @@ export function Sidebar({
                 >
                   <ScrollText className="mr-2 w-4 h-4" />
                   Python Documentation
+                </Button>
+              )}
+            </NavLink>
+            <NavLink to={routes.readme()} reloadDocument>
+              {({ isActive }) => (
+                <Button
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className="w-full justify-start"
+                >
+                  <HelpCircle className="mr-2 w-4 h-4" />
+                  Help
                 </Button>
               )}
             </NavLink>
