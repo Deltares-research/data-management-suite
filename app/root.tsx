@@ -6,6 +6,7 @@ import type {
 } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -30,6 +31,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from './components/ui/tooltip'
+import { HelpCircle } from 'lucide-react'
 
 export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
@@ -81,23 +83,28 @@ export default function App() {
               <MenuItem to={routes.items()}>Register</MenuItem>
             </div>
 
-            {user && (
-              <TooltipProvider delayDuration={0}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Avatar className="ml-auto">
-                      <AvatarFallback>
-                        {firstName?.[0]}
-                        {lastName?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent align="end">
-                    Logged in as {user?.name}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+            <div className="ml-auto flex items-center gap-3">
+              <Link to={routes.readme()}>
+                <HelpCircle className="w-4 h-4" />
+              </Link>
+              {user && (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Avatar className="ml-auto">
+                        <AvatarFallback>
+                          {firstName?.[0]}
+                          {lastName?.[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TooltipTrigger>
+                    <TooltipContent align="end">
+                      Logged in as {user?.name}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
           </div>
           <Outlet />
         </div>
