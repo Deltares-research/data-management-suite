@@ -83,7 +83,7 @@
     "stac-spec": "github:radiantearth/stac-spec#v1.0.0-beta.2",
     "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.6",
-    "uuid": "^9.0.0",
+    "uuid": "^9.0.1",
     "zod": "^3.22.4",
     "zod-form-data": "^2.0.2",
     "zodix": "^0.4.1"
@@ -97,7 +97,7 @@
     "@types/mapbox-gl": "^2.7.11",
     "@types/react": "^18.2.38",
     "@types/react-dom": "^18.0.11",
-    "@types/uuid": "^9.0.2",
+    "@types/uuid": "^9.0.7",
     "autoprefixer": "^10.4.14",
     "eslint": "^8.55.0",
     "playwright": "^1.36.1",
