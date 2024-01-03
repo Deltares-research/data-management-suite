@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.5.0...web-v0.6.0) (2023-12-20)
+
+
+### :rocket: Features
+
+* Improve Storage finder ([#115](https://github.com/Deltares-research/data-management-suite/issues/115)) ([2e1327b](https://github.com/Deltares-research/data-management-suite/commit/2e1327bbb0e0c40e36b26e0466ea4541cc679263))
+* **ui:** Add readme page ([#126](https://github.com/Deltares-research/data-management-suite/issues/126)) ([690ca53](https://github.com/Deltares-research/data-management-suite/commit/690ca53e1f7b4932b52bc72d0b4e69901df92c6e))
+
+
+### :arrow_up: Dependencies updates
+
+* bump @radix-ui/react-dropdown-menu from 2.0.5 to 2.0.6 ([#118](https://github.com/Deltares-research/data-management-suite/issues/118)) ([a7d1fa0](https://github.com/Deltares-research/data-management-suite/commit/a7d1fa06cb79370ab9620bb9bea97283888b537e))
+* bump @tanstack/react-table from 8.10.7 to 8.11.0 ([#120](https://github.com/Deltares-research/data-management-suite/issues/120)) ([ae88ffc](https://github.com/Deltares-research/data-management-suite/commit/ae88ffcd24688d207bb0f2898cdfc94f50dac87d))
+* bump tailwindcss from 3.3.3 to 3.3.6 ([#109](https://github.com/Deltares-research/data-management-suite/issues/109)) ([a724f5e](https://github.com/Deltares-research/data-management-suite/commit/a724f5ea38e737d4169615c8dfcc76f68a6c66f5))
+* bump vite from 4.5.0 to 4.5.1 ([#93](https://github.com/Deltares-research/data-management-suite/issues/93)) ([e9940b7](https://github.com/Deltares-research/data-management-suite/commit/e9940b7bca4efdce978931215f881d5129bf79f6))
+* bump zod-form-data from 2.0.1 to 2.0.2 ([#119](https://github.com/Deltares-research/data-management-suite/issues/119)) ([ccec6ff](https://github.com/Deltares-research/data-management-suite/commit/ccec6ff7edde370e4d7ec35733b96ced5cb57e96))
+
 ## [0.5.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.4.6...web-v0.5.0) (2023-12-12)
 
 
