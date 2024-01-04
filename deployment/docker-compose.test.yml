@@ -23,6 +23,7 @@ services:
   watchtower:
     container_name: watchtower
     image: containrrr/watchtower
+    restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --interval 60 --cleanup --label-enable --include-stopped
@@ -32,6 +33,7 @@ services:
   datadog-agent:
     container_name: datadog-agent
     image: datadog/agent:latest
+    restart: unless-stopped
     pid: host
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
