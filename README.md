@@ -56,6 +56,11 @@ It is also possible to run the remix server in a docker container, then we only 
 docker compose up
 ```
 
+For that you might have to set up the database initially. You can do that by running the following command:
+```
+docker compose exec web npm run e2e:setupdb
+```
+
 ## Tests
 
 To run the tests:
