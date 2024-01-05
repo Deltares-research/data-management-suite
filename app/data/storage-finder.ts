@@ -72,7 +72,7 @@ export let storageCategories = [
   },
   {
     id: 'size',
-    description: 'Will the total amount of data exceed 5TB??',
+    description: 'Will the total amount of data exceed 5TB?',
     dependentOn: [],
     options: [
       {
