@@ -111,7 +111,7 @@ export default function StorageFinderPage() {
           </DialogTrigger>
           <DialogContent className="max-w-xl">
             <DialogHeader>
-              <DialogTitle>Delares Data Storage Finder</DialogTitle>
+              <DialogTitle>Deltares Data Storage Finder</DialogTitle>
             </DialogHeader>
             <div className="mt-3 prose prose-sm prose-h1:text-lg prose-h2:text-base prose-headings:font-medium">
               <StorageFinderIntro />
