@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.6.0...web-v0.7.0) (2024-01-08)
+
+
+### :rocket: Features
+
+* improved Storage finder contents ([#137](https://github.com/Deltares-research/data-management-suite/issues/137)) ([507fa41](https://github.com/Deltares-research/data-management-suite/commit/507fa41d97a345d42c55e385d90bb452bd730b7d))
+
 ## [0.6.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.5.0...web-v0.6.0) (2023-12-20)
 
 
