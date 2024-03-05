@@ -4,6 +4,12 @@ import minioPage from './options/minio.mdx'
 import surfFileSenderPage from './options/surf-filesender.mdx'
 import ftpsPage from './options/ftps.mdx'
 import ms365Page from './options/ms365-onedrive.mdx'
+import cloudPage from './options/cloud-storage.mdx'
+import geoserverPage from './options/geoserver.mdx'
+import nDiskPage from './options/n-disk.mdx'
+import threddsPage from './options/thredds.mdx'
+import zenodoPage from './options/zenodo.mdx'
+import postgresPage from './options/postgres.mdx'
 
 export let storageCategories = [
   {
