@@ -15,6 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card'
+import { Checkbox } from '~/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
@@ -43,6 +44,8 @@ export let meta: MetaFunction = () => {
     },
   ]
 }
+
+export let handle = { showMenu: false }
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let session = await getSession(request.headers.get('Cookie'))
@@ -87,6 +90,8 @@ export default function StorageFinderPage() {
       Object.entries(current).reduce((acc, [key, value]) => {
         let category = storageCategories.find(c => c.id === key)
 
+        if (!category) return acc
+
         let dependenciesMet =
           category?.dependentOn.every(dep => flatValues.includes(dep)) ?? false
 
@@ -100,7 +105,7 @@ export default function StorageFinderPage() {
   }, [flatValues])
 
   return (
-    <div className="py-12 px-8">
+    <div className="py-12 px-8 h-screen">
       <Outlet />
 
       <H2 className="flex items-center gap-3">
@@ -119,8 +124,8 @@ export default function StorageFinderPage() {
           </DialogContent>
         </Dialog>
       </H2>
-      <div className="pt-12 grid grid-cols-3 gap-12">
-        <div>
+      <div className="pt-12 grid grid-cols-3 gap-4 h-full">
+        <div className="max-h-full overflow-auto pr-8 pb-8">
           <div className="flex flex-col gap-8">
             {storageCategories.map(category => {
               let disabled = category.dependentOn.some(
@@ -137,27 +142,64 @@ export default function StorageFinderPage() {
                     {category.description}
                   </h3>
                   <div className="pt-3">
-                    <RadioGroup
-                      key={disabled ? 'disabled' : 'enabled'}
-                      disabled={disabled}
-                      name={category.id}
-                      value={values[category.id]}
-                      onValueChange={value => {
-                        setValues({ ...values, [category.id]: value })
-                      }}
-                    >
-                      {category.options.map(option => (
-                        <div
-                          key={option.id}
-                          className="flex items-center gap-2"
-                        >
-                          <RadioGroupItem id={option.id} value={option.id} />
-                          <Label htmlFor={option.id}>
-                            {option.description}
-                          </Label>
-                        </div>
-                      ))}
-                    </RadioGroup>
+                    {category.type === 'single' ? (
+                      <RadioGroup
+                        key={disabled ? 'disabled' : 'enabled'}
+                        disabled={disabled}
+                        name={category.id}
+                        value={values[category.id]}
+                        onValueChange={value => {
+                          setValues(current => ({
+                            ...current,
+                            [category.id]: value,
+                          }))
+                        }}
+                      >
+                        {category.options.map(option => (
+                          <div
+                            key={option.id}
+                            className="flex items-center gap-2"
+                          >
+                            <RadioGroupItem id={option.id} value={option.id} />
+                            <Label htmlFor={option.id}>
+                              {option.description}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {category.options.map(option => (
+                          <div
+                            key={option.id}
+                            className="flex items-center gap-2"
+                          >
+                            <Checkbox
+                              id={option.id}
+                              value={option.id}
+                              checked={flatValues.includes(option.id)}
+                              onCheckedChange={checked => {
+                                if (checked) {
+                                  setValues(current => ({
+                                    ...current,
+                                    [option.id]: option.id,
+                                  }))
+                                } else {
+                                  setValues(current => {
+                                    let { [option.id]: _, ...rest } = current
+
+                                    return rest
+                                  })
+                                }
+                              }}
+                            />
+                            <Label htmlFor={option.id}>
+                              {option.description}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
@@ -165,7 +207,7 @@ export default function StorageFinderPage() {
           </div>
         </div>
 
-        <div className="col-span-2 relative">
+        <div className="col-span-2 relative overflow-auto max-h-full">
           <div className="grid grid-cols-3 gap-5">
             {storageOptions.map(storageOption => {
               let isAvailable = flatValues.every(v =>
