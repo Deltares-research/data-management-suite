@@ -15,6 +15,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useMatches,
 } from '@remix-run/react'
 
 import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
@@ -65,6 +66,12 @@ export default function App() {
   let user = useLoaderData<typeof loader>()
   let [firstName, lastName] = (user?.name ?? '? ?').split(' ')
 
+  let matches = useMatches()
+  let match = matches.find((m: any) =>
+    m?.handle?.hasOwnProperty('showMenu'),
+  ) as any
+  let showMenu = match?.handle?.showMenu ?? true
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -75,37 +82,39 @@ export default function App() {
       </head>
       <body className="flex flex-col h-full">
         <div className="h-full flex flex-col">
-          <div className="border-b flex-shrink-0 h-12 px-8 flex items-center gap-12">
-            <Logo className="h-4" />
-            <div className="flex gap-5 items-center py-2">
-              <MenuItem to={routes.home()}>Home</MenuItem>
-              <MenuItem to={routes.search()}>Search</MenuItem>
-              <MenuItem to={routes.items()}>Register</MenuItem>
-            </div>
+          {showMenu && (
+            <div className="border-b flex-shrink-0 h-12 px-8 flex items-center gap-12">
+              <Logo className="h-4" />
+              <div className="flex gap-5 items-center py-2">
+                <MenuItem to={routes.home()}>Home</MenuItem>
+                <MenuItem to={routes.search()}>Search</MenuItem>
+                <MenuItem to={routes.items()}>Register</MenuItem>
+              </div>
 
-            <div className="ml-auto flex items-center gap-3">
-              <Link to={routes.readme()}>
-                <HelpCircle className="w-4 h-4" />
-              </Link>
-              {user && (
-                <TooltipProvider delayDuration={0}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Avatar className="ml-auto">
-                        <AvatarFallback>
-                          {firstName?.[0]}
-                          {lastName?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                    </TooltipTrigger>
-                    <TooltipContent align="end">
-                      Logged in as {user?.name}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
+              <div className="ml-auto flex items-center gap-3">
+                <Link to={routes.readme()}>
+                  <HelpCircle className="w-4 h-4" />
+                </Link>
+                {user && (
+                  <TooltipProvider delayDuration={0}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Avatar className="ml-auto">
+                          <AvatarFallback>
+                            {firstName?.[0]}
+                            {lastName?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent align="end">
+                        Logged in as {user?.name}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
             </div>
-          </div>
+          )}
           <Outlet />
         </div>
 

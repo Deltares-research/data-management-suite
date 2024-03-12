@@ -1,0 +1,27 @@
+**Description of functionality**
+
+PostgreSQL/PostGIS is an opensource relational database management system with full GIS analysis capabilities. It can store ‘virtually’ unlimited amounts of data where high performance is guaranteed (in case of use amounts there are numerous options to optimize performance are available). PostgreSQL/PostGIS is used in projects with large timeseries or large amounts of spatial objects that serve as ‘administration’ in models for instance. Think of scenario analysis with peat parcels in the Netherlands.
+
+**When to use**
+
+RDBMS in common are exceptionally useful to use if you need to collaborate with colleagues and need to store and analyze large data sets (> 2Gb) of tabular data in (but not limited to) an environment with large amounts of changes (i.e. continues completion with timeseries data).
+
+**How to use**
+
+PostgreSQL/PostGIS can be made available to Deltares users via DPC (Deltares Private Cloud) where you can access it via automated procedures (e.g. Python, R, FEWS). If spatial data extension (PostGIS) is enabled data can be visualized in your desktop GIS application (QGIS, for instance is by default capable of display of data and interaction with PostgreSQL/PostGIS). There are numerous ways to interact with PostgreSQL/PostGIS. On e-learning platform of Deltares a general introduction of PostgreSQL/PostGIS and usage in projects is given.  
+It is good practice to have a local PostgreSQL/PostGIS database running on your local machine, in that case you start with [https://www.enterprisedb.com/downloads/postgres-postgresql-downloads](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
+
+**How to get started**
+
+For local use: just install PostgreSQL (follow this link) and install the spatial extension PostGIS via the installer.  
+Via Topdesk call (enable a link to this), with a clear specification for the components (PostGIS, but there are other plugins (check [postgresql extensions](https://www.postgresql.org/download/products/6-postgresql-extensions/)).
+
+**Limitations**
+
+There are hardly any technical limitations. Limitations arise from the hardware mounted to the database server, by default the base configuration is 10Gb, but extension of this up to several Tb is possible. Even the amount of connections per second can be configured. Most probably you will not need to optimize performance. Check [PostgreSQL Limits page](https://www.postgresql.org/docs/current/limits.html).
+
+There are limitations in the collaboration on the database. By default, no access from outside VPN is granted. That having said, PostgreSQL is often used as backend with API’s to enable interaction with external users.
+
+TRL:
+
+HIGH
