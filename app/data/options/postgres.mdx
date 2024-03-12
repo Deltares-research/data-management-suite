@@ -1,13 +1,3 @@
-Functional requirements
-
-- Description of functionality
-- When to use
-- How to use
-- How to get started
-- Limitations (storage size, privacy, sharing and collaboration)
-- Costs
-- TRL (Figuur 1)
-
 **Description of functionality**
 
 PostgreSQL/PostGIS is an opensource relational database management system with full GIS analysis capabilities. It can store ‘virtually’ unlimited amounts of data where high performance is guaranteed (in case of use amounts there are numerous options to optimize performance are available). PostgreSQL/PostGIS is used in projects with large timeseries or large amounts of spatial objects that serve as ‘administration’ in models for instance. Think of scenario analysis with peat parcels in the Netherlands.
@@ -31,10 +21,6 @@ Via Topdesk call (enable a link to this), with a clear specification for the com
 There are hardly any technical limitations. Limitations arise from the hardware mounted to the database server, by default the base configuration is 10Gb, but extension of this up to several Tb is possible. Even the amount of connections per second can be configured. Most probably you will not need to optimize performance. Check [PostgreSQL Limits page](https://www.postgresql.org/docs/current/limits.html).
 
 There are limitations in the collaboration on the database. By default, no access from outside VPN is granted. That having said, PostgreSQL is often used as backend with API’s to enable interaction with external users.
-
-**Costs**
-
-PostgreSQL is installed on a Linux server which needs maintenance. This costs … Euro a year. Additional costs come from the costs associated with the disk storage used (€100,- TB/month).
 
 TRL:
 
