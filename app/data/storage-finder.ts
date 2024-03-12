@@ -12,22 +12,22 @@ import cloudPage from './options/cloud.mdx'
 import zenodoPage from './options/zenodo.mdx'
 
 export let storageCategories = [
-  {
-    id: 'project-related',
-    description: 'Is the data project-related?',
-    dependentOn: [],
-    type: 'single',
-    options: [
-      {
-        id: 'project-related-yes',
-        description: 'Yes',
-      },
-      {
-        id: 'project-related-no',
-        description: 'No',
-      },
-    ],
-  },
+  // {
+  //   id: 'project-related',
+  //   description: 'Is the data project-related?',
+  //   dependentOn: [],
+  //   type: 'single',
+  //   options: [
+  //     {
+  //       id: 'project-related-yes',
+  //       description: 'Yes',
+  //     },
+  //     {
+  //       id: 'project-related-no',
+  //       description: 'No',
+  //     },
+  //   ],
+  // },
   {
     id: 'store-transfer-archive',
     description: 'Do you want to store, transfer or archive your data?',
@@ -100,26 +100,26 @@ export let storageCategories = [
       },
     ],
   },
-  {
-    id: 'security',
-    description: 'What are the needs regarding data security?',
-    dependentOn: [],
-    type: 'single',
-    options: [
-      {
-        id: 'security-n/a',
-        description: 'Not applicable (no sensitive data)',
-      },
-      {
-        id: 'security-standard',
-        description: 'Standard Deltares security measures',
-      },
-      {
-        id: 'security-critical',
-        description: 'Additional security measures required',
-      },
-    ],
-  },
+  // {
+  //   id: 'security',
+  //   description: 'What are the needs regarding data security?',
+  //   dependentOn: [],
+  //   type: 'single',
+  //   options: [
+  //     {
+  //       id: 'security-n/a',
+  //       description: 'Not applicable (no sensitive data)',
+  //     },
+  //     {
+  //       id: 'security-standard',
+  //       description: 'Standard Deltares security measures',
+  //     },
+  //     {
+  //       id: 'security-critical',
+  //       description: 'Additional security measures required',
+  //     },
+  //   ],
+  // },
   {
     id: 'confidentiality',
     description:
@@ -202,7 +202,7 @@ export let storageOptions: StorageOption[] = [
     description: 'Basic storage on the Deltares Network Drive',
     component: pDiskPage,
     features: [
-      'project-related-yes',
+      // 'project-related-yes',
       'store',
       'archive',
       'sharing-internal',
@@ -221,7 +221,7 @@ export let storageOptions: StorageOption[] = [
     description: 'Storage on the Deltares Network Drive',
     component: nDiskPage,
     features: [
-      'project-related-yes',
+      // 'project-related-yes',
       'archive',
       'sharing-internal',
       'security-n/a',
