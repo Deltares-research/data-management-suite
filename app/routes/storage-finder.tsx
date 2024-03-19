@@ -5,7 +5,7 @@ import {
   type MetaFunction,
 } from '@remix-run/node'
 import { Link, Outlet, useLoaderData, useSubmit } from '@remix-run/react'
-import { AlertTriangle, Info, Mail } from 'lucide-react'
+import { AlertTriangle, Info, Mail, RotateCcw } from 'lucide-react'
 import React from 'react'
 import { H2 } from '~/components/typography'
 import { Button } from '~/components/ui/button'
@@ -71,11 +71,15 @@ export default function StorageFinderPage() {
 
   let submit = useSubmit()
 
+  function reset() {
+    setValues({})
+  }
+
   React.useEffect(() => {
-    if (!introOpen) {
+    if (!introOpen && !introSeen) {
       submit(null, { action: '', method: 'post' })
     }
-  }, [introOpen, submit])
+  }, [introOpen, introSeen, submit])
 
   let flatValues = Object.values(values) as Feature[]
 
@@ -124,8 +128,14 @@ export default function StorageFinderPage() {
           </DialogContent>
         </Dialog>
       </H2>
+
       <div className="pt-12 grid grid-cols-3 gap-4 h-full">
         <div className="max-h-full overflow-auto pr-8 pb-8">
+          {Object.values(values).length > 0 && (
+            <Button onClick={reset} className="mb-5">
+              <RotateCcw className="w-4 h-4 mr-1.5" /> Reset Questions
+            </Button>
+          )}
           <div className="flex flex-col gap-8">
             {storageCategories.map(category => {
               let disabled = category.dependentOn.some(
