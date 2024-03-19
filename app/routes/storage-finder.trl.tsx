@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog'
 import { routes } from '~/routes'
-import TlrInfo from '~/data/storage-finder-tlr-info.mdx'
+import TRLInfo from '~/data/storage-finder-trl-info.mdx'
 
 export default function StorageFinderPage() {
   let navigate = useNavigate()
@@ -18,7 +18,7 @@ export default function StorageFinderPage() {
           <DialogTitle>Technology Readiness Level</DialogTitle>
         </DialogHeader>
         <div className="prose prose-sm prose-h1:text-lg prose-h2:text-base prose-headings:font-medium">
-          <TlrInfo />
+          <TRLInfo />
         </div>
       </DialogContent>
     </Dialog>
