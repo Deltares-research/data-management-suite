@@ -2,7 +2,7 @@
   "name": "data-management-suite",
   "private": true,
   "sideEffects": false,
-  "version": "0.6.0",
+  "version": "0.7.0",
   "scripts": {
     "build": "remix build",
     "format": "prettier --write .",
