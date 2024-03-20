@@ -154,7 +154,7 @@ export default function StorageFinderPage() {
                   <div className="pt-3">
                     {category.type === 'single' ? (
                       <RadioGroup
-                        key={disabled ? 'disabled' : 'enabled'}
+                        key={disabled ? 'disabled' : values[category.id]}
                         disabled={disabled}
                         name={category.id}
                         value={values[category.id]}
