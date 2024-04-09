@@ -90,8 +90,9 @@ model Item {
   geometry   Unsupported("geometry")? // Required, but making it optional allows for prisma.create queries
   properties Json?
 
-  links  Link[]
-  assets Asset[]
+  links    Link[]
+  assets   Asset[]
+  keywords Keyword[]
 
   // For calculating datetime, start_datetime and end_datetime in item.properties
   datetime       DateTime?
@@ -177,20 +178,35 @@ model Collection {
 
   access Access  @default(PRIVATE)
   groups Group[]
+
+  keywordGroups KeywordGroup[]
 }
 
 model Keyword {
   id String @id @default(uuid())
 
-  parent   Keyword?  @relation("parent-child", fields: [parentId], references: [id])
-  parentId String?
-  children Keyword[] @relation("parent-child")
+  group   KeywordGroup @relation(fields: [groupId], references: [id])
+  groupId String
 
-  title       String
+  labelEN     String
+  labelNL     String?
   description String?
 
   standard   Standard? @relation(fields: [standardId], references: [id])
   standardId String?
+  externalId String?
+
+  items Item[]
+}
+
+model KeywordGroup {
+  id String @id @default(uuid())
+
+  title       String
+  description String?
+
+  keywords    Keyword[]
+  collections Collection[]
 }
 
 model Standard {
