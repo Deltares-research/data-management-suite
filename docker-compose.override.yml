@@ -7,3 +7,5 @@ services:
       - ./public:/app/public
     env_file:
       - .env
+    ports:
+      - '3001:3001'
