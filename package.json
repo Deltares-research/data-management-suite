@@ -101,7 +101,7 @@
     "autoprefixer": "^10.4.14",
     "eslint": "^8.55.0",
     "playwright": "^1.36.1",
-    "prisma": "^5.6.0",
+    "prisma": "^5.11.0",
     "stac-ts": "^1.0.0",
     "tailwindcss": "^3.3.6",
     "ts-node": "^10.9.1",
