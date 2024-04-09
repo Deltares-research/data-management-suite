@@ -5,7 +5,6 @@ import type {
 } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
 import {
-  isRouteErrorResponse,
   useRouteError,
   Link,
   Links,

@@ -1,11 +1,11 @@
 import type {
   LinksFunction,
   LoaderFunctionArgs,
-  V2_MetaFunction,
+  MetaFunction,
 } from '@remix-run/node'
 import type { MapLayerMouseEvent, ViewStateChangeEvent } from 'react-map-gl'
-import Map, { Layer, Source } from 'react-map-gl'
-import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
+import { Map, Layer, Source } from 'react-map-gl'
+import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css?url'
 import {
   Form,
   Link,
@@ -44,7 +44,7 @@ import { loader as searchLoader } from '~/routes/api.search'
 const MAPBOX_TOKEN =
   'pk.eyJ1Ijoicm9iZXJ0YnJvZXJzbWEiLCJhIjoiY2tjMjVwbnRuMjBoMjM0bXh1eHR5d2o0YSJ9.xZxWCeY2LEaGHDzME5JqfA'
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [{ title: 'Search' }]
 }
 

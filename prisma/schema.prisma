@@ -34,8 +34,6 @@ model Group {
 
   name String @unique
 
-  collections Collection[]
-
   members     Member[]
   permissions Permission[]
 }
@@ -69,15 +67,18 @@ enum Access {
 }
 
 model Permission {
+  id String @id @default(uuid())
+
   group   Group  @relation(fields: [groupId], references: [id])
   groupId String
 
-  catalog   Catalog @relation(fields: [catalogId], references: [id])
-  catalogId String
+  catalog   Catalog? @relation(fields: [catalogId], references: [id])
+  catalogId String?
+
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  collectionId String?
 
   role Role
-
-  @@id([catalogId, groupId])
 }
 
 // STAC Item
@@ -175,8 +176,8 @@ model Collection {
   catalog   Catalog @relation(fields: [catalogId], references: [id])
   catalogId String
 
-  access Access  @default(PRIVATE)
-  groups Group[]
+  access      Access       @default(PRIVATE)
+  permissions Permission[]
 }
 
 model Keyword {
