@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.7.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.6.0...web-v0.7.0) (2024-04-09)
+
+
+### :rocket: Features
+
+* improved Storage finder contents ([#137](https://github.com/Deltares-research/data-management-suite/issues/137)) ([507fa41](https://github.com/Deltares-research/data-management-suite/commit/507fa41d97a345d42c55e385d90bb452bd730b7d))
+* **robots.txt:** disallow all ([#160](https://github.com/Deltares-research/data-management-suite/issues/160)) ([1e1a2e6](https://github.com/Deltares-research/data-management-suite/commit/1e1a2e6fd80b54ddf85c6c704c3a0f5265652fd8))
+
+
+### :arrow_up: Dependencies updates
+
+* bump @remix-run/css-bundle from 2.2.0 to 2.8.1 ([#175](https://github.com/Deltares-research/data-management-suite/issues/175)) ([87c1cb2](https://github.com/Deltares-research/data-management-suite/commit/87c1cb2707f3fcfca9533a033cdadc44b1b3f1e4))
+* bump @remix-run/serve from 2.2.0 to 2.8.1 ([#174](https://github.com/Deltares-research/data-management-suite/issues/174)) ([de99c57](https://github.com/Deltares-research/data-management-suite/commit/de99c57791d60186b44597af289b58125eb12a88))
+* bump express from 4.18.2 to 4.19.2 ([#187](https://github.com/Deltares-research/data-management-suite/issues/187)) ([a62c074](https://github.com/Deltares-research/data-management-suite/commit/a62c074b36f2237cb2edbe831a08fbc418f4feca))
+* bump follow-redirects from 1.15.3 to 1.15.6 ([#185](https://github.com/Deltares-research/data-management-suite/issues/185)) ([fbd6317](https://github.com/Deltares-research/data-management-suite/commit/fbd63173c48a1ff194f2e34736f7de63ad42f650))
+* bump prisma from 5.6.0 to 5.11.0 ([#179](https://github.com/Deltares-research/data-management-suite/issues/179)) ([e413cb1](https://github.com/Deltares-research/data-management-suite/commit/e413cb1f9ff48075d1a9e9c91aceb5b3ebe5c75a))
+* bump stac-spec from v1.0.0-beta.2 to v1.0.0 ([#117](https://github.com/Deltares-research/data-management-suite/issues/117)) ([20fdd4b](https://github.com/Deltares-research/data-management-suite/commit/20fdd4bd82692db9cd723262b7a0a0e19e6b2690))
+* bump undici from 5.27.2 to 5.28.4 ([#186](https://github.com/Deltares-research/data-management-suite/issues/186)) ([962f3d6](https://github.com/Deltares-research/data-management-suite/commit/962f3d68330549ceec92a62f8ddb1984ba36975f))
+* bump uuid and @types/uuid ([#127](https://github.com/Deltares-research/data-management-suite/issues/127)) ([71913f5](https://github.com/Deltares-research/data-management-suite/commit/71913f55c20934e83c64a4df7bbd76a6eba43357))
+* bump vite from 4.5.1 to 4.5.3 ([#188](https://github.com/Deltares-research/data-management-suite/issues/188)) ([48c50a4](https://github.com/Deltares-research/data-management-suite/commit/48c50a451c87192558c9cc440accdab7231c9129))
+
 ## [0.6.0](https://github.com/Deltares-research/data-management-suite/compare/web-v0.5.0...web-v0.6.0) (2023-12-20)
 
 
