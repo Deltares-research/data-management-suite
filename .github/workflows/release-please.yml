@@ -41,6 +41,8 @@ jobs:
       - name: Add python files to release
         if: ${{ steps.release.outputs['utils/deltares_datasuite--release_created'] }}
         working-directory: ./utils/deltares_datasuite
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_UPLOAD_TOKEN }}
         run: |
           gh release upload ${{ steps.release.outputs['utils/deltares_datasuite--tag_name'] }} .dist/*
 
