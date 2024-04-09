@@ -39,7 +39,7 @@ types-requests = "^2.31.0.10"
 python-dotenv = "^1.0.0"
 
 [tool.poetry.group.dev.dependencies]
-bandit = "^1.7.5"
+bandit = "^1.7.7"
 black = { version = "^23.11.0", allow-prereleases = true }
 darglint = "^1.8.1"
 isort = { extras = ["colors"], version = "^5.12.0" }
