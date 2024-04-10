@@ -1,9 +1,19 @@
 import type { Prisma } from '@prisma/client'
 import { Access, Role } from '@prisma/client'
 
-export function whereUserCanReadItem(userId: string): Prisma.ItemWhereInput {
+export function whereUserCanReadItem(userId?: string): Prisma.ItemWhereInput {
+  if (userId) {
+    return {
+      collection: whereUserCanReadCollection(userId),
+    }
+  }
+
   return {
-    collection: whereUserCanReadCollection(userId),
+    collection: {
+      catalog: {
+        access: Access.PUBLIC,
+      },
+    },
   }
 }
 
@@ -30,9 +40,6 @@ export function whereUserCanReadCollection(
             },
           },
         },
-      },
-      {
-        access: Access.PUBLIC,
       },
     ],
   }

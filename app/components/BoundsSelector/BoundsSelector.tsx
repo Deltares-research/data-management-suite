@@ -1,16 +1,16 @@
 import React, { useState, useCallback } from 'react'
-import Map from 'react-map-gl'
+import { Map } from 'react-map-gl'
 
 import DrawControl from './DrawControl'
 import type { Feature, Polygon } from 'geojson'
 import { useField } from 'remix-validated-form'
 import { ErrorMessage } from '../typography'
 
-// TODO: Get token from BE
-const MAPBOX_TOKEN =
-  'pk.eyJ1Ijoicm9iZXJ0YnJvZXJzbWEiLCJhIjoiY2tjMjVwbnRuMjBoMjM0bXh1eHR5d2o0YSJ9.xZxWCeY2LEaGHDzME5JqfA'
-
 export function BoundsSelector({ name }: { name: string }) {
+  // TODO: Get token from BE
+  const MAPBOX_TOKEN =
+    'pk.eyJ1Ijoicm9iZXJ0YnJvZXJzbWEiLCJhIjoiY2tjMjVwbnRuMjBoMjM0bXh1eHR5d2o0YSJ9.xZxWCeY2LEaGHDzME5JqfA'
+
   let { defaultValue } = useField(`${name}`)
   let { error } = useField(`${name}.coordinates`)
 

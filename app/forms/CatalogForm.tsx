@@ -3,7 +3,7 @@ import { Access, Role } from '@prisma/client'
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
-import { Plus, X } from 'lucide-react'
+import { Plus, Unlock, X, Lock } from 'lucide-react'
 import React from 'react'
 import {
   ValidatedForm,
@@ -13,14 +13,19 @@ import {
 import { z } from 'zod'
 import { zx } from 'zodix'
 import { GroupSelector } from '~/components/GroupSelector'
-import { ErrorMessage, H3, H4 } from '~/components/typography'
+import { ErrorMessage, H3, H4, Muted } from '~/components/typography'
 import { Button } from '~/components/ui/button'
-import { FormInput, FormSelect, FormTextarea } from '~/components/ui/form'
+import {
+  FormInput,
+  FormRadioGroup,
+  FormRadioGroupItem,
+  FormSelect,
+  FormTextarea,
+} from '~/components/ui/form'
 import { SelectItem } from '~/components/ui/select'
 import { routes } from '~/routes'
 import { serverOnly$ } from 'vite-env-only'
 import { db } from '~/utils/db.server'
-import { AccessSelector } from '~/components/AccessSelector'
 
 let catalogSchema = z.object({
   title: z.string().nullish(),
@@ -112,7 +117,40 @@ export function CatalogForm({
           <div className="mt-12 grid w-full items-center gap-8">
             <FormInput name="title" label="Title" />
             <FormTextarea name="description" label="Description" />
-            <AccessSelector name="access" />
+            <FormRadioGroup
+              name="access"
+              className="grid grid-cols-2 gap-5"
+              defaultValue={Access.PRIVATE}
+            >
+              <FormRadioGroupItem
+                label={
+                  <div>
+                    <strong className="text-md font-medium flex items-center">
+                      <Unlock className="w-4 h-4 mr-1.5 flex-shrink-0" /> Public
+                    </strong>
+                    <Muted className="mt-1 text-sm font-normal">
+                      This catalog and all it's collections and items will be
+                      accesible by anyone on the internet.
+                    </Muted>
+                  </div>
+                }
+                value={Access.PUBLIC}
+              />
+              <FormRadioGroupItem
+                label={
+                  <div>
+                    <strong className="text-md font-medium flex items-center">
+                      <Lock className="w-4 h-4 mr-1.5 flex-shrink-0" /> Private
+                    </strong>
+                    <Muted className="mt-1 text-sm font-normal">
+                      This catalog and all it's collections and items will only
+                      be readable or editable by the groups you specify below.
+                    </Muted>
+                  </div>
+                }
+                value={Access.PRIVATE}
+              />
+            </FormRadioGroup>
 
             <div className="">
               <H4>Permissions</H4>

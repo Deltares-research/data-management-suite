@@ -176,7 +176,6 @@ model Collection {
   catalog   Catalog @relation(fields: [catalogId], references: [id])
   catalogId String
 
-  access      Access       @default(PRIVATE)
   permissions Permission[]
 }
 

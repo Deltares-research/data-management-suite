@@ -1,5 +1,5 @@
 import { randUuid } from '@ngneat/falso'
-import { Access, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import type { Permission, Catalog, Group } from '@prisma/client'
 import type { ActionFunctionArgs, SerializeFrom } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
@@ -16,7 +16,6 @@ import {
 import { serverOnly$ } from 'vite-env-only'
 import { z } from 'zod'
 import { zx } from 'zodix'
-import { AccessSelector } from '~/components/AccessSelector'
 import { CatalogSelector } from '~/components/CatalogSelector'
 import { GroupSelector } from '~/components/GroupSelector'
 import { ID } from '~/components/ID'
@@ -31,7 +30,6 @@ let collectionSchema = z.object({
   title: z.string(),
   description: z.string().nullish(),
   catalogId: z.string().min(1, { message: 'Please select a catalog' }),
-  access: z.nativeEnum(Access),
   permissions: z
     .array(
       z.object({
@@ -158,7 +156,6 @@ export function CollectionForm({
             />
             <FormInput name="title" label="Title" />
             <FormTextarea name="description" label="Description" />
-            <AccessSelector name="access" />
 
             <div className="">
               <H4>Permissions</H4>
