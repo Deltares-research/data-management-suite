@@ -14,7 +14,7 @@
     "e2e": "npm run e2e:setupdb && npm run e2e:setupplaywright npm run e2e:test",
     "e2e:setupdb": "prisma migrate reset -f && prisma db seed",
     "e2e:setupplaywright": "playwright install --with-deps",
-    "e2e:test": "npx remix-serve ./build/index.js & playwright test",
+    "e2e:test": "npx remix-serve ./build/server/index.js & playwright test",
     "typecheck": "tsc -b"
   },
   "prisma": {
