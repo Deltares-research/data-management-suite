@@ -87,7 +87,7 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
-        run: npx remix-serve ./build/index.js & npx playwright test
+        run: npx remix-serve ./build/server/index.js & npx playwright test
         env:
           AZURE_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_APP_CLIENT_ID }}
