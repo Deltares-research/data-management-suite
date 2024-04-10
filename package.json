@@ -113,7 +113,10 @@
     "vite-env-only": "2.2.1",
     "vite-tsconfig-paths": "4.3.2"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
+  },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   }
 }
