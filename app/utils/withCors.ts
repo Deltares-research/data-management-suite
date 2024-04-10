@@ -1,7 +1,10 @@
 import type { LoaderFunctionArgs, LoaderFunction } from '@remix-run/node'
 import { json } from '@remix-run/node'
 
-export function withCors(loader: LoaderFunction) {
+export function withCors(
+  loader: LoaderFunction,
+  options: { allowOrigin: string } = { allowOrigin: '*' },
+) {
   return async function loaderWithCors({
     request,
     ...args
@@ -9,7 +12,7 @@ export function withCors(loader: LoaderFunction) {
     if (request.method === `OPTIONS`) {
       return new Response(null, {
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': options.allowOrigin,
           'Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, DELETE',
           'Access-Control-Allow-Headers': 'content-type',
         },
@@ -20,7 +23,8 @@ export function withCors(loader: LoaderFunction) {
 
     return json(data, {
       headers: {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': options.allowOrigin,
+        'Access-Control-Allow-Credentials': 'true',
       },
     })
   }

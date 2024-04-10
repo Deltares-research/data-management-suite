@@ -5,7 +5,9 @@ import { redirect } from '@remix-run/node'
 
 export const loader = () => redirect('/login')
 
-export const action = ({ request }: ActionFunctionArgs) => {
-  let authenticator = createAuthenticator(request)
+export const action = async ({ request }: ActionFunctionArgs) => {
+  let body = await request.formData()
+  let redirectUrl = body.get('redirectUrl')?.toString()
+  let authenticator = createAuthenticator(request, redirectUrl)
   return authenticator.authenticate('microsoft', request)
 }

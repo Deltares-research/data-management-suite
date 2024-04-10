@@ -31,17 +31,23 @@ let playwrightAdminPassword = assert(
   'PLAYWRIGHT_USER_PASSWORD should be set',
 )
 
-function createMicrosoftStrategy(request: LoaderFunctionArgs['request']) {
-  let url = new URL(request.url)
+function createMicrosoftStrategy(
+  request: LoaderFunctionArgs['request'],
+  redirectUri?: string,
+) {
+  if (!redirectUri) {
+    let url = new URL(request.url)
+    redirectUri = `${url.hostname === 'localhost' ? 'http' : 'https'}://${
+      url.host
+    }/auth/microsoft/callback`
+  }
 
   let microsoftStrategy = new MicrosoftStrategy(
     {
       clientId,
       clientSecret,
       tenantId,
-      redirectUri: `${url.hostname === 'localhost' ? 'http' : 'https'}://${
-        url.host
-      }/auth/microsoft/callback`,
+      redirectUri: redirectUri,
       scope: 'openid profile email', // optional
       prompt: 'login', // optional,
     },
@@ -68,8 +74,11 @@ function createMicrosoftStrategy(request: LoaderFunctionArgs['request']) {
   return microsoftStrategy
 }
 
-export function createAuthenticator(request: LoaderFunctionArgs['request']) {
-  authenticator.use(createMicrosoftStrategy(request))
+export function createAuthenticator(
+  request: LoaderFunctionArgs['request'],
+  redirectUri?: string,
+) {
+  authenticator.use(createMicrosoftStrategy(request, redirectUri))
 
   return authenticator
 }
