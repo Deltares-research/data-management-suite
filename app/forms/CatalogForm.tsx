@@ -66,7 +66,7 @@ export let submitCatalogForm = serverOnly$(async function submitCatalogForm({
   let form = await catalogValidator.validate(await request.formData())
 
   if (form.error) {
-    throw validationError(form.error)
+    return validationError(form.error)
   }
 
   let { permissions, ...formData } = form.data

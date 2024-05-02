@@ -9,12 +9,13 @@
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
     "dev": "remix vite:dev",
     "build": "remix vite:build",
-    "start": "prisma migrate deploy ; remix-serve ./build/server/index.js",
+    "start": "prisma migrate deploy ; npm run serve",
+    "serve": "remix-serve ./build/server/index.js",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "e2e": "npm run e2e:setupdb && npm run e2e:setupplaywright npm run e2e:test",
     "e2e:setupdb": "prisma migrate reset -f && prisma db seed",
     "e2e:setupplaywright": "playwright install --with-deps",
-    "e2e:test": "npx remix-serve ./build/server/index.js & playwright test",
+    "e2e:test": "npm run serve & playwright test",
     "typecheck": "tsc -b"
   },
   "prisma": {

@@ -39,7 +39,7 @@ export let submitItemForm = serverOnly$(async function submitItemForm({
   let form = await itemValidator.validate(formDataRaw)
 
   if (form.error) {
-    throw validationError(form.error)
+    return validationError(form.error)
   }
 
   let { geometry, collection, ...formData } = form.data
