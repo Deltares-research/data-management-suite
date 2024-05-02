@@ -20,17 +20,32 @@ export function CatalogSelector({
   catalogs,
   name,
   label,
+  value: _value,
+  onValueChange,
 }: {
   catalogs: SerializeFrom<Catalog>[]
   name: string
   label: string
+  value?: string
+  onValueChange?(value: string): void
 }) {
   let { defaultValue, error } = useField(name)
   let [open, setOpen] = React.useState(false)
-  let [value, setValue] = React.useState<string>(defaultValue)
+  let [value, setValue] = React.useState<string>(defaultValue ?? _value)
   let id = React.useId()
 
   let selectedCatalog = catalogs.find(c => c.id === value)
+
+  React.useEffect(() => {
+    if (_value) {
+      setValue(_value)
+    }
+  }, [_value])
+
+  function _setValue(newValue: string) {
+    setValue(newValue)
+    onValueChange?.(newValue)
+  }
 
   return (
     <div>
@@ -61,7 +76,7 @@ export function CatalogSelector({
                   key={catalog.id}
                   value={catalog.id}
                   onSelect={currentValue => {
-                    setValue(currentValue === value ? '' : currentValue)
+                    _setValue(currentValue === value ? '' : currentValue)
                     setOpen(false)
                   }}
                 >

@@ -1,11 +1,12 @@
 import type { LoaderFunctionArgs } from '@remix-run/node'
 import { db } from '~/utils/db.server'
-import type { Item } from '@prisma/client'
 import { zx } from 'zodix'
 import { z } from 'zod'
 import { prismaToStacItem } from '~/utils/prismaToStac'
 import type { FeatureCollection } from 'geojson'
 import { createAuthenticator } from '~/services/auth.server'
+import { whereUserCanReadItem } from '~/utils/authQueries'
+import { fetchItemsGeometries } from '~/utils/fetchGeometries'
 
 export async function loader({ request }: LoaderFunctionArgs) {
   let authenticator = createAuthenticator(request)
@@ -56,76 +57,45 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   // return result
 
-  let items = await db.$queryRaw<
-    (Item & {
-      geometry: string
-      collectionTitle: string
-      catalogTitle: string
-    })[]
-  >`
-  WITH AuthorizedCatalogs as (
-    SELECT 
-      DISTINCT "Catalog".id 
-    FROM "Catalog"
-      LEFT JOIN "Permission" ON "Permission"."catalogId" = "Catalog"."id"
-      LEFT JOIN "Group" ON "Group"."id" = "Permission"."groupId"
-      LEFT JOIN "Member" ON "Member"."groupId" = "Group"."id"
-      where (
-        (
-          "Catalog"."access" = 'PUBLIC'
-        )
-        OR 
-        (
-          "Permission"."role" IN ('ADMIN', 'CONTRIBUTOR', 'READER') 
-          AND 
-          "Member"."personId" =  ${user?.id ?? '-1'}
-        )
-      )
-  )
-    SELECT 
-      ST_AsGeoJson("Item"."geometry") as geometry, 
-      "Item"."id" as id, 
-      "Item"."datetime", 
-      "Item"."start_datetime", 
-      "Item"."end_datetime", 
-      "Item"."properties", 
-      "Collection"."title" as "collectionTitle", 
-      "Catalog"."title" as "catalogTitle" 
-    FROM "Item"
-    JOIN "Collection" ON "Collection"."id" = "Item"."collectionId"
-    JOIN "Catalog" ON "Catalog"."id" = "Collection"."catalogId"
-    INNER JOIN AuthorizedCatalogs on AuthorizedCatalogs.id = "Catalog"."id"
-    WHERE (
-      ST_Intersects("Item"."geometry", 
-        ST_MakeEnvelope(
-          ${bbox[0].toFixed(12)}::double precision, 
-          ${bbox[1].toFixed(12)}::double precision, 
-          ${bbox[2].toFixed(12)}::double precision,
-          ${bbox[3].toFixed(12)}::double precision, 
-          4326))
-      OR "Item"."geometry" IS NULL
-      )
-    AND 
-      ("Item"."properties"->>'title' ILIKE ${
-        '%' + q + '%'
-      } OR "Item"."properties"->>'description' ILIKE ${'%' + q + '%'})
+  let itemsMeta = await db.item.findMany({
+    where: {
+      ...whereUserCanReadItem(user?.id),
+      OR: [
+        {
+          properties: {
+            path: ['title'],
+            string_contains: q,
+          },
+        },
+        {
+          properties: {
+            path: ['description'],
+            string_contains: q,
+          },
+        },
+      ],
+    },
+    include: {
+      collection: {
+        include: {
+          catalog: true,
+        },
+      },
+      assets: true,
+    },
+  })
 
-    LIMIT 100
-  `
+  let items = await fetchItemsGeometries(itemsMeta, bbox)
 
   let features = [
     ...items.map(item => {
-      let geometry = JSON.parse(item.geometry)
-
-      // TODO: Generate STAC Item
       return {
         ...prismaToStacItem({
           ...item,
-          geometry,
           request,
         }),
-        collectionTitle: item.collectionTitle,
-        catalogTitle: item.catalogTitle,
+        collectionTitle: item.collection.title,
+        catalogTitle: item.collection.catalog.title,
       }
     }),
     // ...externalResults.features?.map(feature => ({

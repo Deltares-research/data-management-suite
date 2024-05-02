@@ -41,7 +41,9 @@ test('can edit catalogs', async ({ page }) => {
 test('cannot create a catalog without admins', async ({ page }) => {
   await page.goto(routes.createCatalog())
 
-  let title = await page.getByRole('heading', { name: /Create catalog/i })
+  await page.waitForLoadState('networkidle')
+
+  let title = page.getByRole('heading', { name: /Create catalog/i })
 
   await expect(title).toBeInViewport()
 
@@ -58,6 +60,7 @@ test('cannot create a catalog without admins', async ({ page }) => {
   await expect(requiredError).toBeInViewport()
 
   await page.getByRole('button', { name: /Add permission/i }).click()
+  await expect(page.getByText(/Role/i)).toBeInViewport()
   await page.getByRole('button', { name: /Save/i }).click()
 
   let adminError = await page.getByText(
