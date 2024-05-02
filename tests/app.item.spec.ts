@@ -34,8 +34,10 @@ test('can create item', async ({ page }) => {
     .fill(mockCollection.title)
   await page.getByRole('option', { name: mockCollection.title }).click()
 
+  await page.waitForLoadState('networkidle')
+
   // Geometry
-  let map = await page.getByTestId('geometry-selector')
+  let map = page.getByTestId('geometry-selector')
   await map.click({
     position: {
       x: 40,
