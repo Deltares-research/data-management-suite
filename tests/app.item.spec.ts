@@ -31,7 +31,7 @@ test('can create item', async ({ page }) => {
   await page.getByRole('combobox', { name: /Collection/i }).click()
   await page
     .getByRole('combobox', { name: /Search collections/i })
-    .type(mockCollection.title)
+    .fill(mockCollection.title)
   await page.getByRole('option', { name: mockCollection.title }).click()
 
   // Geometry
