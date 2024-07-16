@@ -283,7 +283,9 @@ export let storageOptions: StorageOption[] = [
       'store',
       'archive',
       'sharing-internal',
+      'sharing-external',
       'collab-no',
+      'collab-external',
       'collab-internal',
       'size-less-than-5tb',
       'size-more-than-5tb',
@@ -297,7 +299,7 @@ export let storageOptions: StorageOption[] = [
       'interface-web',
       'interface-jupyter',
     ],
-    maybeFeatures: ['collab-external'],
+    maybeFeatures: [],
   },
   {
     id: 'postgres',
