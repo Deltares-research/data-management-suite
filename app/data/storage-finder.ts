@@ -212,6 +212,8 @@ export let storageOptions: StorageOption[] = [
       'security-n/a',
       'security-standard',
       'confidentiality-no',
+      'access-n/a',
+      'access-h7',
     ],
     maybeFeatures: ['size-more-than-5tb'],
   },
