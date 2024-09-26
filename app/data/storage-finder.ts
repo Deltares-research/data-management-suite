@@ -237,8 +237,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'ms365-onedrive',
     name: 'MS365 OneDrive',
-    component: ms365Page,
     description: 'OneDrive for Business',
+    component: ms365Page,
     features: [
       'project-related-no',
       'store',
@@ -255,9 +255,9 @@ export let storageOptions: StorageOption[] = [
   },
   {
     id: 'surf-research-drive',
-    name: 'Surf Research Drive',
-    component: surfResearchDrivePage,
+    name: 'SURF Research Drive',
     description: 'SURF Research Drive',
+    component: surfResearchDrivePage,
     features: [
       'project-related-yes',
       'store',
@@ -278,8 +278,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'minio',
     name: 'MinIO',
-    component: minioPage,
     description: 'S3 compatible object storage',
+    component: minioPage,
     features: [
       'project-related-yes',
       'store',
@@ -306,8 +306,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'postgres',
     name: 'Postgres/PostGIS',
-    component: postgresPage,
     description: 'Postgres/PostGIS database',
+    component: postgresPage,
     features: [
       'project-related-no',
       'project-related-yes',
@@ -332,8 +332,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'geoserver',
     name: 'Geoserver',
-    component: geoserverPage,
     description: 'Geoserver for serving geospatial data',
+    component: geoserverPage,
     features: [
       'project-related-no',
       'project-related-yes',
@@ -360,8 +360,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'tds',
     name: 'THREDDS Data Server',
-    component: tdsPage,
     description: 'THREDDS Data Server for serving netCDF data',
+    component: tdsPage,
     features: [
       'project-related-no',
       'project-related-yes',
@@ -389,8 +389,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'cloud',
     name: 'Cloud Storage',
-    component: cloudPage,
     description: 'Cloud Storage',
+    component: cloudPage,
     features: [
       'project-related-no',
       'project-related-yes',
@@ -416,9 +416,9 @@ export let storageOptions: StorageOption[] = [
   },
   {
     id: 'surf-filesender',
-    name: 'SURF filesender',
-    component: surfFileSenderPage,
+    name: 'SURF Filesender',
     description: 'Send files to external parties',
+    component: surfFileSenderPage,
     features: [
       'project-related-no',
       'project-related-yes',
@@ -433,8 +433,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'ftps',
     name: 'FTPS',
-    component: ftpsPage,
     description: 'Secure FTP server',
+    component: ftpsPage,
     features: [
       'project-related-yes',
       'project-related-no',
@@ -451,8 +451,8 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'zenodo',
     name: 'ZENODO',
-    component: zenodoPage,
     description: 'ZENODO',
+    component: zenodoPage,
     features: [
       'project-related-no',
       'project-related-yes',
