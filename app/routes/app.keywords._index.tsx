@@ -46,7 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
   let form = await keywordValidator.validate(formData)
 
   if (form.error) {
-    throw validationError(form.error)
+    return validationError(form.error)
   }
 
   let { id, ...data } = form.data

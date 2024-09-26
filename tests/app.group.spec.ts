@@ -28,6 +28,8 @@ test('can create a group and add members', async ({ page }) => {
   // @ Group List
   await page.getByRole('link', { name: groupName }).click()
 
+  await page.waitForLoadState('networkidle')
+
   // @ Group Details
   await page.getByRole('button', { name: /Add People/i }).click()
   await page.getByRole('combobox').click()

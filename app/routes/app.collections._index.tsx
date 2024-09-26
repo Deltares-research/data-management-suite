@@ -16,7 +16,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
-import { getCollectionAuthReadWhere } from '~/utils/authQueries'
+import { whereUserCanReadCollection } from '~/utils/authQueries'
 import { getDataTableFilters } from '~/utils/dataTableFilters'
 import { db } from '~/utils/db.server'
 
@@ -24,7 +24,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   let user = await requireAuthentication(request)
   let filters = await getDataTableFilters(request)
 
-  let where = getCollectionAuthReadWhere(user.id)
+  let where = whereUserCanReadCollection(user.id)
 
   let [count, rawCollections] = await db.$transaction([
     db.collection.count({
