@@ -63,7 +63,7 @@ export async function action({ request }: ActionFunctionArgs) {
     let form = await newApiKeyValidator.validate(formData)
 
     if (form.error) {
-      throw validationError(form.error)
+      return validationError(form.error)
     }
 
     let newKey = uuid()
@@ -91,7 +91,7 @@ export async function action({ request }: ActionFunctionArgs) {
     let form = await idValidator.validate(formData)
 
     if (form.error) {
-      throw validationError(form.error)
+      return validationError(form.error)
     }
 
     await db.apiKey.delete({

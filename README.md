@@ -57,6 +57,7 @@ docker compose up
 ```
 
 When running the server in a docker container for the first time, you might have to set up the database initially:
+
 ```
 docker compose exec web npm run e2e:setupdb
 ```
@@ -67,7 +68,7 @@ To run the tests:
 
 ```bash
 npx playwright install --with-deps
-npx remix-serve ./build/index.js & npx playwright test
+npm run e2e:test
 ```
 
 ## Deployment

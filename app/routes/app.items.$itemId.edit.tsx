@@ -4,7 +4,7 @@ import { redirect } from '@remix-run/node'
 import type {
   LoaderFunctionArgs,
   ActionFunctionArgs,
-  V2_MetaFunction,
+  MetaFunction,
 } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
@@ -15,9 +15,12 @@ import { zx } from 'zodix'
 import { z } from 'zod'
 import type { AllowedGeometry } from '~/types'
 import { prismaToStacItem } from '~/utils/prismaToStac'
-import { getCollectionAuthReadWhere } from '~/utils/authQueries'
+import {
+  whereUserCanReadItem,
+  whereUserCanWriteCollection,
+} from '~/utils/authQueries'
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [{ title: 'Edit metadata' }]
 }
 
@@ -34,13 +37,13 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
         },
       },
     },
-    where: getCollectionAuthReadWhere(user.id),
+    where: whereUserCanWriteCollection(user.id),
   })
 
   let defaultValues = await db.item.findUnique({
     where: {
+      ...whereUserCanReadItem(user.id),
       id: itemId,
-      collection: getCollectionAuthReadWhere(user.id),
     },
     include: {
       assets: true,

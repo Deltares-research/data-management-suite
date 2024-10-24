@@ -1,23 +1,25 @@
 {
   "name": "data-management-suite",
   "private": true,
+  "type": "module",
   "sideEffects": false,
   "version": "0.7.0",
   "scripts": {
-    "build": "remix build",
     "format": "prettier --write .",
     "lint": "eslint --cache --cache-location ./node_modules/.cache/eslint .",
-    "dev": "remix dev --manual",
+    "dev": "remix vite:dev",
+    "build": "remix vite:build",
+    "start": "prisma migrate deploy ; npm run serve",
+    "serve": "remix-serve ./build/server/index.js",
     "setup": "prisma generate && prisma migrate deploy && prisma db seed",
     "e2e": "npm run e2e:setupdb && npm run e2e:setupplaywright npm run e2e:test",
     "e2e:setupdb": "prisma migrate reset -f && prisma db seed",
     "e2e:setupplaywright": "playwright install --with-deps",
-    "e2e:test": "npx remix-serve ./build/index.js & playwright test",
-    "start": "prisma migrate deploy ; remix-serve ./build/index.js",
+    "e2e:test": "npm run serve & playwright test",
     "typecheck": "tsc -b"
   },
   "prisma": {
-    "seed": "ts-node --require tsconfig-paths/register prisma/seed.ts"
+    "seed": "bun prisma/seed.ts"
   },
   "eslintIgnore": [
     "/node_modules",
@@ -44,9 +46,8 @@
     "@radix-ui/react-separator": "^1.0.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@remix-run/css-bundle": "2.8.1",
-    "@remix-run/node": "2.3.0",
-    "@remix-run/react": "2.3.1",
+    "@remix-run/node": "2.8.1",
+    "@remix-run/react": "2.8.1",
     "@remix-run/serve": "2.8.1",
     "@remix-validated-form/with-zod": "^2.0.7",
     "@tailwindcss/typography": "0.5.10",
@@ -79,7 +80,7 @@
     "remix-auth-form": "^1.4.0",
     "remix-auth-microsoft": "^2.0.0",
     "remix-auth-oauth2": "^1.7.0",
-    "remix-validated-form": "^5.1.5",
+    "remix-validated-form": "5.1.5",
     "stac-spec": "github:radiantearth/stac-spec#v1.0.0",
     "tailwind-merge": "^2.1.0",
     "tailwindcss-animate": "^1.0.6",
@@ -89,9 +90,10 @@
     "zodix": "^0.4.1"
   },
   "devDependencies": {
+    "@mdx-js/rollup": "3.0.1",
     "@playwright/test": "^1.40.0",
-    "@remix-run/dev": "2.2.0",
-    "@remix-run/eslint-config": "2.3.1",
+    "@remix-run/dev": "2.8.1",
+    "@remix-run/eslint-config": "2.8.1",
     "@types/geojson": "^7946.0.10",
     "@types/mapbox__mapbox-gl-draw": "^1.4.6",
     "@types/mapbox-gl": "^2.7.11",
@@ -99,6 +101,7 @@
     "@types/react-dom": "^18.0.11",
     "@types/uuid": "^9.0.7",
     "autoprefixer": "^10.4.14",
+    "bun": "1.1.3",
     "eslint": "^8.55.0",
     "playwright": "^1.36.1",
     "prisma": "^5.11.0",
@@ -106,9 +109,15 @@
     "tailwindcss": "^3.3.6",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "5.2.8",
+    "vite-env-only": "2.2.1",
+    "vite-tsconfig-paths": "4.3.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.6.1"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=18.0.0"
   }
 }
