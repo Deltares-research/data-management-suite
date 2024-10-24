@@ -10,6 +10,7 @@ import geoserverPage from './options/geoserver.mdx'
 import tdsPage from './options/tds.mdx'
 import cloudPage from './options/cloud.mdx'
 import zenodoPage from './options/zenodo.mdx'
+import fourTUPage from './options/fourTU.mdx'
 
 export let storageCategories = [
   // {
@@ -453,6 +454,22 @@ export let storageOptions: StorageOption[] = [
     name: 'ZENODO',
     description: 'ZENODO',
     component: zenodoPage,
+    features: [
+      'project-related-no',
+      'project-related-yes',
+      'archive',
+      'size-less-than-5tb',
+      'size-more-than-5tb',
+      'confidentiality-no',
+      'access-n/a',
+    ],
+    maybeFeatures: [],
+  },
+  {
+    id: 'fourTU',
+    name: '4TU',
+    description: '4TU',
+    component: fourTUPage,
     features: [
       'project-related-no',
       'project-related-yes',

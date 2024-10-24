@@ -57,6 +57,7 @@ docker compose up
 ```
 
 When running the server in a docker container for the first time, you might have to set up the database initially:
+
 ```
 docker compose exec web npm run e2e:setupdb
 ```
@@ -78,7 +79,7 @@ For deployment instructions, refer to the `deployment` directory which should co
 
 We welcome contributions! Please follow these steps to contribute:
 
-1. Fork the repository.
+1. Clone the repository.
 2. Create a new branch (`git checkout -b feature/YourFeature`).
 3. Make your changes and commit them (`git commit -am 'Add some feature'`).
 4. Push to the branch (`git push origin feature/YourFeature`).
