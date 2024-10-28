@@ -468,7 +468,7 @@ export let storageOptions: StorageOption[] = [
   {
     id: 'fourTU',
     name: '4TU',
-    description: '4TU',
+    description: '4TU.ResearchData repository',
     component: fourTUPage,
     features: [
       'project-related-no',
