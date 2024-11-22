@@ -22,8 +22,9 @@ import { BookIcon, Plus, X } from 'lucide-react'
 import { randUuid } from '@ngneat/falso'
 import { H3, Muted } from '~/components/typography'
 import { routes } from '~/routes'
+import { serverOnly$ } from 'vite-env-only'
 
-export async function submitItemForm({
+export let submitItemForm = serverOnly$(async function submitItemForm({
   request,
   id,
 }: ActionFunctionArgs & { id?: string }) {
@@ -38,7 +39,7 @@ export async function submitItemForm({
   let form = await itemValidator.validate(formDataRaw)
 
   if (form.error) {
-    throw validationError(form.error)
+    return validationError(form.error)
   }
 
   let { geometry, collection, ...formData } = form.data
@@ -125,7 +126,7 @@ export async function submitItemForm({
     geometry,
     request,
   })
-}
+})
 
 export function ItemForm({
   defaultValues,

@@ -1,4 +1,4 @@
-import type { V2_MetaFunction } from '@remix-run/node'
+import type { MetaFunction } from '@remix-run/node'
 import { Link } from '@remix-run/react'
 import { ArrowRight } from 'lucide-react'
 import { H2, H3, Muted } from '~/components/typography'
@@ -13,7 +13,7 @@ import {
 } from '~/components/ui/card'
 import { routes } from '~/routes'
 
-export let meta: V2_MetaFunction = () => {
+export let meta: MetaFunction = () => {
   return [
     {
       title: 'Deltares Data Management Suite',

@@ -3,7 +3,7 @@ import { Access, Role } from '@prisma/client'
 import type { ActionFunctionArgs } from '@remix-run/node'
 import { redirect } from '@remix-run/node'
 import { withZod } from '@remix-validated-form/with-zod'
-import { Lock, Plus, Unlock, X } from 'lucide-react'
+import { Plus, Unlock, X, Lock } from 'lucide-react'
 import React from 'react'
 import {
   ValidatedForm,
@@ -24,6 +24,7 @@ import {
 } from '~/components/ui/form'
 import { SelectItem } from '~/components/ui/select'
 import { routes } from '~/routes'
+import { serverOnly$ } from 'vite-env-only'
 import { db } from '~/utils/db.server'
 
 let catalogSchema = z.object({
@@ -55,7 +56,7 @@ let catalogSchema = z.object({
 
 let catalogValidator = withZod(catalogSchema)
 
-export async function submitCatalogForm({
+export let submitCatalogForm = serverOnly$(async function submitCatalogForm({
   request,
   id,
 }: ActionFunctionArgs & { id?: string }) {
@@ -90,7 +91,7 @@ export async function submitCatalogForm({
   })
 
   return redirect(redirectUrl ?? routes.catalogs())
-}
+})
 
 export function CatalogForm({
   defaultValues,

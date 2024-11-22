@@ -12,6 +12,7 @@ import { FormInput } from '~/components/ui/form'
 import { routes } from '~/routes'
 import { requireAuthentication } from '~/services/auth.server'
 import { db } from '~/utils/db.server'
+import { serverOnly$ } from 'vite-env-only'
 
 let groupSchema = z.object({
   name: z.string(),
@@ -19,7 +20,7 @@ let groupSchema = z.object({
 
 let clientGroupValidator = withZod(groupSchema)
 
-export async function submitGroupForm({
+export let submitGroupForm = serverOnly$(async function submitGroupForm({
   request,
   id,
 }: ActionFunctionArgs & { id?: string }) {
@@ -94,7 +95,7 @@ export async function submitGroupForm({
   }
 
   return redirect(redirectUrl ?? routes.groups())
-}
+})
 
 export function GroupForm({
   defaultValues,

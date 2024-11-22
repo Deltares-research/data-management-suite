@@ -12,7 +12,7 @@ import { redirect } from '@remix-run/node'
 
 import { db } from '~/utils/db.server'
 import { ItemForm, submitItemForm } from '~/forms/items/ItemForm'
-import { getCollectionAuthContributeWhere } from '~/utils/authQueries'
+import { whereUserCanWriteCollection } from '~/utils/authQueries'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Register metadata' }]
@@ -29,7 +29,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
         },
       },
     },
-    where: getCollectionAuthContributeWhere(user.id),
+    where: whereUserCanWriteCollection(user.id),
   })
 
   return { collections }

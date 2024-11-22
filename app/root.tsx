@@ -1,4 +1,3 @@
-import { cssBundleHref } from '@remix-run/css-bundle'
 import type {
   ActionFunctionArgs,
   LinksFunction,
@@ -6,9 +5,9 @@ import type {
 } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
 import {
+  useRouteError,
   Link,
   Links,
-  LiveReload,
   Meta,
   NavLink,
   Outlet,
@@ -18,9 +17,9 @@ import {
   useMatches,
 } from '@remix-run/react'
 
-import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css'
-import mapboxDrawStyles from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import styles from './tailwind.css'
+import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css?url'
+import mapboxDrawStyles from '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css?url'
+import styles from './tailwind.css?url'
 import { Logo } from './components/Logo'
 import { routes } from './routes'
 import { createAuthenticator } from './services/auth.server'
@@ -38,10 +37,9 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: styles },
   { rel: 'stylesheet', href: mapboxStyles },
   { rel: 'stylesheet', href: mapboxDrawStyles },
-  ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
 ]
 
-export async function rootLoader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   let authenticator = createAuthenticator(request)
   let user = await authenticator.isAuthenticated(request)
 
@@ -54,8 +52,6 @@ export async function rootLoader({ request }: LoaderFunctionArgs) {
     },
   })
 }
-
-export let loader = rootLoader
 
 export async function action({ request }: ActionFunctionArgs) {
   let authenticator = createAuthenticator(request)
@@ -120,7 +116,6 @@ export default function App() {
 
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   )
@@ -138,4 +133,23 @@ function MenuItem(props: NavLinkProps) {
       {...props}
     />
   )
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError()
+
+  console.error(error)
+
+  if (error instanceof Error) {
+    return (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+        <p>The stack trace is:</p>
+        <pre>{error.stack}</pre>
+      </div>
+    )
+  } else {
+    return <h1>Unknown Error</h1>
+  }
 }

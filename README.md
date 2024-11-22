@@ -68,7 +68,7 @@ To run the tests:
 
 ```bash
 npx playwright install --with-deps
-npx remix-serve ./build/index.js & npx playwright test
+npm run e2e:test
 ```
 
 ## Deployment
