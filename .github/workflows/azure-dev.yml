@@ -104,8 +104,6 @@ jobs:
 
   provision:
     runs-on: ubuntu-latest
-    needs:
-      - end2endtest
     if: github.actor != 'dependabot[bot]'
     defaults:
       run:
@@ -221,8 +219,6 @@ jobs:
   build:
     name: Build and push container image
     runs-on: ubuntu-latest
-    needs:
-      - end2endtest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Checkout
