@@ -1,8 +1,9 @@
 import { cssBundleHref } from '@remix-run/css-bundle'
-import type {
-  ActionFunctionArgs,
-  LinksFunction,
-  LoaderFunctionArgs,
+import {
+  redirect,
+  type ActionFunctionArgs,
+  type LinksFunction,
+  type LoaderFunctionArgs,
 } from '@remix-run/node'
 import type { NavLinkProps } from '@remix-run/react'
 import {
@@ -42,6 +43,11 @@ export const links: LinksFunction = () => [
 ]
 
 export async function rootLoader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url)
+  if (!url.pathname.startsWith(routes.storageFinder())) {
+    return redirect(routes.storageFinder())
+  }
+
   let authenticator = createAuthenticator(request)
   let user = await authenticator.isAuthenticated(request)
 
