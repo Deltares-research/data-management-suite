@@ -31,7 +31,7 @@ jobs:
   end2endtest:
     name: End 2 end test
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     services:
       # Label used to access the service container
       postgres:
