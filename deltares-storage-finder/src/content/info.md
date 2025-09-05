@@ -10,13 +10,9 @@ The Deltares Data Storage Finder is a tool that helps you in getting an overview
 
 &nbsp;
 
-For more information and help with your data management needs and approach, contact your unit’s data steward:
+For more information and help with your data management needs and approach, contact the data stewards team via email:
 
-- Data Steward BGS 	[datasteward-bgs@deltares.nl](mailto:datasteward-bgs@deltares.nl)
-- Data Steward GEO	[datasteward-geo@deltares.nl](mailto:datasteward-geo@deltares.nl)
-- Data Steward HYE 	[datasteward-hye@deltares.nl](mailto:datasteward-hye@deltares.nl)
-- Data Steward ZKS 	[datasteward-zks@deltares.nl](mailto:datasteward-zks@deltares.nl)
-- Data Steward ZWS  [datasteward-zws@deltares.nl](mailto:datasteward-zws@deltares.nl)
+[datastewards@deltares.nl](mailto:datastewards@deltares.nl)
 
 &nbsp;
 
