@@ -69,7 +69,7 @@
     "mapbox-gl": "^2.15.0",
     "p-pipe": "^4.0.0",
     "react": "^18.2.0",
-    "react-code-blocks": "^0.1.4",
+    "react-code-blocks": "^0.1.6",
     "react-day-picker": "^8.8.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.49.0",
